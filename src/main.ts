@@ -27,6 +27,6 @@ async function bootstrap() {
   SwaggerModule.setup('', app, document);
   app.enableCors();
   app.useStaticAssets(join(__dirname, '../public'));
-  await app.listen(process.env.PORT || 3000, '0.0.0.0');
+  await app.listen(process.env.PORT || 8080, '0.0.0.0');
 }
 bootstrap();
