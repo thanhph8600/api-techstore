@@ -12,6 +12,8 @@ import { CategoryModule } from './controller/category/category.module';
 import { CategoryDetailModule } from './controller/category-detail/category-detail.module';
 import { BrandModule } from './controller/brand/brand.module';
 import { SpecificationModule } from './controller/specification/main/specification.module';
+import { ProductPriceModule } from './controller/variation/product-price/product-price.module';
+import { UploadModule } from './middleware/upload/upload.module';
 import mongoose from 'mongoose';
 
 @Module({
@@ -33,6 +35,8 @@ import mongoose from 'mongoose';
     CategoryDetailModule,
     BrandModule,
     SpecificationModule,
+    ProductPriceModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

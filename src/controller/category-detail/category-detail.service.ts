@@ -7,14 +7,14 @@ import { CreateCategoryDetailDto } from './dto/create-category-detail.dto';
 import { UpdateCategoryDetailDto } from './dto/update-category-detail.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { DetailCategory } from './schemas/category-detail.schema';
 import { CategoryService } from '../category/category.service';
+import { CategoryDetail } from './schemas/category-detail.schema';
 
 @Injectable()
 export class CategoryDetailService {
   constructor(
     @InjectModel('CategoryDetail')
-    private readonly detailCategoryModel: Model<DetailCategory>,
+    private readonly detailCategoryModel: Model<CategoryDetail>,
     private readonly categoryModel: CategoryService,
   ) {}
   async create(createCategoryDetailDto: CreateCategoryDetailDto) {

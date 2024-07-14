@@ -6,11 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { ShopService } from './shop.service';
-import { CreateShopDto } from './dto/create-shop.dto';
 import { UpdateShopDto } from './dto/update-shop.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from 'src/middleware/auth/auth.guard';
 
 @ApiBearerAuth()
 @ApiTags('shop')
@@ -18,9 +20,10 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 export class ShopController {
   constructor(private readonly shopService: ShopService) {}
 
+  @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createShopDto: CreateShopDto) {
-    return this.shopService.create(createShopDto);
+  create(@Request() req) {
+    return this.shopService.create(req.user);
   }
 
   @Get()
@@ -28,9 +31,10 @@ export class ShopController {
     return this.shopService.findAll();
   }
 
+  @UseGuards(AuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.shopService.findOne(+id);
+  findOne(@Request() req) {
+    return this.shopService.findByCustomer(req);
   }
 
   @Patch(':id')

@@ -1,15 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as MongooseSchema, ObjectId } from 'mongoose';
+import { Schema as MongooseSchema, Types, HydratedDocument } from 'mongoose';
 
-export type DetailCategoryDocument = HydratedDocument<DetailCategory>;
+export type CategoryDetailDocument = HydratedDocument<CategoryDetail>;
 
 @Schema()
-export class DetailCategory {
-  _id: string;
-  @Prop({
-    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Category' }],
-  })
-  id_category: ObjectId;
+export class CategoryDetail {
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Category' })
+  id_category: Types.ObjectId[];
 
   @Prop()
   name: string;
@@ -24,5 +21,5 @@ export class DetailCategory {
   slug: string;
 }
 
-export const DetailCategorySchema =
-  SchemaFactory.createForClass(DetailCategory);
+export const CategoryDetailSchema =
+  SchemaFactory.createForClass(CategoryDetail);
