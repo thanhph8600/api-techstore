@@ -43,7 +43,7 @@ export class AuthService {
   }
 
   async refreshToken(refresh_token: RefreshTokenDto) {
-    console.log(refresh_token);
+    // console.log(refresh_token);
     try {
       const payload = await this.jwtService.verifyAsync(
         refresh_token.refreshToken,
@@ -56,7 +56,7 @@ export class AuthService {
       }
       const user = await this.customerService.findOneWithPhone(payload.phone);
       const newPayload = this.payload(user);
-      console.log('user', newPayload);
+      // console.log('user', newPayload);
       return this.generateToken(newPayload);
     } catch (error) {
       console.log('error refresh token', error);

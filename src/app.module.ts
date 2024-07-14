@@ -13,6 +13,7 @@ import { CategoryDetailModule } from './controller/category-detail/category-deta
 import { BrandModule } from './controller/brand/brand.module';
 import { SpecificationModule } from './controller/specification/main/specification.module';
 import mongoose from 'mongoose';
+import { CartModule } from './controller/cart/cart.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import mongoose from 'mongoose';
     CategoryDetailModule,
     BrandModule,
     SpecificationModule,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [AppService],

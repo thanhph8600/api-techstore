@@ -11,6 +11,7 @@ import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Public } from 'src/middleware/auth/public';
 
 @ApiBearerAuth()
 @ApiTags('product')
@@ -22,7 +23,7 @@ export class ProductController {
   create(@Body() createProductDto: CreateProductDto) {
     return this.productService.create(createProductDto);
   }
-
+  @Public()
   @Get()
   findAll() {
     return this.productService.findAll();
