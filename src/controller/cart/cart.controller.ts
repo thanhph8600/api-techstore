@@ -40,7 +40,10 @@ export class CartController {
     return this.cartService.update(id, updateCartDto);
   }
   @Patch(':id/:productId')
-  removeChildItem(@Param('id') id: string, @Param('productId') productId: string) {
+  removeChildItem(
+    @Param('id') id: string,
+    @Param('productId') productId: string,
+  ) {
     return this.cartService.removeChildItem(id, productId);
   }
   @Delete(':id')
