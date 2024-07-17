@@ -53,6 +53,25 @@ export class ProductController {
     return this.productService.update(id, updateProductDto);
   }
 
+  @Patch('updateThumbnails/:id')
+  updateThumbnails(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+  ) {
+    return this.productService.updateThumbnail(id, updateProductDto);
+  }
+
+  @Patch('banned/:id')
+  banned(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+    return this.productService.update(id, updateProductDto);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('unlisted/:id')
+  unlisted(@Param('id') id: string, @Request() req, @Body() unlisted) {
+    return this.productService.updateBanned(id, req.user, unlisted);
+  }
+
   @Put('specification')
   updateSpecification(@Body() updateProductDto: UpdateProductDto) {
     return this.productService.updateProductSpecification(updateProductDto);

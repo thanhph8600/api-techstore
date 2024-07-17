@@ -96,4 +96,10 @@ export class ProductPriceService {
   remove(id: number) {
     return `This action removes a #${id} productPrice`;
   }
+
+  async removeByIdProduct(idProduct: string) {
+    await this.productpriceModel.deleteMany({ id_product: idProduct });
+    await this.variationColorModel.deleteMany({ id_product: idProduct });
+    await this.variationSizeModel.deleteMany({ id_product: idProduct });
+  }
 }

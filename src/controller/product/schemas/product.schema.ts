@@ -26,6 +26,12 @@ export class Product {
 
   @Prop({ default: 0 })
   view: number;
+
+  @Prop({ default: false })
+  banned: boolean;
+
+  @Prop({ default: false })
+  unlisted: boolean;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

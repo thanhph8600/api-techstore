@@ -26,6 +26,12 @@ export class CreateProductDto {
   view: number;
 
   @ApiProperty()
+  banned: boolean;
+
+  @ApiProperty()
+  unlisted: boolean;
+
+  @ApiProperty()
   specifications: {
     [key: string]: string;
   }[];

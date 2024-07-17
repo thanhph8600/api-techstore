@@ -12,6 +12,9 @@ export class VariationColor {
 
   @Prop()
   value: string;
+
+  @Prop()
+  thumbnail: string;
 }
 
 export const VariationColorSchema =
