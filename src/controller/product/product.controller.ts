@@ -29,6 +29,7 @@ export class ProductController {
   create(@Body() createProductDto: CreateProductDto, @Request() req) {
     return this.productService.create(createProductDto, req.user);
   }
+
   @Public()
   @Get()
   findAll() {

@@ -34,7 +34,6 @@ export class CustomerService {
         );
       }
       this.addUser(createCustomerDto);
-      return new HttpException('Đăng ký thành công!', HttpStatus.OK);
     } catch (error) {
       console.log('error', error);
       throw new InternalServerErrorException();
