@@ -15,6 +15,7 @@ import { SpecificationModule } from './controller/specification/main/specificati
 import { ProductPriceModule } from './controller/variation/product-price/product-price.module';
 import { UploadModule } from './middleware/upload/upload.module';
 import mongoose from 'mongoose';
+import { CartModule } from './controller/cart/cart.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import mongoose from 'mongoose';
     SpecificationModule,
     ProductPriceModule,
     UploadModule,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [AppService],

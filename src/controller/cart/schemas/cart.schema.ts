@@ -9,8 +9,8 @@ export class Cart {
   @Prop({ type: Types.ObjectId, required: true })
   customerId: Types.ObjectId;
 
-  @Prop([{ type: { productId: { type: Types.ObjectId }, quantity: { type: Number } }, _id: false }])
-  cartItems: { productId: Types.ObjectId; quantity: number }[];
+  @Prop([{ type: { productPriceId: { type: Types.ObjectId, ref: 'ProductPrice' }, quantity: { type: Number } }, _id: false }])
+  cartItems: { productPriceId: Types.ObjectId; quantity: number }[];
 }
 
 export const CartSchema = SchemaFactory.createForClass(Cart);
