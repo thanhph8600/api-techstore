@@ -4,11 +4,9 @@ import { Type } from 'class-transformer';
 
 export class CartItem {
   @ApiProperty()
-  @IsNotEmpty()
-  productId: string;
+  productPriceId: string;
 
   @ApiProperty()
-  @IsNotEmpty()
   quantity: number;
 }
 

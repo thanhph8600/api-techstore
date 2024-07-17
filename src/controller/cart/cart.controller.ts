@@ -11,6 +11,7 @@ import {
 import { CartService } from './cart.service';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
+import { Public } from 'src/middleware/auth/public';
 
 @Controller('cart')
 export class CartController {
@@ -25,14 +26,10 @@ export class CartController {
   findAll() {
     return this.cartService.findAll();
   }
-
+@Public()
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const cart = await this.cartService.findOne(id);
-    if (!cart) {
-      throw new NotFoundException(`Cart with customerId ${id} not found`);
-    }
-    return cart;
+    return this.cartService.findOne(id);
   }
 
   @Patch(':id')
@@ -40,7 +37,10 @@ export class CartController {
     return this.cartService.update(id, updateCartDto);
   }
   @Patch(':id/:productId')
-  removeChildItem(@Param('id') id: string, @Param('productId') productId: string) {
+  removeChildItem(
+    @Param('id') id: string,
+    @Param('productId') productId: string,
+  ) {
     return this.cartService.removeChildItem(id, productId);
   }
   @Delete(':id')
