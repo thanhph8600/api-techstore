@@ -55,6 +55,13 @@ export class ProductService {
   }
 
   async findAll() {
+    try {
+      const listProducts = await this.productModel.find();
+      return listProducts;
+    } catch (error) {
+      console.log('error find all product', error);
+      throw new InternalServerErrorException();
+    }
     const products = await this.productModel
       .find()
       .populate('id_shop')
