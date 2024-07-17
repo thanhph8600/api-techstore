@@ -97,7 +97,8 @@ export class AuthService {
 
   async register(signUpDto: CreateCustomerDto) {
     try {
-      return this.customerService.create(signUpDto);
+      const newCustomer = await this.customerService.create(signUpDto);
+      return newCustomer;
     } catch (error) {
       console.log('error', error);
       throw new InternalServerErrorException();
