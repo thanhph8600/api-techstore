@@ -12,6 +12,8 @@ import { CategoryModule } from './controller/category/category.module';
 import { CategoryDetailModule } from './controller/category-detail/category-detail.module';
 import { BrandModule } from './controller/brand/brand.module';
 import { SpecificationModule } from './controller/specification/main/specification.module';
+import { ProductPriceModule } from './controller/variation/product-price/product-price.module';
+import { UploadModule } from './middleware/upload/upload.module';
 import mongoose from 'mongoose';
 import { CartModule } from './controller/cart/cart.module';
 
@@ -35,6 +37,8 @@ import { CartModule } from './controller/cart/cart.module';
     BrandModule,
     SpecificationModule,
     CartModule,
+    ProductPriceModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

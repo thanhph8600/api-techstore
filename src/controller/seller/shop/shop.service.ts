@@ -1,17 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import { CreateShopDto } from './dto/create-shop.dto';
 import { UpdateShopDto } from './dto/update-shop.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Shop } from './entities/shop.entity';
+import { CustomerService } from 'src/controller/customer/customer.service';
 
 @Injectable()
 export class ShopService {
-  constructor(@InjectModel('Shop') private readonly shopModule: Model<Shop>) {}
+  constructor(
+    @InjectModel('Shop') private readonly shopModule: Model<Shop>,
+    private readonly customerService: CustomerService,
+  ) {}
 
-  create(createShopDto: CreateShopDto) {
-    console.log(createShopDto);
-    return 'This action adds a new shop';
+  async create(payload) {
+    const checkShop = await this.shopModule.findOne({
+      id_customer: payload.sub,
+    });
+    if (checkShop) {
+      return checkShop;
+    }
+    const newShop = {
+      id_customer: payload.sub,
+      name: payload.username,
+      thumbnail: payload.avata,
+    };
+    return await this.shopModule.create(newShop);
   }
 
   findAll() {
@@ -20,6 +33,10 @@ export class ShopService {
 
   findOne(id: number) {
     return `This action returns a #${id} shop`;
+  }
+
+  findByCustomer(req) {
+    return this.create(req.user);
   }
 
   update(id: number, updateShopDto: UpdateShopDto) {

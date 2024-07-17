@@ -43,7 +43,6 @@ export class AuthService {
   }
 
   async refreshToken(refresh_token: RefreshTokenDto) {
-    // console.log(refresh_token);
     try {
       const payload = await this.jwtService.verifyAsync(
         refresh_token.refreshToken,

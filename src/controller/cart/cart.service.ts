@@ -58,15 +58,19 @@ export class CartService {
       }
       const { productId, quantity } = updateCartDto;
       // console.log(cart.cartItems, productId, quantity)
-      const checkProductId = cart.cartItems.find((item: any) => item.productId == productId);
+      const checkProductId = cart.cartItems.find(
+        (item: any) => item.productId == productId,
+      );
       if (checkProductId) {
         checkProductId.quantity += quantity;
-        if(checkProductId.quantity <= 0) {
-          cart.cartItems = cart.cartItems.filter(item => item.productId != productId);  
+        if (checkProductId.quantity <= 0) {
+          cart.cartItems = cart.cartItems.filter(
+            (item) => item.productId != productId,
+          );
         }
-      }else if(quantity > 0) {
+      } else if (quantity > 0) {
         cart.cartItems.push({ productId, quantity });
-      }else {
+      } else {
         throw new HttpException('err', 401);
       }
       return await cart.save();
@@ -81,7 +85,9 @@ export class CartService {
       if (!cart) {
         throw new NotFoundException(`Cart with customerId ${id} not found`);
       }
-      cart.cartItems = cart.cartItems.filter((item: any) => item.productId != productId);
+      cart.cartItems = cart.cartItems.filter(
+        (item: any) => item.productId != productId,
+      );
       return await cart.save();
     } catch (error) {
       console.error('Error in removeChildItem:', error);

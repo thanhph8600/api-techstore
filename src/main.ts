@@ -15,7 +15,9 @@ async function bootstrap() {
     AppModule,
     new ExpressAdapter(expressApp),
   );
-
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads/',
+  });
   app.useGlobalPipes(new ValidationPipe());
   const config = new DocumentBuilder()
     .setTitle('Flea markets')

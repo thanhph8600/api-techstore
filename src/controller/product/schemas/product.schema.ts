@@ -1,32 +1,59 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as MongooseSchema, ObjectId } from 'mongoose';
+import { Document, Schema as MongooseSchema, Types } from 'mongoose';
 
-export type ProductDocument = HydratedDocument<Product>;
+export type ProductDocument = Product & Document;
 
 @Schema()
 export class Product {
   _id: string;
 
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Shop' }] })
-  id_shop: ObjectId;
+  id_shop: Types.ObjectId;
+
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'CategoryDetail' }],
+  })
+  id_categoryDetail: Types.ObjectId;
 
   @Prop()
   name: string;
 
   @Prop()
-  thumbnail: string;
+  thumbnails: string[];
 
   @Prop()
   description: string;
 
-  @Prop()
-  address: string;
-
   @Prop({ default: 0 })
-  count_follower: string;
-
-  @Prop({ default: 0 })
-  star: string;
+  view: number;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
+
+ProductSchema.virtual('product_specifications', {
+  ref: 'ProductSpecification',
+  localField: '_id',
+  foreignField: 'id_product',
+  justOne: false,
+});
+
+ProductSchema.virtual('variation_color', {
+  ref: 'VariationColor',
+  localField: '_id',
+  foreignField: 'id_product',
+  justOne: false,
+});
+
+ProductSchema.virtual('variation_size', {
+  ref: 'VariationSize',
+  localField: '_id',
+  foreignField: 'id_product',
+  justOne: false,
+});
+
+ProductSchema.virtual('product_price', {
+  ref: 'ProductPrice',
+  localField: '_id',
+  foreignField: 'id_product',
+  justOne: false,
+});
