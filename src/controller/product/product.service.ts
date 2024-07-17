@@ -113,7 +113,7 @@ export class ProductService {
     }
   }
 
-  async updateBanned(
+  async updateUnlisted(
     idProduct,
     payload: payload,
     unlisted: { unlisted: boolean },
@@ -128,6 +128,23 @@ export class ProductService {
         return new HttpException('Bạn không phải là người đăng', 401);
       }
       return await this.productModel.findByIdAndUpdate(idProduct, unlisted);
+    } catch (error) {
+      console.log('error find by id product' + error);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async updateBanned(idProduct, payload: payload, banned: { banned: boolean }) {
+    try {
+      const product = await this.productModel
+        .findById(idProduct)
+        .populate('id_shop')
+        .lean()
+        .exec();
+      if (product.id_shop[0].id_customer != payload.sub) {
+        return new HttpException('Bạn không phải là người đăng', 401);
+      }
+      return await this.productModel.findByIdAndUpdate(idProduct, banned);
     } catch (error) {
       console.log('error find by id product' + error);
       throw new InternalServerErrorException();

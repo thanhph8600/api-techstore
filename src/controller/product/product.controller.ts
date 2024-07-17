@@ -61,15 +61,16 @@ export class ProductController {
     return this.productService.updateThumbnail(id, updateProductDto);
   }
 
+  @UseGuards(AuthGuard)
   @Patch('banned/:id')
-  banned(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productService.update(id, updateProductDto);
+  banned(@Param('id') id: string, @Request() req, @Body() banned) {
+    return this.productService.updateBanned(id, req.user, banned);
   }
 
   @UseGuards(AuthGuard)
   @Patch('unlisted/:id')
   unlisted(@Param('id') id: string, @Request() req, @Body() unlisted) {
-    return this.productService.updateBanned(id, req.user, unlisted);
+    return this.productService.updateUnlisted(id, req.user, unlisted);
   }
 
   @Put('specification')
