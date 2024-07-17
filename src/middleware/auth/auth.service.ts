@@ -55,7 +55,7 @@ export class AuthService {
       }
       const user = await this.customerService.findOneWithPhone(payload.phone);
       const newPayload = this.payload(user);
-      console.log('user', newPayload);
+      // console.log('user', newPayload);
       return this.generateToken(newPayload);
     } catch (error) {
       console.log('error refresh token', error);

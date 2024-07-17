@@ -3,12 +3,8 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product } from './schemas/product.schema';
-import { Model, ObjectId } from 'mongoose';
-import { ShopService } from '../seller/shop/shop.service';
-import { ProductSpecification } from './schemas/product_specification.schema';
-import { CreateProductSpecificationDto } from './dto/create-product_specification.dto';
-import { ProductPriceService } from '../variation/product-price/product-price.service';
-
+import { Model } from 'mongoose';
+@Injectable()
 @Injectable()
 export class ProductService {
   constructor(
@@ -55,6 +51,13 @@ export class ProductService {
   }
 
   async findAll() {
+    try {
+      const listProducts = await this.productModal.find();
+      return listProducts;
+    } catch (error) {
+      console.log('error find all product', error);
+      throw new InternalServerErrorException();
+    }
     const products = await this.productModel
       .find()
       .populate('id_shop')
@@ -62,7 +65,6 @@ export class ProductService {
       .lean()
       .exec();
     return handleThumbnailListProduct(products);
-  }
 
   async findOne(id: ObjectId) {
     try {
