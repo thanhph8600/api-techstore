@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  NotFoundException,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartDto } from './dto/create-cart.dto';
@@ -26,7 +25,7 @@ export class CartController {
   findAll() {
     return this.cartService.findAll();
   }
-@Public()
+  @Public()
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.cartService.findOne(id);

@@ -17,8 +17,8 @@ export class CartService {
   ) {}
   async create(createCartDto: CreateCartDto) {
     try {
-        const newCart = new this.cartModel(createCartDto);
-        await newCart.save();
+      const newCart = new this.cartModel(createCartDto);
+      await newCart.save();
     } catch (error) {
       console.log('error cart create', error);
       throw new InternalServerErrorException();
@@ -36,27 +36,27 @@ export class CartService {
   async findOne(id: string): Promise<Cart> {
     try {
       const customerId = new Types.ObjectId(id);
-      const cart = await this.cartModel.findOne({ customerId: customerId })
-      .populate({
-        path: 'cartItems.productPriceId', 
-        select: 'id_color id_product id_size price stock',
-        populate: [
-          {
-          path: 'id_product',
-          select: 'id_shop , id_categoryDetail, name , thumbnails',
-            populate: {
-              path: 'id_shop',
-            }
-        },
-        {
-          path: 'id_color',
-        },
-        {
-          path: 'id_size',
-        },
-      ]
-
-      });     
+      const cart = await this.cartModel
+        .findOne({ customerId: customerId })
+        .populate({
+          path: 'cartItems.productPriceId',
+          select: 'id_color id_product id_size price stock',
+          populate: [
+            {
+              path: 'id_product',
+              select: 'id_shop , id_categoryDetail, name , thumbnails',
+              populate: {
+                path: 'id_shop',
+              },
+            },
+            {
+              path: 'id_color',
+            },
+            {
+              path: 'id_size',
+            },
+          ],
+        });
       if (!cart) {
         throw new NotFoundException(`Cart with customerId ${id} not found`);
       }
@@ -70,9 +70,13 @@ export class CartService {
   async update(id: string, updateCartDto: any): Promise<Cart> {
     try {
       const customerId = new Types.ObjectId(id);
-      const cart = await this.cartModel.findOne({ customerId: customerId }).exec();
+      const cart = await this.cartModel
+        .findOne({ customerId: customerId })
+        .exec();
       if (!cart) {
-        throw new NotFoundException(`Cart with customerId ${customerId} not found`);
+        throw new NotFoundException(
+          `Cart with customerId ${customerId} not found`,
+        );
       }
       const { productPriceId, quantity } = updateCartDto;
       // console.log(cart.cartItems, productId, quantity)
