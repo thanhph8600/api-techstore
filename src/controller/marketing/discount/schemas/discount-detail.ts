@@ -19,7 +19,7 @@ export class DiscountDetail {
   id_productPrice: Types.ObjectId;
 
   @Prop()
-  rabais: number;
+  percent: number;
 
   @Prop({
     type: MongooseSchema.Types.Mixed,

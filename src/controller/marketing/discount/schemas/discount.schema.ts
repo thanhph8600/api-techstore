@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema, ObjectId } from 'mongoose';
 
 export type DiscountDocument = HydratedDocument<Discount>;
 
@@ -8,7 +8,7 @@ export class Discount {
   _id: string;
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Shop' })
-  id_shop: string;
+  id_shop: ObjectId;
 
   @Prop()
   name: string;
