@@ -16,6 +16,8 @@ import { ProductPriceModule } from './controller/variation/product-price/product
 import { UploadModule } from './middleware/upload/upload.module';
 import mongoose from 'mongoose';
 import { CartModule } from './controller/cart/cart.module';
+import { DiscountModule } from './controller/marketing/discount/discount.module';
+import { VoucherModule } from './controller/marketing/voucher/voucher.module';
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { CartModule } from './controller/cart/cart.module';
     CartModule,
     ProductPriceModule,
     UploadModule,
+    DiscountModule,
+    VoucherModule,
   ],
   controllers: [AppController],
   providers: [AppService],

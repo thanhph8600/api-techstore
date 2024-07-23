@@ -11,6 +11,12 @@ export class Identification {
   id_shop: ObjectId;
 
   @Prop()
+  type_card:
+    | 'Căn Cước Công Dân (CCCD)'
+    | 'Chứng Minh Nhân Dân (CMND)'
+    | 'Passport';
+
+  @Prop()
   full_name: string;
 
   @Prop()

@@ -95,7 +95,14 @@ export class ProductService {
       .find<CreateProductDto[]>({
         id_shop,
       })
-      .populate('product_price')
+      .populate({
+        path: 'product_price',
+        populate: [{ path: 'id_color' }, { path: 'id_size' }],
+      })
+      .populate({
+        path: 'id_categoryDetail',
+        populate: { path: 'id_category' },
+      })
       .lean();
     return handleThumbnailListProduct(products);
   }

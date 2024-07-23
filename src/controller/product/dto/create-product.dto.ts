@@ -19,6 +19,9 @@ export class CreateProductDto {
   thumbnails: string[];
 
   @ApiProperty()
+  code: string;
+
+  @ApiProperty()
   @IsNotEmpty()
   description: string;
 

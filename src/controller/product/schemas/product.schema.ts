@@ -24,6 +24,9 @@ export class Product {
   @Prop()
   description: string;
 
+  @Prop()
+  code: string;
+
   @Prop({ default: 0 })
   view: number;
 

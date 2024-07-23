@@ -6,18 +6,22 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { IdentificationService } from './identification.service';
 import { CreateIdentificationDto } from './dto/create-identification.dto';
 import { UpdateIdentificationDto } from './dto/update-identification.dto';
+import { AuthGuard } from 'src/middleware/auth/auth.guard';
 
 @Controller('identification')
 export class IdentificationController {
   constructor(private readonly identificationService: IdentificationService) {}
 
+  @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createIdentificationDto: CreateIdentificationDto) {
-    return this.identificationService.create(createIdentificationDto);
+  create(@Request() req, @Body() create: CreateIdentificationDto) {
+    return this.identificationService.create(req.user, create);
   }
 
   @Get()
@@ -25,9 +29,10 @@ export class IdentificationController {
     return this.identificationService.findAll();
   }
 
+  @UseGuards(AuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.identificationService.findOne(+id);
+  findOne(@Request() req) {
+    return this.identificationService.findOne(req.user);
   }
 
   @Patch(':id')
@@ -35,7 +40,7 @@ export class IdentificationController {
     @Param('id') id: string,
     @Body() updateIdentificationDto: UpdateIdentificationDto,
   ) {
-    return this.identificationService.update(+id, updateIdentificationDto);
+    return this.identificationService.update(id, updateIdentificationDto);
   }
 
   @Delete(':id')
