@@ -55,13 +55,6 @@ export class ProductService {
   }
 
   async findAll() {
-    try {
-      const listProducts = await this.productModel.find();
-      return listProducts;
-    } catch (error) {
-      console.log('error find all product', error);
-      throw new InternalServerErrorException();
-    }
     const products = await this.productModel
       .find()
       .populate('id_shop')
@@ -83,6 +76,7 @@ export class ProductService {
           path: 'product_price',
           populate: [{ path: 'id_color' }, { path: 'id_size' }],
         })
+        .populate('id_shop')
         .lean()
         .exec();
       return handleThumbnailproduct(product);
@@ -121,6 +115,12 @@ export class ProductService {
 
   remove(id: number) {
     return `This action removes a #${id} product`;
+  }
+  async search(query: string) {
+    const products = await this.productModel.find({
+      name: { $regex: query, $options: 'i' },
+    }).select('name');
+    return products;
   }
 }
 

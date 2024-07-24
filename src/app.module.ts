@@ -16,6 +16,12 @@ import { ProductPriceModule } from './controller/variation/product-price/product
 import { UploadModule } from './middleware/upload/upload.module';
 import mongoose from 'mongoose';
 import { CartModule } from './controller/cart/cart.module';
+import { CartSelectModule } from './controller/cart-select/cart-select.module';
+import { OrderModule } from './controller/order/order.module';
+import { SubOrderModule } from './controller/sub-order/sub-order.module';
+import { SearchQueryModule } from './controller/search-query/search-query.module';
+import { HistorySearchModule } from './controller/history-search/history-search.module';
+import { CustomerRewardModule } from './controller/customer-reward/customer-reward.module';
 
 @Module({
   imports: [
@@ -39,6 +45,12 @@ import { CartModule } from './controller/cart/cart.module';
     ProductPriceModule,
     UploadModule,
     CartModule,
+    CartSelectModule,
+    OrderModule,
+    SubOrderModule,
+    SearchQueryModule,
+    HistorySearchModule,
+    CustomerRewardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

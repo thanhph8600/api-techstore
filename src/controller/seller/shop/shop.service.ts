@@ -47,4 +47,12 @@ export class ShopService {
   remove(id: number) {
     return `This action removes a #${id} shop`;
   }
+  async search(query: string) {
+    const shop = await this.shopModule
+      .find({
+        name: { $regex: query, $options: 'i' },
+      }).select('name')
+      .exec();
+    return shop;
+  }
 }

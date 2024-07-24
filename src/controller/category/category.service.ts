@@ -67,4 +67,20 @@ export class CategoryService {
   remove(id: number) {
     return `This action removes a #${id} category`;
   }
+  async search(query: string) {
+    try {
+      const categories = await this.categoryModel
+        .find({
+          $or: [
+            { name: { $regex: query, $options: 'i' } },
+            { slug: { $regex: query, $options: 'i' } },
+          ],
+        }).select('name slug')
+        .limit(10);
+      return categories;
+    } catch (error) {
+      console.log('error category search ', error);
+      throw new InternalServerErrorException();
+    }
+  }
 }

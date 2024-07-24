@@ -14,7 +14,7 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class CustomerService {
   constructor(
-    private readonly CartService: CartService,
+    private readonly cartService: CartService,
     @InjectModel('Customer') private readonly customerModel: Model<Customer>,
   ) {}
   async create(createCustomerDto: CreateCustomerDto) {
@@ -44,7 +44,7 @@ export class CustomerService {
         customerId: newUserCreated._id,
         cartItems: [],
       }
-      this.CartService.create(newUserCart);
+      this.cartService.create(newUserCart);
       return new HttpException('Đăng ký thành công!', HttpStatus.OK);
     } catch (error) {
       console.log('error', error);

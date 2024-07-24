@@ -84,8 +84,8 @@ export class ProductPriceService {
     return `This action returns all productPrice`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} productPrice`;
+  findOne(id: string) {
+    return this.productpriceModel.findById(id).exec();
   }
 
   update(id: number, updateProductPriceDto: UpdateProductPriceDto) {

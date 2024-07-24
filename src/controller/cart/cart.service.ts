@@ -9,16 +9,19 @@ import { CreateCartDto } from './dto/create-cart.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cart } from './schemas/cart.schema';
 import { Model, Types } from 'mongoose';
-import path from 'path';
+import { ProductPriceService } from '../variation/product-price/product-price.service';
+import { CartSelectService } from '../cart-select/cart-select.service';
 @Injectable()
 export class CartService {
   constructor(
     @InjectModel(Cart.name) private readonly cartModel: Model<Cart>,
+    private readonly productPriceService: ProductPriceService,
+    private readonly cartSelectService: CartSelectService
   ) {}
   async create(createCartDto: CreateCartDto) {
     try {
-        const newCart = new this.cartModel(createCartDto);
-        await newCart.save();
+      const newCart = new this.cartModel(createCartDto);
+      await newCart.save();
     } catch (error) {
       console.log('error cart create', error);
       throw new InternalServerErrorException();
@@ -37,26 +40,26 @@ export class CartService {
     try {
       const customerId = new Types.ObjectId(id);
       const cart = await this.cartModel.findOne({ customerId: customerId })
-      .populate({
-        path: 'cartItems.productPriceId', 
-        select: 'id_color id_product id_size price stock',
-        populate: [
-          {
-          path: 'id_product',
-          select: 'id_shop , id_categoryDetail, name , thumbnails',
-            populate: {
-              path: 'id_shop',
-            }
-        },
-        {
-          path: 'id_color',
-        },
-        {
-          path: 'id_size',
-        },
-      ]
+        .populate({
+          path: 'cartItems.productPriceId',
+          select: 'id_color id_product id_size price stock',
+          populate: [
+            {
+              path: 'id_product',
+              select: 'id_shop , id_categoryDetail, name , thumbnails',
+              populate: {
+                path: 'id_shop',
+              }
+            },
+            {
+              path: 'id_color',
+            },
+            {
+              path: 'id_size',
+            },
+          ]
 
-      });     
+        });
       if (!cart) {
         throw new NotFoundException(`Cart with customerId ${id} not found`);
       }
@@ -68,35 +71,41 @@ export class CartService {
   }
 
   async update(id: string, updateCartDto: any): Promise<Cart> {
-    try {
       const customerId = new Types.ObjectId(id);
       const cart = await this.cartModel.findOne({ customerId: customerId }).exec();
       if (!cart) {
         throw new NotFoundException(`Cart with customerId ${customerId} not found`);
       }
       const { productPriceId, quantity } = updateCartDto;
-      // console.log(cart.cartItems, productId, quantity)
       const checkProductId = cart.cartItems.find(
         (item: any) => item.productPriceId == productPriceId,
       );
+      const productPrice = await this.productPriceService.findOne(productPriceId);
       if (checkProductId) {
         checkProductId.quantity += quantity;
         if (checkProductId.quantity <= 0) {
           cart.cartItems = cart.cartItems.filter(
             (item) => item.productPriceId != productPriceId,
           );
+          const cartSelect = await this.cartSelectService.findOne(id);
+          const checkIfHave = cartSelect.listProductSelect.find(
+            (item: any) => item._id == productPriceId,
+          )
+          if(checkIfHave) {
+            this.cartSelectService.removeChildItem(id, updateCartDto);
+          }
+        } else if (checkProductId.quantity > productPrice.stock) {
+          checkProductId.quantity -= quantity;
+          throw new HttpException('Số lượng vượt quá kho', 299);
         }
       } else if (quantity > 0) {
         cart.cartItems.push({ productPriceId, quantity });
       } else {
-        throw new HttpException('err', 401);
+        throw new HttpException('Invalid quantity', 401);
       }
       return await cart.save();
-    } catch (error) {
-      console.error('Error in update:', error);
-      throw new InternalServerErrorException();
-    }
   }
+  
   async removeChildItem(id: string, productId: string): Promise<Cart> {
     try {
       const cart = await this.cartModel.findOne({ customerId: id }).exec();
