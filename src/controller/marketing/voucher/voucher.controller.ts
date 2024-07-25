@@ -14,7 +14,10 @@ import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
 import { AuthGuard } from 'src/middleware/auth/auth.guard';
 import { Public } from 'src/middleware/auth/public';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('voucher')
 @Controller('voucher')
 export class VoucherController {
   constructor(private readonly voucherService: VoucherService) {}

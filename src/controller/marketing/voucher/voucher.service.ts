@@ -76,6 +76,7 @@ export class VoucherService {
     const listVoucher = await this.voucherModel
       .find({ id_shop: idShop })
       .populate('id_product')
+      .sort({ created: -1 })
       .lean()
       .exec();
     return this.handleThumbnailListVoucher(listVoucher);
@@ -95,9 +96,10 @@ export class VoucherService {
     }
   }
 
-  remove(id: string) {
+  async remove(id: string) {
     try {
-      this.voucherModel.findByIdAndDelete(id);
+      console.log(id);
+      await this.voucherModel.findByIdAndDelete(id);
     } catch (error) {
       console.log('error update voucher');
       console.log(error);

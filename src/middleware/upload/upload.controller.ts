@@ -14,7 +14,6 @@ import { UploadService } from './upload.service';
 import { extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import * as fs from 'fs';
-import * as path from 'path';
 import { Response } from 'express';
 
 interface DeleteRequest {
@@ -71,33 +70,12 @@ export class UploadController {
   @Delete('files')
   async deleteFiles(@Body() body: DeleteRequest, @Res() res: Response) {
     try {
-      console.log(body);
       const { filesToDelete } = body;
-      console.log(filesToDelete);
-      filesToDelete.forEach((filename) => {
-        const filePath = path.join(
-          __dirname,
-          '../../../uploads',
-          getFilename(filename),
-        );
-        console.log(filePath);
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-        }
-      });
-
-      res.status(HttpStatus.OK).json({ message: 'Files deleted successfully' });
+      return await this.uploadService.deleteFile(filesToDelete);
     } catch (error) {
       res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ message: 'Error deleting files', error: error.message });
     }
   }
-}
-function getFilename(input) {
-  if (input.includes('/')) {
-    const parts = input.split('/');
-    return parts[parts.length - 1];
-  }
-  return input;
 }

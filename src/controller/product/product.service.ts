@@ -13,6 +13,7 @@ import { ProductSpecification } from './schemas/product_specification.schema';
 import { CreateProductSpecificationDto } from './dto/create-product_specification.dto';
 import { ProductPriceService } from '../variation/product-price/product-price.service';
 import { payload } from '../customer/interface/customer.interface';
+import { UploadService } from 'src/middleware/upload/upload.service';
 
 @Injectable()
 export class ProductService {
@@ -22,6 +23,7 @@ export class ProductService {
     private readonly productSpecificationModel: Model<ProductSpecification>,
     private readonly shopService: ShopService,
     private readonly productVariation: ProductPriceService,
+    private readonly uploadService: UploadService,
   ) {}
 
   async create(createProductDto: CreateProductDto, payload) {
@@ -199,8 +201,19 @@ export class ProductService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: string) {
+    try {
+      const product = await this.productModel.findById(id);
+      await this.productModel.findByIdAndDelete(id);
+      await this.productSpecificationModel.deleteMany({
+        id_product: product._id,
+      });
+      await this.productVariation.removeByIdProduct(product._id);
+      await this.uploadService.deleteFile(product.thumbnails);
+    } catch (error) {
+      console.log('error remove product' + error);
+      throw new InternalServerErrorException();
+    }
   }
 }
 

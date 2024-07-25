@@ -18,6 +18,7 @@ import mongoose from 'mongoose';
 import { CartModule } from './controller/cart/cart.module';
 import { DiscountModule } from './controller/marketing/discount/discount.module';
 import { VoucherModule } from './controller/marketing/voucher/voucher.module';
+import { AddressModule } from './controller/address/address.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { VoucherModule } from './controller/marketing/voucher/voucher.module';
     UploadModule,
     DiscountModule,
     VoucherModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [AppService],

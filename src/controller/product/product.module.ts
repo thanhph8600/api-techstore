@@ -10,6 +10,7 @@ import {
 } from './schemas/product_specification.schema';
 import { ProductPriceModule } from '../variation/product-price/product-price.module';
 import { CategoryDetailModule } from '../category-detail/category-detail.module';
+import { UploadModule } from 'src/middleware/upload/upload.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CategoryDetailModule } from '../category-detail/category-detail.module'
     ShopModule,
     ProductPriceModule,
     CategoryDetailModule,
+    UploadModule,
   ],
   controllers: [ProductController],
   providers: [ProductService],

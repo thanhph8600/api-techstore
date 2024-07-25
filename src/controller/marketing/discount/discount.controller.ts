@@ -14,7 +14,10 @@ import { CreateDiscountDto } from './dto/create-discount.dto';
 import { UpdateDiscountDto } from './dto/update-discount.dto';
 import { Public } from 'src/middleware/auth/public';
 import { AuthGuard } from 'src/middleware/auth/auth.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('discount')
 @Controller('discount')
 export class DiscountController {
   constructor(private readonly discountService: DiscountService) {}

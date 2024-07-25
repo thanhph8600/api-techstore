@@ -13,7 +13,10 @@ import { IdentificationService } from './identification.service';
 import { CreateIdentificationDto } from './dto/create-identification.dto';
 import { UpdateIdentificationDto } from './dto/update-identification.dto';
 import { AuthGuard } from 'src/middleware/auth/auth.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('identification')
 @Controller('identification')
 export class IdentificationController {
   constructor(private readonly identificationService: IdentificationService) {}

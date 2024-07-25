@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -13,14 +18,31 @@ export class UploadService {
     const filenames = files.map((file) => file.filename);
     return { message: 'Files uploaded successfully', filenames };
   }
-  deleteFile(filename: string) {
-    const filePath = path.join(__dirname, '../uploads', filename);
 
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-      return { message: 'File deleted successfully', filename };
-    } else {
-      throw new Error('File not found');
+  deleteFile(filesToDelete: string[]) {
+    try {
+      filesToDelete.forEach((filename) => {
+        const filePath = path.join(
+          __dirname,
+          '../../../uploads',
+          getFilename(filename),
+        );
+        console.log(filePath);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      });
+      return new HttpException('Xóa ảnh thành công!', HttpStatus.OK);
+    } catch (error) {
+      console.log('error deleteFile' + error);
+      throw new InternalServerErrorException();
     }
   }
+}
+function getFilename(input) {
+  if (input.includes('/')) {
+    const parts = input.split('/');
+    return parts[parts.length - 1];
+  }
+  return input;
 }
