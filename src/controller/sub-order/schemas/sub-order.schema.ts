@@ -19,7 +19,7 @@ export class SubOrder {
   @Prop({ type: Types.ObjectId, default: null })
   voucherShop: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, default: null })
+  @Prop({ type: Types.ObjectId, default: null, ref: 'Voucher' })
   voucher2t: Types.ObjectId;
 
   @Prop({ type: Number, default: 0 })
@@ -30,6 +30,9 @@ export class SubOrder {
 
   @Prop({ type: Number, default: 0 })
   totalDisCount: number;
+
+  @Prop({ type: Number, default: 0 })
+  coinRefunt: number;
 
   @Prop({ type: Types.ObjectId, default: null })
   voucherShipping: Types.ObjectId;
@@ -52,6 +55,8 @@ export class SubOrder {
 
   @Prop({ type: Number, default: 0 })
   total: number;
+
+  customerReward?: any
 }
 
 export const SubOrderSchema = SchemaFactory.createForClass(SubOrder);

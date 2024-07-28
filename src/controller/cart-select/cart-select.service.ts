@@ -42,7 +42,6 @@ export class CartSelectService {
       await this.cartSelectModal.create(newCartSlecte);
       const cartSelecte = await this.cartSelectModal.findOne({ customerId: customerId }).exec();
       cartSelecte.listProductSelect.push(productPriceId);
-      // console.log('cartSlecte', cartSelecte);
       return await cartSelecte.save();
     } else {
       const checkProductPriceId = CartSelect.listProductSelect.find((item: any) => item._id == productPriceId);
@@ -55,14 +54,21 @@ export class CartSelectService {
       }
     }
   }
+  async selectAll(id: string , updateCartSlecteDto: any): Promise<CartSelect> {
+    const customerId = new Types.ObjectId(id);
+    if(updateCartSlecteDto.type === 'true') {
+      const CartSelect = await this.cartSelectModal.findOneAndUpdate({ customerId: customerId }, {listProductSelect: updateCartSlecteDto.listProductSelect}).exec();
+      return CartSelect;
+    }else {
+      const CartSelect = await this.cartSelectModal.findOneAndUpdate({ customerId: customerId }, {listProductSelect: []}).exec();
+      return CartSelect;
+    }
+  }
   async removeChildItem(id: string, updateCartSlecteDto: any): Promise<CartSelect> {
     const customerId = new Types.ObjectId(id);
     const { productPriceId } = updateCartSlecteDto;
     try {
       const CartSelect = await this.cartSelectModal.findOne({ customerId: customerId }).exec();
-      console.log('CartSelect', CartSelect);
-      console.log('productId', updateCartSlecteDto);
-      
       if (!CartSelect) {
         throw new NotFoundError(`Cart with customerId ${id} not found`);
       }

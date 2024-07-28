@@ -7,8 +7,14 @@ export type IdentificationDocument = HydratedDocument<Identification>;
 export class Identification {
   _id: string;
 
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Shop' }] })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Shop' })
   id_shop: ObjectId;
+
+  @Prop()
+  type_card:
+    | 'Căn Cước Công Dân (CCCD)'
+    | 'Chứng Minh Nhân Dân (CMND)'
+    | 'Passport';
 
   @Prop()
   full_name: string;

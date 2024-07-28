@@ -9,7 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { CategoryService } from '../category/category.service';
 import { CategoryDetail } from './schemas/category-detail.schema';
-
+import * as diacritics from 'diacritics';
 @Injectable()
 export class CategoryDetailService {
   constructor(
@@ -109,4 +109,25 @@ export class CategoryDetailService {
   remove(id: number) {
     return `This action removes a #${id} categoryDetail`;
   }
+  fintOneByName(name: string) {
+    return this.detailCategoryModel.findOne({ name: name });
+  }
+  async search(query: string) {
+    try {
+      const normalizedQuery = diacritics.remove(query)
+        .replace(/[^\w\s]/g, '')  
+        .replace(/\s+/g, '\\s*'); 
+      const categorydetails = await this.detailCategoryModel.find().select('name slug');
+      const result = categorydetails.filter(cat => {
+        const normalizedCatName = diacritics.remove(cat.name);
+        const normalizedCatSlug = diacritics.remove(cat.slug);
+        return new RegExp(normalizedQuery, 'i').test(normalizedCatName) || new RegExp(normalizedQuery, 'i').test(normalizedCatSlug);
+      });
+      return result;
+    } catch (error) {
+      console.log('Error category detail search:', error);
+      throw new InternalServerErrorException();
+    }
+  }
+  
 }

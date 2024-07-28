@@ -37,9 +37,10 @@ export class ShopController {
     return this.shopService.findByCustomer(req);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateShopDto: UpdateShopDto) {
-    return this.shopService.update(+id, updateShopDto);
+  @UseGuards(AuthGuard)
+  @Patch()
+  update(@Request() req, @Body() updateShopDto: UpdateShopDto) {
+    return this.shopService.update(req.user, updateShopDto);
   }
 
   @Delete(':id')

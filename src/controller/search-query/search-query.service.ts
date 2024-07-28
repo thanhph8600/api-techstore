@@ -1,21 +1,15 @@
-    import { Injectable } from '@nestjs/common';
-    import { ProductService } from '../product/product.service';
-    import { ShopService } from '../seller/shop/shop.service';
-import { CategoryService } from '../category/category.service';
+import { Injectable } from '@nestjs/common';
+import { CategoryDetailService } from '../category-detail/category-detail.service';
 
     @Injectable()
     export class SearchQueryService {
         constructor(
-            private readonly productService: ProductService , 
-            private readonly shopService : ShopService ,
-            private readonly categoryService: CategoryService
+            private readonly categoryDetailService: CategoryDetailService
         ) {}
 
         async searchQuery(query: string) {
-            const productQuery = await this.productService.search(query);
-            const shopQuery = await this.shopService.search(query);
-            const categoryQuery = await this.categoryService.search(query);
-            const combinedResults = [...categoryQuery,...productQuery, ...shopQuery];
+            const categoryQuery = await this.categoryDetailService.search(query);
+            const combinedResults = [...categoryQuery];
             return combinedResults.slice(0, 6);
         }
 

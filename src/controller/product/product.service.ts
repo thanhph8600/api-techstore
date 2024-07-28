@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -8,19 +12,21 @@ import { ShopService } from '../seller/shop/shop.service';
 import { ProductSpecification } from './schemas/product_specification.schema';
 import { CreateProductSpecificationDto } from './dto/create-product_specification.dto';
 import { ProductPriceService } from '../variation/product-price/product-price.service';
+import { payload } from '../customer/interface/customer.interface';
+import { CategoryDetailService } from '../category-detail/category-detail.service';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectModel(Product.name) private readonly productModel: Model<Product>,
     @InjectModel(ProductSpecification.name)
-    private readonly productSpecificationService: Model<ProductSpecification>,
+    private readonly productSpecificationModel: Model<ProductSpecification>,
     private readonly shopService: ShopService,
     private readonly productVariation: ProductPriceService,
+    private readonly categoryDetailService: CategoryDetailService,
   ) {}
 
   async create(createProductDto: CreateProductDto, payload) {
-    console.log(createProductDto);
     const shop = await this.shopService.create(payload);
     createProductDto.id_shop = shop._id;
     const newProduct = await this.productModel.create(createProductDto);
@@ -44,9 +50,10 @@ export class ProductService {
   async createProductSpecification(
     createProductSpecification: CreateProductSpecificationDto,
   ) {
-    this.productSpecificationService.create(createProductSpecification);
+    this.productSpecificationModel.create(createProductSpecification);
   }
-  createVariationProduct(idProduct, variation) {
+  async createVariationProduct(idProduct, variation) {
+    // await this.productVariation.
     this.productVariation.createVariation(idProduct, variation);
   }
 
@@ -59,6 +66,7 @@ export class ProductService {
       .find()
       .populate('id_shop')
       .populate('product_price')
+      .populate('id_categoryDetail')
       .lean()
       .exec();
     return handleThumbnailListProduct(products);
@@ -91,22 +99,105 @@ export class ProductService {
       .find<CreateProductDto[]>({
         id_shop,
       })
+      .populate({
+        path: 'product_price',
+        populate: [{ path: 'id_color' }, { path: 'id_size' }],
+      })
+      .populate({
+        path: 'id_categoryDetail',
+        populate: { path: 'id_category' },
+      })
       .lean();
     return handleThumbnailListProduct(products);
   }
 
-  update(id: string, updateProductDto: UpdateProductDto) {
+  async update(id: string, updateProductDto: UpdateProductDto) {
     try {
+      if (updateProductDto.variation) {
+        await this.productVariation.removeByIdProduct(id);
+        await this.createVariationProduct(id, updateProductDto.variation);
+      }
       return this.productModel.findByIdAndUpdate(id, updateProductDto);
     } catch (error) {
       console.log('error update product' + error);
       throw new InternalServerErrorException();
     }
   }
+  
 
-  updateProductSpecification(updateProductDto: UpdateProductDto) {
+  async updateUnlisted(
+    idProduct,
+    payload: payload,
+    unlisted: { unlisted: boolean },
+  ) {
     try {
-      console.log(updateProductDto);
+      const product = await this.productModel
+        .findById(idProduct)
+        .populate('id_shop')
+        .lean()
+        .exec();
+      if (product.id_shop[0].id_customer != payload.sub) {
+        return new HttpException('Bạn không phải là người đăng', 401);
+      }
+      return await this.productModel.findByIdAndUpdate(idProduct, unlisted);
+    } catch (error) {
+      console.log('error find by id product' + error);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async updateBanned(idProduct, payload: payload, banned: { banned: boolean }) {
+    try {
+      const product = await this.productModel
+        .findById(idProduct)
+        .populate('id_shop')
+        .lean()
+        .exec();
+      if (product.id_shop[0].id_customer != payload.sub) {
+        return new HttpException('Bạn không phải là người đăng', 401);
+      }
+      return await this.productModel.findByIdAndUpdate(idProduct, banned);
+    } catch (error) {
+      console.log('error find by id product' + error);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  updateThumbnail(id_product: string, thumbnails) {
+    try {
+      return this.productModel.findByIdAndUpdate(id_product, thumbnails);
+    } catch (error) {
+      console.log('error update product' + error);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async updateProductSpecification(updateProductDto) {
+    try {
+      const id_product = updateProductDto.id_product;
+      Object.keys(updateProductDto.specification).map(async (key) => {
+        const id_specification = key;
+        const id_specification_detail = updateProductDto.specification[key];
+        const check = await this.productSpecificationModel.find({
+          id_product: id_product,
+          id_specifications: id_specification,
+        });
+        if (check.length > 0) {
+          return this.productSpecificationModel.findByIdAndUpdate(
+            check[0]._id,
+            {
+              id_specifications_detail: id_specification_detail,
+            },
+          );
+        } else {
+          const specification: CreateProductSpecificationDto = {
+            id_product: id_product,
+            id_specifications: id_specification,
+            id_specifications_detail: id_specification_detail,
+          };
+          await this.createProductSpecification(specification);
+        }
+      });
     } catch (error) {
       console.log('error update product' + error);
       throw new InternalServerErrorException();
@@ -116,14 +207,7 @@ export class ProductService {
   remove(id: number) {
     return `This action removes a #${id} product`;
   }
-  async search(query: string) {
-    const products = await this.productModel.find({
-      name: { $regex: query, $options: 'i' },
-    }).select('name');
-    return products;
-  }
 }
-
 export function handleThumbnailListProduct(listProduct) {
   const updatedProducts = listProduct.map((product) => {
     return handleThumbnailproduct(product);

@@ -22,7 +22,8 @@ import { SubOrderModule } from './controller/sub-order/sub-order.module';
 import { SearchQueryModule } from './controller/search-query/search-query.module';
 import { HistorySearchModule } from './controller/history-search/history-search.module';
 import { CustomerRewardModule } from './controller/customer-reward/customer-reward.module';
-
+import { DiscountModule } from './controller/marketing/discount/discount.module';
+import { VoucherModule } from './controller/marketing/voucher/voucher.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
@@ -51,6 +52,11 @@ import { CustomerRewardModule } from './controller/customer-reward/customer-rewa
     SearchQueryModule,
     HistorySearchModule,
     CustomerRewardModule,
+    CartModule,
+    ProductPriceModule,
+    UploadModule,
+    DiscountModule,
+    VoucherModule,
   ],
   controllers: [AppController],
   providers: [AppService],

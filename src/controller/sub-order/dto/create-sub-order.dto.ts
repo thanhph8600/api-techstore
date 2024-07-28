@@ -48,6 +48,11 @@ export class CreateSubOrderDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsNumber()
+  coinRefunt?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumber()
   costShipping?: number;
 
   @ApiProperty({ required: false })

@@ -75,7 +75,11 @@ export class UploadController {
       const { filesToDelete } = body;
       console.log(filesToDelete);
       filesToDelete.forEach((filename) => {
-        const filePath = path.join(__dirname, '../../../uploads', filename);
+        const filePath = path.join(
+          __dirname,
+          '../../../uploads',
+          getFilename(filename),
+        );
         console.log(filePath);
         if (fs.existsSync(filePath)) {
           fs.unlinkSync(filePath);
@@ -89,4 +93,12 @@ export class UploadController {
         .json({ message: 'Error deleting files', error: error.message });
     }
   }
+}
+
+function getFilename(input) {
+  if (input.includes('/')) {
+    const parts = input.split('/');
+    return parts[parts.length - 1];
+  }
+  return input;
 }

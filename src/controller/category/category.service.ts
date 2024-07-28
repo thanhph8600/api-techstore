@@ -67,7 +67,7 @@ export class CategoryService {
   remove(id: number) {
     return `This action removes a #${id} category`;
   }
-  async search(query: string) {
+  async search(query: string) {    
     try {
       const categories = await this.categoryModel
         .find({

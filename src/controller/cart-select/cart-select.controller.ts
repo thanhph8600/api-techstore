@@ -26,6 +26,11 @@ export class CartSelectController {
   update(@Param('id') id: string, @Body() updateCartSelectDto: UpdateCartSelectDto) {
     return this.cartSelectService.update(id, updateCartSelectDto);
   }
+
+  @Patch('select-all/:id')
+  selectAll(@Param('id') id: string, @Body() updateCartSelectDto: UpdateCartSelectDto) {
+    return this.cartSelectService.selectAll(id, updateCartSelectDto);
+  }
   @Patch('remove-child-item/:id')
   removeChildItem(@Param('id') id: string, @Body() updateCartSelectDto: UpdateCartSelectDto) {
     return this.cartSelectService.removeChildItem(id, updateCartSelectDto);

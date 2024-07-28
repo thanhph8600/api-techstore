@@ -9,6 +9,7 @@ import {
   UseGuards,
   Request,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -29,6 +30,7 @@ export class ProductController {
   create(@Body() createProductDto: CreateProductDto, @Request() req) {
     return this.productService.create(createProductDto, req.user);
   }
+
   @Public()
   @Get()
   findAll() {
@@ -50,6 +52,26 @@ export class ProductController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.update(id, updateProductDto);
+  }
+
+  @Patch('updateThumbnails/:id')
+  updateThumbnails(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+  ) {
+    return this.productService.updateThumbnail(id, updateProductDto);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('banned/:id')
+  banned(@Param('id') id: string, @Request() req, @Body() banned) {
+    return this.productService.updateBanned(id, req.user, banned);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('unlisted/:id')
+  unlisted(@Param('id') id: string, @Request() req, @Body() unlisted) {
+    return this.productService.updateUnlisted(id, req.user, unlisted);
   }
 
   @Put('specification')

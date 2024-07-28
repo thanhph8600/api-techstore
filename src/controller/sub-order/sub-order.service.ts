@@ -4,9 +4,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { SubOrder } from './schemas/sub-order.schema';
 import { Model, Types } from 'mongoose';
 import { UpdateSubOrderDto } from './dto/update-sub-order.dto';
+import { CustomerRewardService } from '../customer-reward/customer-reward.service';
+import { VoucherService } from '../marketing/voucher/voucher.service';
 @Injectable()
 export class SubOrderService {
-  constructor(@InjectModel(SubOrder.name) private subOrderModel: Model<SubOrder>) { }
+  constructor(@InjectModel(SubOrder.name) private subOrderModel: Model<SubOrder>,
+    private readonly customerReward: CustomerRewardService,
+    private readonly voucherService: VoucherService
+  ) { }
   async create(createSubOrderDto: CreateSubOrderDto) {
     try {
       const newSubOrder = new this.subOrderModel(createSubOrderDto);
@@ -46,8 +51,14 @@ export class SubOrderService {
         .populate({
           path: 'customerId',
           select: 'name , phone , avata',
-        });
-      return subOrder;
+        })
+        .populate({
+          path: 'voucher2t',
+          select: 'name , percent , code, maximum_reduction',
+        })
+      const customerReward = await this.customerReward.findOne(id);
+      const data = { subOrder, customerReward };
+      return data;
     } catch (error) {
       console.log('error cartSlecte findOne', error);
       throw new InternalServerErrorException();
@@ -62,10 +73,41 @@ export class SubOrderService {
         subOrder.total = subOrder.total + subOrder.costShipping - 25000;
         await subOrder.save();
       }
+      if (updateSubOrderDto.coin) {
+        subOrder.total = subOrder.total - updateSubOrderDto.coin;
+        await subOrder.save();
+      }
       if (!subOrder) {
         throw new NotFoundException(`SubOrder with ID ${id} not found`);
       }
-
+      if (updateSubOrderDto.voucher2t) {
+        const dataVoucher = await this.voucherService.findByIdVoucher(updateSubOrderDto.voucher2t);
+        if (dataVoucher.type === 'price') {
+          const discountAmount = subOrder.total * (dataVoucher.percent / 100);
+          if(discountAmount > dataVoucher.maximum_reduction){
+            subOrder.totalDisCount = dataVoucher.maximum_reduction;
+            subOrder.coinRefunt = 0;
+            await subOrder.save();
+          }else {
+            subOrder.totalDisCount = discountAmount;
+            subOrder.coinRefunt = 0;
+            await subOrder.save();
+          }
+        } else if (dataVoucher.type === 'coin') {
+          const coinAmount = subOrder.total * (dataVoucher.percent / 100);
+          if(coinAmount > dataVoucher.maximum_reduction){
+            subOrder.coinRefunt = dataVoucher.maximum_reduction;
+            subOrder.totalDisCount = 0;
+            await subOrder.save();
+          }else {
+            subOrder.coinRefunt = coinAmount;
+            subOrder.totalDisCount = 0;
+            await subOrder.save();
+          }
+        }else {
+          return subOrder
+        }
+      }
       return subOrder;
     } catch (error) {
       console.error('Error updating sub-order:', error.message || error);

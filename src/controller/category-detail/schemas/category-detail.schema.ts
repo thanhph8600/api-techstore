@@ -6,7 +6,7 @@ export type CategoryDetailDocument = HydratedDocument<CategoryDetail>;
 @Schema()
 export class CategoryDetail {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Category' })
-  id_category: Types.ObjectId[];
+  id_category: Types.ObjectId;
 
   @Prop()
   name: string;

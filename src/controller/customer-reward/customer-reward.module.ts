@@ -10,5 +10,6 @@ import { CustomerReward, CustomerRewardSchema } from './schemas/customer-reward.
   ],
   controllers: [CustomerRewardController],
   providers: [CustomerRewardService],
+  exports: [CustomerRewardService]
 })
 export class CustomerRewardModule {}

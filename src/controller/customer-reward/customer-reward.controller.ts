@@ -19,7 +19,7 @@ export class CustomerRewardController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.customerRewardService.findOne(+id);
+    return this.customerRewardService.findOne(id);
   }
 
   @Patch(':id')

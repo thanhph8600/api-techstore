@@ -3,8 +3,14 @@ import { IsNotEmpty } from 'class-validator';
 import { ObjectId } from 'mongoose';
 export class CreateIdentificationDto {
   @ApiProperty()
-  @IsNotEmpty()
   id_shop: ObjectId;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  type_card:
+    | 'Căn Cước Công Dân (CCCD)'
+    | 'Chứng Minh Nhân Dân (CMND)'
+    | 'Passport';
 
   @ApiProperty()
   @IsNotEmpty()

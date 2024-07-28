@@ -15,7 +15,7 @@ import { Public } from 'src/middleware/auth/public';
 
 @Controller('cart')
 export class CartController {
-  constructor(private readonly cartService: CartService) {}
+  constructor(private readonly cartService: CartService) { }
 
   @Post()
   create(@Body() createCartDto: CreateCartDto) {
@@ -26,7 +26,7 @@ export class CartController {
   findAll() {
     return this.cartService.findAll();
   }
-@Public()
+  @Public()
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.cartService.findOne(id);
@@ -36,12 +36,10 @@ export class CartController {
   update(@Param('id') id: string, @Body() updateCartDto: UpdateCartDto) {
     return this.cartService.update(id, updateCartDto);
   }
-  @Patch(':id/:productId')
+  @Patch('/remove-child-item/:id')
   removeChildItem(
-    @Param('id') id: string,
-    @Param('productId') productId: string,
-  ) {
-    return this.cartService.removeChildItem(id, productId);
+    @Param('id') id: string, @Body() updateCartDto: UpdateCartDto) {
+    return this.cartService.removeChildItem(id, updateCartDto);
   }
   @Delete(':id')
   remove(@Param('id') id: string) {

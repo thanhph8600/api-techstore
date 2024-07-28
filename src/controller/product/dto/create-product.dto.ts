@@ -19,11 +19,20 @@ export class CreateProductDto {
   thumbnails: string[];
 
   @ApiProperty()
+  code: string;
+
+  @ApiProperty()
   @IsNotEmpty()
   description: string;
 
   @ApiProperty()
   view: number;
+
+  @ApiProperty()
+  banned: boolean;
+
+  @ApiProperty()
+  unlisted: boolean;
 
   @ApiProperty()
   specifications: {

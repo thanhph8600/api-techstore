@@ -3,7 +3,7 @@ import { IsNotEmpty } from 'class-validator';
 export class CreateCustomerRewardDto {
     @ApiProperty()
     @IsNotEmpty()
-    customer_id: string;
+    customerId: string;
 
     coin: number;
 

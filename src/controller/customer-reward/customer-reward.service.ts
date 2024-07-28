@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateCustomerRewardDto } from './dto/create-customer-reward.dto';
 import { UpdateCustomerRewardDto } from './dto/update-customer-reward.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose'
+import { Model, Types } from 'mongoose'
 import { CustomerReward } from './schemas/customer-reward.schema';
 
 @Injectable()
@@ -24,8 +24,13 @@ export class CustomerRewardService {
     return `This action returns all customerReward`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} customerReward`;
+  async findOne(id: string): Promise<CustomerReward> {
+    const customerReward = await this.customerRewardModel.findOne({ customerId: id }).exec();
+    if(!customerReward) {
+      const newCustomerReward = this.create({customerId: id, coin: 0, voucher: []});
+      return newCustomerReward;
+    }
+    return customerReward;
   }
 
   update(id: number, updateCustomerRewardDto: UpdateCustomerRewardDto) {
