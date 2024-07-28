@@ -15,11 +15,20 @@ export class Address extends Document {
   @Prop({})
   address: string;
 
-  @Prop({ default: 'Nhà riêng' })
-  addressType: string;
+  @Prop({ default: false })
+  addressType: boolean;
 
   @Prop({ default: false })
   isDefault: boolean;
+
+  @Prop({})
+  province: string;
+
+  @Prop({})
+  district: string;
+  
+  @Prop({})
+  ward: string
 }
 
 export const AddressSchema = SchemaFactory.createForClass(Address);
