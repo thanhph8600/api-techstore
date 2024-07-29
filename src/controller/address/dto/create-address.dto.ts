@@ -21,7 +21,19 @@ export class CreateAddressDto {
   @ApiProperty()
   address: string;
 
-  addressType: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  province: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  district: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  ward: string;
+
+  addressType: boolean;
 
   isDefault: boolean;
 }
