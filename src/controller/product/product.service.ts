@@ -30,6 +30,7 @@ export class ProductService {
     const shop = await this.shopService.create(payload);
     createProductDto.id_shop = shop._id;
     const newProduct = await this.productModel.create(createProductDto);
+
     if (createProductDto.specifications) {
       Object.keys(createProductDto.specifications).map(async (key) => {
         const specification: CreateProductSpecificationDto = {
@@ -40,6 +41,7 @@ export class ProductService {
         await this.createProductSpecification(specification);
       });
     }
+
     if (createProductDto.variation) {
       this.createVariationProduct(newProduct._id, createProductDto.variation);
     }
