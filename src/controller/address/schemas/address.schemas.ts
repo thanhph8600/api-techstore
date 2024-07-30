@@ -26,9 +26,9 @@ export class Address extends Document {
 
   @Prop({})
   district: string;
-  
+
   @Prop({})
-  ward: string
+  ward: string;
 }
 
 export const AddressSchema = SchemaFactory.createForClass(Address);

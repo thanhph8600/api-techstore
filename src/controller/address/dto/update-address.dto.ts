@@ -34,10 +34,6 @@ export class UpdateAddressDto extends PartialType(CreateAddressDto) {
 export class UpdateIsDefault {
   @ApiProperty()
   @IsNotEmpty()
-  addressId: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
   customerId: string;
 }
 

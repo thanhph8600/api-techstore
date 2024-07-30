@@ -40,6 +40,7 @@ export class DiscountController {
     return this.discountService.findByIdShop(req.user);
   }
 
+  @Public()
   @Get(':id')
   findByIdDiscount(@Param('id') id: string) {
     return this.discountService.findByIdDiscount(id);

@@ -69,7 +69,6 @@ export class AddressService {
     }
   }
 
-
   async findAll(): Promise<Address[]> {
     return this.addressModel.find().exec();
   }

@@ -51,7 +51,10 @@ export class VoucherService {
   async findByIdVoucher(id: string) {
     const voucher = await this.voucherModel
       .findById(id)
-      .populate('id_product')
+      .populate({
+        path: 'id_product',
+        populate: [{ path: 'product_price' }],
+      })
       .lean()
       .exec();
     if (voucher.id_product.length > 0) {

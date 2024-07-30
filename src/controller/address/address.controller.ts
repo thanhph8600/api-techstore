@@ -1,4 +1,18 @@
-import { Controller, Get, Post, Body, Param, UsePipes, ValidationPipe, HttpException, HttpStatus, Delete, Patch, NotFoundException, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UsePipes,
+  ValidationPipe,
+  HttpException,
+  HttpStatus,
+  Delete,
+  Patch,
+  NotFoundException,
+  Put,
+} from '@nestjs/common';
 import { AddressService } from './address.service';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { ApiTags } from '@nestjs/swagger';
@@ -44,6 +58,25 @@ export class AddressController {
     @Param('addressId') addressId: string,
     @Body() updateAddressDto: UpdateAddressDto,
   ) {
+    const updatedAddress = await this.addressService.updateAddress(
+      addressId,
+      updateAddressDto,
+    );
+    if (!updatedAddress) {
+      throw new NotFoundException(`Địa chỉ với ID ${addressId} không được tìm thấy`);
+    }
+    return {
+      message: 'Cập nhật địa chỉ thành công',
+      address: updatedAddress,
+    };
+  }
+
+  @Public()
+  @Delete(':addressId')
+  async delete(
+    @Param('addressId') addressId: string,
+    @Body() updateAddressDto: UpdateAddressDto,
+  ) {
     const updatedAddress = await this.addressService.updateAddress(addressId, updateAddressDto);
     if (!updatedAddress) {
       throw new NotFoundException(`Address with ID ${addressId} not found`);
@@ -56,11 +89,6 @@ export class AddressController {
 
 
 
-  @Public()
-  @Delete(':addressId')
-  async delete(@Param('addressId') addressId: string): Promise<{message: string}> {
-    return this.addressService.delete(addressId);
-  }
   @Get()
   async findAll() {
     return this.addressService.findAll();
