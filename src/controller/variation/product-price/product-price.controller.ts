@@ -10,7 +10,10 @@ import {
 import { ProductPriceService } from './product-price.service';
 import { UpdateProductPriceDto } from './dto/update-product-price.dto';
 import { CreateProductPriceDto } from './dto/create-product-price.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('product-price')
 @Controller('product-price')
 export class ProductPriceController {
   constructor(private readonly productPriceService: ProductPriceService) {}

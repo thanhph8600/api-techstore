@@ -26,7 +26,7 @@ export class SubOrderService {
       }, 0)
       if (subOrder.items.length > 0) {
         subOrder.subTotal = TotalMoneyOrder;
-        subOrder.total = TotalMoneyOrder;
+        subOrder.total = TotalMoneyOrder + 12000;
         await subOrder.save()
       }
       const response = {
@@ -56,6 +56,7 @@ export class SubOrderService {
           path: 'voucher2t',
           select: 'name , percent , code, maximum_reduction',
         })
+        .populate('address')
       const customerReward = await this.customerReward.findOne(id);
       const data = { subOrder, customerReward };
       return data;

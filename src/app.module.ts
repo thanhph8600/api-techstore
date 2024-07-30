@@ -24,6 +24,7 @@ import { HistorySearchModule } from './controller/history-search/history-search.
 import { CustomerRewardModule } from './controller/customer-reward/customer-reward.module';
 import { DiscountModule } from './controller/marketing/discount/discount.module';
 import { VoucherModule } from './controller/marketing/voucher/voucher.module';
+import { AddressModule } from './controller/address/address.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
@@ -57,6 +58,7 @@ import { VoucherModule } from './controller/marketing/voucher/voucher.module';
     UploadModule,
     DiscountModule,
     VoucherModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -11,12 +11,14 @@ import { Cart } from './schemas/cart.schema';
 import { Model, Types } from 'mongoose';
 import { ProductPriceService } from '../variation/product-price/product-price.service';
 import { CartSelectService } from '../cart-select/cart-select.service';
+import { DiscountService } from '../marketing/discount/discount.service';
 @Injectable()
 export class CartService {
   constructor(
     @InjectModel(Cart.name) private readonly cartModel: Model<Cart>,
     private readonly productPriceService: ProductPriceService,
-    private readonly cartSelectService: CartSelectService
+    private readonly cartSelectService: CartSelectService,
+    // private readonly discountService: DiscountService
   ) { }
   async create(createCartDto: CreateCartDto) {
     try {
@@ -58,7 +60,6 @@ export class CartService {
               path: 'id_size',
             },
           ]
-
         });
       if (!cart) {
         throw new NotFoundException(`Cart with customerId ${id} not found`);

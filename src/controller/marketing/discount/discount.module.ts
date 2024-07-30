@@ -27,5 +27,6 @@ import { ShopModule } from 'src/controller/seller/shop/shop.module';
   ],
   controllers: [DiscountController],
   providers: [DiscountService],
+  exports: [DiscountService],
 })
 export class DiscountModule {}

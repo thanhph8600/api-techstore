@@ -13,7 +13,8 @@ import { CartModule } from '../cart/cart.module';
   imports: [
     MongooseModule.forFeature([
       { name: Customer.name, schema: CustomerSchema },
-    ]),CartModule
+    ]),
+    CartModule
   ],
   controllers: [CustomerController],
   providers: [CustomerService],

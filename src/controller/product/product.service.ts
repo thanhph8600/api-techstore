@@ -7,13 +7,14 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product } from './schemas/product.schema';
-import { Model, ObjectId } from 'mongoose';
+import { Model, ObjectId, Types } from 'mongoose';
 import { ShopService } from '../seller/shop/shop.service';
 import { ProductSpecification } from './schemas/product_specification.schema';
 import { CreateProductSpecificationDto } from './dto/create-product_specification.dto';
 import { ProductPriceService } from '../variation/product-price/product-price.service';
 import { payload } from '../customer/interface/customer.interface';
-import { CategoryDetailService } from '../category-detail/category-detail.service';
+import { UploadService } from 'src/middleware/upload/upload.service';
+import { DiscountService } from '../marketing/discount/discount.service';
 
 @Injectable()
 export class ProductService {
@@ -23,7 +24,8 @@ export class ProductService {
     private readonly productSpecificationModel: Model<ProductSpecification>,
     private readonly shopService: ShopService,
     private readonly productVariation: ProductPriceService,
-    private readonly categoryDetailService: CategoryDetailService,
+    private readonly uploadService: UploadService,
+    private readonly discountService: DiscountService,
   ) {}
 
   async create(createProductDto: CreateProductDto, payload) {
@@ -74,10 +76,13 @@ export class ProductService {
 
   async findOne(id: ObjectId) {
     try {
-      const product = await this.productModel
+      const product: any = await this.productModel
         .findById(id)
         .populate('id_categoryDetail')
-        .populate('product_specifications')
+        .populate({
+          path: 'product_specifications',
+          populate:[ { path: 'id_specifications' }, { path: 'id_specifications_detail' }],
+        })
         .populate('variation_color')
         .populate('variation_size')
         .populate({
@@ -87,6 +92,32 @@ export class ProductService {
         .populate('id_shop')
         .lean()
         .exec();
+      if(!product) throw new HttpException('Không tìm thấy sản phẩm', 404);
+      if(product?.product_price?.length > 0) {
+        const listIdProductPrice = product.product_price.map((item: any) => item._id);
+        const listDiscountByProductPrice = await Promise.all(
+          listIdProductPrice.map(async (item: any) => {
+            return await this.discountService.findOneByIdProductPrice(item);
+          })
+        );
+        const checkListIsAvailibale = listDiscountByProductPrice.filter((item: any) => {
+          const isTime = item && item.id_discocunt && item.id_discocunt.time_start && item.id_discocunt.time_end
+          if(isTime && item.status === true) {
+            return item;
+          }
+        })
+        product.discount = checkListIsAvailibale;
+        if(checkListIsAvailibale.length > 0) {
+          const minMaxPriceAfferDiscount = getMinMaxPriceAfterDiscount(product.product_price, checkListIsAvailibale);
+         
+          if(minMaxPriceAfferDiscount) {
+            product.valuePriceDiscount = minMaxPriceAfferDiscount;
+          }
+          else {
+            product.valuePriceDiscount = null;
+          }
+        }
+      }
       return handleThumbnailproduct(product);
     } catch (error) {
       console.log('error find by id product' + error);
@@ -204,8 +235,19 @@ export class ProductService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: string) {
+    try {
+      const product = await this.productModel.findById(id);
+      await this.productModel.findByIdAndDelete(id);
+      await this.productSpecificationModel.deleteMany({
+        id_product: product._id,
+      });
+      await this.productVariation.removeByIdProduct(product._id);
+      await this.uploadService.deleteFile(product.thumbnails);
+    } catch (error) {
+      console.log('error remove product' + error);
+      throw new InternalServerErrorException();
+    }
   }
 }
 export function handleThumbnailListProduct(listProduct) {
@@ -222,4 +264,32 @@ export function handleThumbnailproduct(product) {
     return imageUrl;
   });
   return { ...product, thumbnails: updatedThumbnail };
+}
+export function getMinMaxPriceAfterDiscount (productPrices: any, discounts: any): { minPrice: number; maxPrice: number } | null  {
+  if (productPrices?.length === 0) return null;
+
+  let minPrice = 0;
+  let maxPrice = 0;
+  productPrices?.forEach((priceObj: any) => {
+     const price = priceObj?.price;
+     const check = discounts?.find((item: any) => item?.id_productPrice.toString() === priceObj?._id.toString())
+    //  console.log(check);
+     
+     if (check) {
+         const percent = check?.percent;
+         const newPrice = discountPrice(price, percent);
+         if (newPrice < minPrice || minPrice === 0) {
+             minPrice = newPrice;
+         }
+         if (newPrice > maxPrice) {
+             maxPrice = newPrice;
+         }
+     }
+  });
+
+  return { minPrice, maxPrice };
+};
+
+export function discountPrice (price: number, percent: number) {
+  return price - (price * percent) / 100
 }

@@ -11,7 +11,10 @@ import { SpecificationService } from './specification.service';
 import { CreateSpecificationDto } from './dto/create-specification.dto';
 import { UpdateSpecificationDto } from './dto/update-specification.dto';
 import { Public } from 'src/middleware/auth/public';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('specifications')
 @Controller('specifications')
 export class SpecificationController {
   constructor(private readonly specificationService: SpecificationService) {}

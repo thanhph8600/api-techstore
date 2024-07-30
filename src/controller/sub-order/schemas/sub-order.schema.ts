@@ -10,8 +10,8 @@ export class SubOrder {
   @Prop({ type: Types.ObjectId, required: true, ref: 'Customer' })
   customerId: Types.ObjectId;
 
-  @Prop({ type: String, default: null})
-  address: string;
+  @Prop({ type: Types.ObjectId, required: true, ref: 'Address' })
+  address: Types.ObjectId;
 
   @Prop({ type: String, default: null })
   shipping: string;
