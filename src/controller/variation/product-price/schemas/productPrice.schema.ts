@@ -28,3 +28,9 @@ export class ProductPrice {
 }
 
 export const ProductPriceSchema = SchemaFactory.createForClass(ProductPrice);
+ProductPriceSchema.virtual('discount_detail', {
+  ref: 'DiscountDetail',
+  localField: '_id',
+  foreignField: 'id_productPrice',
+  justOne: false,
+});

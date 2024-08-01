@@ -7,6 +7,7 @@ import {
   UseInterceptors,
   Delete,
   Body,
+  UploadedFile,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -15,6 +16,7 @@ import { extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import * as fs from 'fs';
 import { Response } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 interface DeleteRequest {
   filesToDelete: string[];
@@ -41,7 +43,10 @@ export class UploadController {
         },
       }),
       fileFilter: (req, file, cb) => {
-        if (!file.mimetype.startsWith('image/')) {
+        if (
+          !file.mimetype.startsWith('image/') &&
+          !file.mimetype.startsWith('video/')
+        ) {
           cb(new Error('File is not an image'), false);
         } else {
           cb(null, true);
@@ -65,6 +70,28 @@ export class UploadController {
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ message: 'Error uploading files', error: error.message });
     }
+  }
+
+  @Post('video')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          return cb(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    console.log(file);
+    return {
+      url: `/uploads/${file.filename}`,
+    };
   }
 
   @Delete('files')
