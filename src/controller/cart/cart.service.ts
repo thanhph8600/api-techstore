@@ -7,22 +7,18 @@ import {
 } from '@nestjs/common';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { UpdateCartDto } from './dto/update-cart.dto';
 import { Cart } from './schemas/cart.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
+import path from 'path';
 @Injectable()
 export class CartService {
   constructor(
     @InjectModel(Cart.name) private readonly cartModel: Model<Cart>,
   ) {}
-  async create(CreateCartDto: CreateCartDto) {
+  async create(createCartDto: CreateCartDto) {
     try {
-      const cart = await this.findOneByName(CreateCartDto.customerId);
-      if (cart.length != 0) {
-        return new HttpException('err', 401);
-      }
-      const newCart = await this.cartModel.create(CreateCartDto);
-      return newCart;
+      const newCart = new this.cartModel(createCartDto);
+      await newCart.save();
     } catch (error) {
       console.log('error cart create', error);
       throw new InternalServerErrorException();
@@ -39,7 +35,28 @@ export class CartService {
   }
   async findOne(id: string): Promise<Cart> {
     try {
-      const cart = await this.cartModel.findOne({ customerId: id }).exec();
+      const customerId = new Types.ObjectId(id);
+      const cart = await this.cartModel
+        .findOne({ customerId: customerId })
+        .populate({
+          path: 'cartItems.productPriceId',
+          select: 'id_color id_product id_size price stock',
+          populate: [
+            {
+              path: 'id_product',
+              select: 'id_shop , id_categoryDetail, name , thumbnails',
+              populate: {
+                path: 'id_shop',
+              },
+            },
+            {
+              path: 'id_color',
+            },
+            {
+              path: 'id_size',
+            },
+          ],
+        });
       if (!cart) {
         throw new NotFoundException(`Cart with customerId ${id} not found`);
       }
@@ -52,24 +69,29 @@ export class CartService {
 
   async update(id: string, updateCartDto: any): Promise<Cart> {
     try {
-      const cart = await this.cartModel.findOne({ customerId: id }).exec();
+      const customerId = new Types.ObjectId(id);
+      const cart = await this.cartModel
+        .findOne({ customerId: customerId })
+        .exec();
       if (!cart) {
-        throw new NotFoundException(`Cart with customerId ${id} not found`);
+        throw new NotFoundException(
+          `Cart with customerId ${customerId} not found`,
+        );
       }
-      const { productId, quantity } = updateCartDto;
+      const { productPriceId, quantity } = updateCartDto;
       // console.log(cart.cartItems, productId, quantity)
       const checkProductId = cart.cartItems.find(
-        (item: any) => item.productId == productId,
+        (item: any) => item.productPriceId == productPriceId,
       );
       if (checkProductId) {
         checkProductId.quantity += quantity;
         if (checkProductId.quantity <= 0) {
           cart.cartItems = cart.cartItems.filter(
-            (item) => item.productId != productId,
+            (item) => item.productPriceId != productPriceId,
           );
         }
       } else if (quantity > 0) {
-        cart.cartItems.push({ productId, quantity });
+        cart.cartItems.push({ productPriceId, quantity });
       } else {
         throw new HttpException('err', 401);
       }
