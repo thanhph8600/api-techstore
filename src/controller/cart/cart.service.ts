@@ -41,7 +41,9 @@ export class CartService {
   async findOne(id: string): Promise<Cart> {
     try {
       const customerId = new Types.ObjectId(id);
-      const cart = await this.cartModel.findOne({ customerId: customerId })
+
+      const cart = await this.cartModel
+        .findOne({ customerId: customerId })
         .populate({
           path: 'cartItems.productPriceId',
           select: 'id_color id_product id_size price stock',
@@ -51,7 +53,8 @@ export class CartService {
               select: 'id_shop , id_categoryDetail, name , thumbnails',
               populate: {
                 path: 'id_shop',
-              }
+
+              },
             },
             {
               path: 'id_color',
@@ -59,7 +62,8 @@ export class CartService {
             {
               path: 'id_size',
             },
-          ]
+
+          ],
         });
       if (!cart) {
         throw new NotFoundException(`Cart with customerId ${id} not found`);
@@ -72,65 +76,75 @@ export class CartService {
   }
 
   async update(id: string, updateCartDto: any): Promise<Cart> {
-    const customerId = new Types.ObjectId(id);
-    const cart = await this.cartModel.findOne({ customerId: customerId }).exec();
-    if (!cart) {
-      throw new NotFoundException(`Cart with customerId ${customerId} not found`);
+    try {
+      const customerId = new Types.ObjectId(id);
+      const cart = await this.cartModel
+        .findOne({ customerId: customerId })
+        .exec();
+      if (!cart) {
+        throw new NotFoundException(
+          `Cart with customerId ${customerId} not found`,
+        );
+      }
+      const { productPriceId, quantity } = updateCartDto;
+      const checkProductId = cart.cartItems.find(
+        (item: any) => item.productPriceId == productPriceId,
+      );
+      const productPrice = await this.productPriceService.findOne(productPriceId);
+      if (checkProductId) {
+        checkProductId.quantity += quantity;
+        if (checkProductId.quantity <= 0) {
+          cart.cartItems = cart.cartItems.filter(
+            (item) => item.productPriceId != productPriceId,
+          );
+          const cartSelect = await this.cartSelectService.findOne(id);
+          const checkIfHave = cartSelect.listProductSelect.find(
+            (item: any) => item._id == productPriceId,
+          )
+          if (checkIfHave) {
+            this.cartSelectService.removeChildItem(id, updateCartDto);
+          }
+        } else if (checkProductId.quantity > productPrice.stock) {
+          checkProductId.quantity -= quantity;
+          throw new HttpException('Số lượng vượt quá kho', 299);
+        }
+      } else if (quantity > 0) {
+        cart.cartItems.push({ productPriceId, quantity });
+      } else {
+        throw new HttpException('Invalid quantity', 401);
+      }
+      return await cart.save();
     }
-    const { productPriceId, quantity } = updateCartDto;
-    const checkProductId = cart.cartItems.find(
-      (item: any) => item.productPriceId == productPriceId,
-    );
-    const productPrice = await this.productPriceService.findOne(productPriceId);
-    if (checkProductId) {
-      checkProductId.quantity += quantity;
-      if (checkProductId.quantity <= 0) {
+    catch (error) {
+      console.error('Error in update:', error);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async removeChildItem(id: string, updateCartDto: any) {
+      const customerId = new Types.ObjectId(id);
+      try {
+        const cart = await this.cartModel.findOne({ customerId: customerId }).exec();
+        if (!cart) {
+          throw new NotFoundException(`Cart with customerId ${id} not found`);
+        }
         cart.cartItems = cart.cartItems.filter(
-          (item) => item.productPriceId != productPriceId,
+          (item: any) => item.productPriceId != updateCartDto.productPriceId,
         );
         const cartSelect = await this.cartSelectService.findOne(id);
         const checkIfHave = cartSelect.listProductSelect.find(
-          (item: any) => item._id == productPriceId,
+          (item: any) => item._id == updateCartDto.productPriceId,
         )
         if (checkIfHave) {
           this.cartSelectService.removeChildItem(id, updateCartDto);
         }
-      } else if (checkProductId.quantity > productPrice.stock) {
-        checkProductId.quantity -= quantity;
-        throw new HttpException('Số lượng vượt quá kho', 299);
+        return await cart.save();
+      } catch (error) {
+        console.error('Error in removeChildItem:', error);
+        throw new InternalServerErrorException();
       }
-    } else if (quantity > 0) {
-      cart.cartItems.push({ productPriceId, quantity });
-    } else {
-      throw new HttpException('Invalid quantity', 401);
     }
-    return await cart.save();
-  }
-
-  async removeChildItem(id: string, updateCartDto: any) {
-    const customerId = new Types.ObjectId(id);
-    try {
-      const cart = await this.cartModel.findOne({ customerId: customerId }).exec();
-      if (!cart) {
-        throw new NotFoundException(`Cart with customerId ${id} not found`);
-      }
-      cart.cartItems = cart.cartItems.filter(
-        (item: any) => item.productPriceId != updateCartDto.productPriceId,
-      );
-      const cartSelect = await this.cartSelectService.findOne(id);
-      const checkIfHave = cartSelect.listProductSelect.find(
-        (item: any) => item._id == updateCartDto.productPriceId,
-      )
-      if (checkIfHave) {
-        this.cartSelectService.removeChildItem(id, updateCartDto);
-      }
-      return await cart.save();
-    } catch (error) {
-      console.error('Error in removeChildItem:', error);
-      throw new InternalServerErrorException();
+  async remove(id: number): Promise < Cart > {
+      return this.cartModel.findOneAndDelete({ customerId: id }).exec();
     }
   }
-  async remove(id: number): Promise<Cart> {
-    return this.cartModel.findOneAndDelete({ customerId: id }).exec();
-  }
-}

@@ -40,12 +40,13 @@ export class CustomerService {
       await this.addUser(createCustomerDto);
       const newUserCreated = await this.customerModel.findOne({
         phone: createCustomerDto.phone,
-      })
+      });
       // console.log('newUserCreated', newUserCreated);
       const newUserCart = {
         customerId: newUserCreated._id,
         cartItems: [],
       }
+
       this.cartService.create(newUserCart);
       return new HttpException('Đăng ký thành công!', HttpStatus.OK);
     } catch (error) {

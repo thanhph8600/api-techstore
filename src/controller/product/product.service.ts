@@ -358,3 +358,4 @@ export function getMaxPrice(productPrice: any) {
   });
   return maxPrice;
 }
+
