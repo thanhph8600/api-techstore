@@ -12,6 +12,7 @@ import { Discount } from './schemas/discount.schema';
 import { DiscountDetail } from './schemas/discount-detail';
 import { ShopService } from 'src/controller/seller/shop/shop.service';
 import { payload } from 'src/controller/customer/interface/customer.interface';
+import { handleThumbnailListProduct } from 'src/controller/product/product.service';
 
 @Injectable()
 export class DiscountService {
@@ -57,6 +58,7 @@ export class DiscountService {
     const shop = await this.shopService.create(payload);
     return this.discountModel
       .find({ id_shop: shop._id })
+      .sort({ created: -1 })
       .populate({
         path: 'discount_detail',
         populate: {
@@ -69,20 +71,17 @@ export class DiscountService {
 
   async findByIdDiscount(id: string) {
     try {
-      return this.discountModel
-        .findById(id)
+      const discount = await this.discountModel
+        .findById({ _id: id })
         .populate({
           path: 'discount_detail',
           populate: {
             path: 'id_productPrice',
-            populate: [
-              { path: 'id_color' },
-              { path: 'id_size' },
-              { path: 'id_product' },
-            ],
+            populate: [{ path: 'id_color' }, { path: 'id_size' }],
           },
         })
         .lean();
+      return discount;
     } catch (error) {
       console.log('error findByIdDiscount discount');
       console.log(error);
@@ -95,7 +94,7 @@ export class DiscountService {
     try {
       const discountDetail = await this.discountDetailModel.findOne({id_productPrice: id_productPrice})
       .populate({
-        path: 'id_discocunt',
+        path: 'id_discount',
         select: 'time_start time_end',
       })
       return discountDetail;
@@ -150,5 +149,19 @@ export class DiscountService {
       console.log(error);
       throw new InternalServerErrorException();
     }
+  }
+  handleThumbnailListDiscount(listDiscount) {
+    return listDiscount.map((itemDiscount) => {
+      return this.handleThumbnailDiscount(itemDiscount);
+    });
+  }
+  handleThumbnailDiscount(discount) {
+    discount.discount_detail.map((itemDiscountDetail) => {
+      return (itemDiscountDetail.id_productPrice.id_product =
+        handleThumbnailListProduct(
+          itemDiscountDetail.id_productPrice.id_product,
+        ));
+    });
+    return discount;
   }
 }

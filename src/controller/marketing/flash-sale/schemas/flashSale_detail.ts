@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types, Schema as MongooseSchema } from 'mongoose';
 
-export type DiscountDetailDocument = HydratedDocument<DiscountDetail>;
+export type FlashSaleDetailDocument = HydratedDocument<FlashSaleDetail>;
 
 const isValidLimit = (value: number | string) => {
   // Allow number or specific string
@@ -9,11 +9,11 @@ const isValidLimit = (value: number | string) => {
 };
 
 @Schema()
-export class DiscountDetail {
+export class FlashSaleDetail {
   _id: string;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Discount' })
-  id_discount: Types.ObjectId;
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'FlashSale' })
+  id_flashSale: Types.ObjectId;
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'ProductPrice' })
   id_productPrice: Types.ObjectId;
@@ -43,5 +43,5 @@ export class DiscountDetail {
   status: boolean;
 }
 
-export const DiscountDetailSchema =
-  SchemaFactory.createForClass(DiscountDetail);
+export const FlashSaleDetailSchema =
+  SchemaFactory.createForClass(FlashSaleDetail);

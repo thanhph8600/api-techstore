@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { DiscountService } from './discount.service';
 import { DiscountController } from './discount.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -8,6 +8,7 @@ import {
   DiscountDetailSchema,
 } from './schemas/discount-detail';
 import { ShopModule } from 'src/controller/seller/shop/shop.module';
+import { CartModule } from 'src/controller/cart/cart.module';
 
 @Module({
   imports: [
@@ -23,10 +24,11 @@ import { ShopModule } from 'src/controller/seller/shop/shop.module';
         schema: DiscountDetailSchema,
       },
     ]),
-    ShopModule,
+    forwardRef(() => ShopModule),
+    forwardRef(() => CartModule),
   ],
   controllers: [DiscountController],
   providers: [DiscountService],
-  exports: [DiscountService],
+  exports: [DiscountService ],
 })
 export class DiscountModule {}

@@ -15,6 +15,7 @@ export class ProductPriceService {
     private readonly variationColorModel: Model<VariationColor>,
     @InjectModel(VariationSize.name)
     private readonly variationSizeModel: Model<VariationSize>,
+    // private readonly discountService : DiscountService
   ) {}
   async createProductPrice(idProduct, productPrice) {
     try {
@@ -58,7 +59,11 @@ export class ProductPriceService {
     const variationPromises = Object.keys(variations).map(async (key) => {
       if (key === 'Màu sắc') {
         const colorPromises = variations[key].map(async (item) => {
-          const newVariation = this.itemVariation(idProduct, item.name);
+          const newVariation = this.itemVariation(
+            idProduct,
+            item.name,
+            item.thumbnail,
+          );
           return this.variationColorModel.create(newVariation);
         });
         await Promise.all(colorPromises);
@@ -74,10 +79,11 @@ export class ProductPriceService {
 
     await Promise.all(variationPromises);
   }
-  itemVariation(idProduct, value) {
+  itemVariation(idProduct, value, thumbnail?) {
     return {
       id_product: idProduct,
       value: value,
+      thumbnail,
     };
   }
   findAll() {

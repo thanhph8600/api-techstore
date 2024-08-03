@@ -25,6 +25,7 @@ import { CustomerRewardModule } from './controller/customer-reward/customer-rewa
 import { DiscountModule } from './controller/marketing/discount/discount.module';
 import { VoucherModule } from './controller/marketing/voucher/voucher.module';
 import { AddressModule } from './controller/address/address.module';
+import { FlashSaleModule } from './controller/marketing/flash-sale/flash-sale.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
@@ -59,6 +60,7 @@ import { AddressModule } from './controller/address/address.module';
     DiscountModule,
     VoucherModule,
     AddressModule,
+    FlashSaleModule,
   ],
   controllers: [AppController],
   providers: [AppService],
