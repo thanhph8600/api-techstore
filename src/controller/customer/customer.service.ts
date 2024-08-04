@@ -3,6 +3,7 @@ import {
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -11,6 +12,7 @@ import { Customer } from './schemas/customer.schema';
 import * as bcrypt from 'bcrypt';
 import { payload } from './interface/customer.interface';
 import { UpdatePassword } from './dto/update-customer.dto';
+import { Multer } from 'multer';
 
 @Injectable()
 export class CustomerService {
@@ -122,5 +124,18 @@ export class CustomerService {
   }
   async comparePass(pass: string, hash: string) {
     return await bcrypt.compare(pass, hash);
+  }
+
+  async updateAvatar(payload: payload, avatarPath: Express.Multer.File): Promise<string> {
+    const customer = await this.customerModel.findById(payload.sub);
+    if (!customer) {
+      throw new NotFoundException('Không tìm thấy khách hàng');
+    }
+  
+    
+    customer.avata =avatarPath.filename;
+    await customer.save();
+  
+    return 'Cập nhật ảnh thành công';
   }
 }
