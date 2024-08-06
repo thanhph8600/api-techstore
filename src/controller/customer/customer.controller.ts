@@ -44,6 +44,13 @@ export class CustomerController {
   }
 
   @UseGuards(AuthGuard)
+  @Get('getOneUser')
+  async getUser(@Request() req): Promise<any> {
+    const user = await this.customerService.findUserById(req.user);
+    return user;
+  }
+
+  @UseGuards(AuthGuard)
   @Patch('change-pass')
   changePass(@Request() req, @Body() updatePass: UpdatePassword) {
     return this.customerService.changePass(req.user, updatePass);
@@ -100,7 +107,26 @@ export class CustomerController {
     const avatarUrl = `/uploads/${file.filename}`;
 
     // Cập nhật avatarUrl vào cơ sở dữ liệu
-    await this.customerService.updateAvatar(req.user, file);
+    const oldAvatarPath = await this.customerService.updateAvatar(req.user, file);
+    console.log("oldAvatarPath",oldAvatarPath);
+    const finalOldAvatarPath = `/DATN/api-techstore/uploads/${oldAvatarPath}`
+
+    const avatarDefault = `/DATN/api-techstore/uploads/avata-default.jpg`
+    
+
+    if (finalOldAvatarPath ) {
+      if(finalOldAvatarPath === avatarDefault) {
+        return
+      }else {
+        fs.unlink(finalOldAvatarPath, (err) => {
+          if (err) {
+            console.error(`Error deleting old avatar: ${err}`);
+          } else {
+            console.log(`Successfully deleted old avatar: ${finalOldAvatarPath}`);
+          }
+        });
+      }
+    }
 
     return {
       message: 'Avata được cập nhật thành công',

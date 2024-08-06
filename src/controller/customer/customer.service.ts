@@ -77,6 +77,14 @@ export class CustomerService {
     return this.customerModel.findOne({ email });
   }
 
+  async findUserById(payload: payload): Promise<Customer> {
+    const user = await this.customerModel.findById(payload.sub).exec();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
   async changePass(payload: payload, updatePassword: UpdatePassword) {
     try {
       if (updatePassword.new_password.length < 6) {
@@ -131,11 +139,12 @@ export class CustomerService {
     if (!customer) {
       throw new NotFoundException('Không tìm thấy khách hàng');
     }
-  
+    
+    const oldPathAvatar = customer.avata
     
     customer.avata =avatarPath.filename;
     await customer.save();
   
-    return 'Cập nhật ảnh thành công';
+    return oldPathAvatar;
   }
 }
