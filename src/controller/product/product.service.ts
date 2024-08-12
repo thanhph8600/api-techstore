@@ -137,7 +137,7 @@ export class ProductService {
         .lean()
         .exec();
       if (!product) throw new HttpException('Không tìm thấy sản phẩm', 404);
-      const getRating = await this.productReviewService.getRatingByProductId(product._id);
+      const getRating = await this.productReviewService.getRatingByProductId(product?._id);
       if(getRating) product.rating = getRating;     
       if (product?.product_price?.length > 0) {
         const listIdProductPrice = product.product_price.map((item: any) => item._id);

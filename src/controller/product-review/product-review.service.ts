@@ -16,9 +16,8 @@ export class ProductReviewService {
   findAll() {
     return `This action returns all productReview`;
   }
-  async getRatingByProductId(id: string) {
-    const productId = new Types.ObjectId(id);
-    const productReviews = await this.productReviewModel.find({productId : productId});
+  async getRatingByProductId(id: Types.ObjectId) {
+    const productReviews = await this.productReviewModel.find({productId : id});
     console.log(productReviews);
     
     // if(productReviews.length > 0) {
