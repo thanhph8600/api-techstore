@@ -20,6 +20,7 @@ import { DiscountModule } from './controller/marketing/discount/discount.module'
 import { VoucherModule } from './controller/marketing/voucher/voucher.module';
 import { AddressModule } from './controller/address/address.module';
 import { FlashSaleModule } from './controller/marketing/flash-sale/flash-sale.module';
+import { BanShopModule } from './controller/ban_shop/ban_shop.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { FlashSaleModule } from './controller/marketing/flash-sale/flash-sale.mo
     VoucherModule,
     AddressModule,
     FlashSaleModule,
+    BanShopModule,
   ],
   controllers: [AppController],
   providers: [AppService],

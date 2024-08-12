@@ -5,12 +5,14 @@ import { Model } from 'mongoose';
 import { Shop } from './entities/shop.entity';
 import { CustomerService } from 'src/controller/customer/customer.service';
 import { payload } from 'src/controller/customer/interface/customer.interface';
+import { BanShopService } from 'src/controller/ban_shop/ban_shop.service';
 
 @Injectable()
 export class ShopService {
   constructor(
     @InjectModel('Shop') private readonly shopModule: Model<Shop>,
     private readonly customerService: CustomerService,
+    private banShopService: BanShopService
   ) {}
 
   async create(payload) {
@@ -26,11 +28,20 @@ export class ShopService {
       thumbnail: payload.avata,
     };
     const shop = await this.shopModule.create(newShop);
+
+    await this.banShopService.create({
+      id_shop: shop.id,
+      reasonBan: "",
+      banStartDate: new Date(),
+      banEndDate: new Date(),
+    })
+
     return shop;
   }
 
-  findAll() {
-    return `This action returns all shop`;
+
+  async findAll() {
+    return await this.shopModule.find();
   }
 
   findOne(id: number) {
