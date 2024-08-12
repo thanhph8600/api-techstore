@@ -16,6 +16,7 @@ import { ProductPriceService } from '../variation/product-price/product-price.se
 import { payload } from '../customer/interface/customer.interface';
 import { UploadService } from 'src/middleware/upload/upload.service';
 import { DiscountService } from '../marketing/discount/discount.service';
+import { ProductReviewService } from '../product-review/product-review.service';
 
 @Injectable()
 export class ProductService {
@@ -27,6 +28,7 @@ export class ProductService {
     private readonly productVariation: ProductPriceService,
     private readonly uploadService: UploadService,
     private readonly discountService: DiscountService,
+    private readonly productReviewService: ProductReviewService
   ) { }
 
   async create(createProductDto: CreateProductDto, payload) {
@@ -78,7 +80,7 @@ export class ProductService {
     await Promise.all(
       products.map(async (item: any) => {
         if (item.product_price.length > 0) {
-          if(item.product_price.length > 0) {
+          if (item.product_price.length > 0) {
             const maxPrice = getMaxPrice(item.product_price);
             item.priceMax = maxPrice;
           }
@@ -89,9 +91,11 @@ export class ProductService {
             })
           );
           const checkListIsAvailibale = listDiscountByProductPrice.filter((item: any) => {
-            const isTime = item && item.id_discount && item.id_discount.time_start && item.id_discount.time_end
-            if (isTime && item.status === true) {
-              return item;
+            if (item?.id_discount) {
+              const isSale = checkDiscount(item.id_discount.time_start, item.id_discount.time_end);
+              if (isSale && item.status === true) {
+                return item;
+              }
             }
           })
           if (checkListIsAvailibale.length > 0) {
@@ -133,31 +137,28 @@ export class ProductService {
         .lean()
         .exec();
       if (!product) throw new HttpException('Không tìm thấy sản phẩm', 404);
+      const getRating = await this.productReviewService.getRatingByProductId(product._id);
+      if(getRating) product.rating = getRating;     
       if (product?.product_price?.length > 0) {
         const listIdProductPrice = product.product_price.map((item: any) => item._id);
         const listDiscountByProductPrice = await Promise.all(
-          listIdProductPrice.map(async (item: any) => {
-            return await this.discountService.findOneByIdProductPrice(item);
-          })
+          listIdProductPrice.map((item: any) => this.discountService.findOneByIdProductPrice(item))
         );
-        // console.log(listDiscountByProductPrice);
-
-        const checkListIsAvailibale = listDiscountByProductPrice.filter((item: any) => {
-          const isTime = item && item.id_discount && item.id_discount.time_start && item.id_discount.time_end
-          if (isTime && item.status === true) {
-            return item;
+        if (!listDiscountByProductPrice || listDiscountByProductPrice.length === 0) {
+          return handleThumbnailproduct(product);
+        }
+        const checkListIsAvailable = listDiscountByProductPrice.filter((item: any) => {
+          if (item) {
+            const checkDiscountIsSale = checkDiscount(item.id_discount.time_start, item.id_discount.time_end);
+            if (checkDiscountIsSale && item.status === true) {
+              return item;
+            }
           }
-        })
-        product.discount = checkListIsAvailibale;
-        if (checkListIsAvailibale.length > 0) {
-          const minMaxPriceAfferDiscount = getMinMaxPriceAfterDiscount(product.product_price, checkListIsAvailibale);
-
-          if (minMaxPriceAfferDiscount) {
-            product.valuePriceDiscount = minMaxPriceAfferDiscount;
-          }
-          else {
-            product.valuePriceDiscount = null;
-          }
+        });
+        if (checkListIsAvailable.length > 0) {
+          product.discount = checkListIsAvailable;
+          const minMaxPriceAfterDiscount = getMinMaxPriceAfterDiscount(product.product_price, checkListIsAvailable);
+          product.valuePriceDiscount = minMaxPriceAfterDiscount || null;
         }
       }
       return handleThumbnailproduct(product);
@@ -186,8 +187,8 @@ export class ProductService {
 
   // async productQuery(q: any) {
   //   console.log(q);
-    
-    
+
+
   // }
   async update(id: string, updateProductDto: UpdateProductDto) {
     try {
@@ -358,4 +359,11 @@ export function getMaxPrice(productPrice: any) {
   });
   return maxPrice;
 }
+export const checkDiscount = (startTime: string, endTime: string) => {
+  const now = new Date();
+  const start = new Date(startTime);
+  const end = new Date(endTime);
+  return now >= start && now <= end;
+};
+
 

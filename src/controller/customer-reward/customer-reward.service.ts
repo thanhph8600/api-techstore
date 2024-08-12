@@ -33,10 +33,22 @@ export class CustomerRewardService {
     return customerReward;
   }
 
-  update(id: number, updateCustomerRewardDto: UpdateCustomerRewardDto) {
-    return `This action updates a #${id} customerReward`;
+  async update(id: string, updateCustomerRewardDto: UpdateCustomerRewardDto) {
+     try {
+      const customerReward = await this.customerRewardModel.findByIdAndUpdate(id, updateCustomerRewardDto);
+      return customerReward;
+     }catch (error) {
+      throw new Error(error);
+     }
   }
-
+  async minusCoin(id: string, coin: number) {
+    try {
+      const customerReward = await this.customerRewardModel.findOneAndUpdate({ customerId: id }, { $inc: { coin: -coin } });
+      return customerReward;
+    }catch (error) {
+      throw new Error(error);
+    }
+  }
   remove(id: number) {
     return `This action removes a #${id} customerReward`;
   }

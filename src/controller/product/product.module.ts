@@ -12,6 +12,7 @@ import { ProductPriceModule } from '../variation/product-price/product-price.mod
 import { CategoryDetailModule } from '../category-detail/category-detail.module';
 import { UploadModule } from 'src/middleware/upload/upload.module';
 import { DiscountModule } from '../marketing/discount/discount.module';
+import { ProductReviewModule } from '../product-review/product-review.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { DiscountModule } from '../marketing/discount/discount.module';
     ProductPriceModule,
     CategoryDetailModule,
     UploadModule,
-    DiscountModule
+    DiscountModule,
+    ProductReviewModule
   ],
   controllers: [ProductController],
   providers: [ProductService],

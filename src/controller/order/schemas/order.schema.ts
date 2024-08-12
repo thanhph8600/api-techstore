@@ -10,10 +10,10 @@ export class Order {
   @Prop({ type: Types.ObjectId, required: true })
   customerId: Types.ObjectId;
 
-  @Prop({ type: String, default: 'waiting' })
+  @Prop({ type: String, default: 'processing' })
   status: string;
 
-  @Prop({ type: String, default: '' })
+  @Prop({ type: Types.ObjectId, required: true , ref: 'Address'})
   address: string;
 
   @Prop({ type: String, default: '' })
@@ -36,16 +36,6 @@ export class Order {
 
   @Prop({ type: String, default: '' })
   methodPayment: string;
-
-  @Prop({ 
-    type: [{ 
-      productPriceId: { type: Types.ObjectId, ref: 'ProductPrice' }, 
-      quantity: { type: Number, default: 1 } 
-    }], 
-    _id: false, 
-    default: [] 
-  })
-  Items: { productPriceId: Types.ObjectId; quantity: number }[];
 
   @Prop({ type: Number, default: 0 })
   total: number;

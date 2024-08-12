@@ -24,7 +24,7 @@ export class CustomerRewardController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCustomerRewardDto: UpdateCustomerRewardDto) {
-    return this.customerRewardService.update(+id, updateCustomerRewardDto);
+    return this.customerRewardService.update(id, updateCustomerRewardDto);
   }
 
   @Delete(':id')

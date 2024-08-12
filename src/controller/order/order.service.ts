@@ -4,21 +4,106 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Order } from './schemas/order.schema';
 import { Model, Types } from 'mongoose';
+import { ItemsOrderService } from '../items-order/items-order.service';
+import { ProductPriceService } from '../variation/product-price/product-price.service';
+import { SubOrderService } from '../sub-order/sub-order.service';
+import { CartService } from '../cart/cart.service';
+import { CustomerRewardService } from '../customer-reward/customer-reward.service';
 
 @Injectable()
 export class OrderService {
-  constructor(@InjectModel(Order.name) private orderModel: Model<Order>) {}
+  constructor(@InjectModel(Order.name) private orderModel: Model<Order>,
+    private readonly itemsOrderService: ItemsOrderService,
+    private readonly productPriceService: ProductPriceService,
+    private readonly SubOrderService: SubOrderService,
+    private readonly cartService: CartService ,
+    private readonly customerRewardService: CustomerRewardService) { }
   async create(createOrderDto: CreateOrderDto) {
-    // const { customerId } = createOrderDto;
     try {
+      const checkStockPromises = createOrderDto.items.flatMap((item: any) =>
+        item.items.map((subItem: any) =>
+          this.productPriceService.checkStockIsAvailable(subItem.productPriceId._id, subItem.quantity)
+        )
+      );
+      const checkStockResults = await Promise.all(checkStockPromises.flat());
+      const allInStock = checkStockResults.every((result) => result);
+      if (!allInStock) {
+        this.SubOrderService.remove(createOrderDto.subOrderId);
+        return { status: 290, message: 'Có sản phẩm hiện không khả dụng vui lòng thử lại' };
+      }else {
+        const updateStockPromises = createOrderDto.items.flatMap((item: any) =>
+          item.items.map((subItem: any) =>
+            this.productPriceService.update(subItem.productPriceId._id, { stock: subItem.productPriceId.stock - subItem.quantity })
+          )
+        );
+        await Promise.all(updateStockPromises.flat());
+      }
+      
       const newOrder = new this.orderModel(createOrderDto);
       await newOrder.save();
+      await this.customerRewardService.minusCoin(createOrderDto.customerId, createOrderDto.coin);
+      const saveItemsOrderAndRemoveInCart = createOrderDto.items.map(async (item: any) => {
+        const subTotalItem = item.items.reduce((acc: number, item: any) => acc + item.quantity * item.productPriceId.price, 0);
+        if(newOrder.coin > 0){
+          item.coin = newOrder.coin / createOrderDto.items.length;
+          item.total = subTotalItem - item.coin + item.costShipping;
+        }else {
+          item.coin = 0
+          item.total = subTotalItem + item.costShipping;
+        }
+        await this.itemsOrderService.create({
+          customerId: createOrderDto.customerId,
+          shopId: item.shopId._id,
+          orderId: newOrder._id,
+          items: item.items,
+          costShipping: item.costShipping,
+          total: item.total,
+          subTotal: subTotalItem,
+          discount: item.discount,
+          coin: item.coin,
+          voucherShopId: item.voucherShopId?._id
+        });
+        for (const subItem of item.items) {
+          await this.cartService.removeChildItem(createOrderDto.customerId, {
+            productPriceId: subItem.productPriceId._id,
+            shopId: item.shopId._id,
+          });
+        }
+      });
+      await Promise.all(saveItemsOrderAndRemoveInCart);
+      await this.SubOrderService.remove(createOrderDto.subOrderId);
+      
+      return { status: 200, message: 'Đơn hàng đang được xử lý' };
     } catch (error) {
       console.log('error cartSlecte create', error);
       throw new InternalServerErrorException();
     }
   }
+  async findByCustomerId(id: string) {
+    try {
+      const orders = await this.orderModel.find({ customerId: id })
+      .populate('customerId')
+      .populate('shopId')
+      .populate('voucher2t')
+      .populate('voucherShipping')
+      .exec();
+      const ordersWithItems = await Promise.all(
+        orders.map(async (order: any) => {
+            const items = await this.itemsOrderService.findByIdOrder(order._id);
+            return {
+                ...order.toObject(),
+                items: items,
+            };
+        })
+    );
 
+    return ordersWithItems;
+    }
+    catch (error) {
+      console.log('error cartSlecte create', error);
+      throw new InternalServerErrorException();
+    }
+  }
   findAll() {
     return `This action returns all order`;
   }

@@ -30,7 +30,7 @@ export class DiscountService {
       createDiscountDto.map((item) => {
         const newDiscountDetail = {
           ...item,
-          id_discocunt: newDiscount._id,
+          id_discount: newDiscount._id,
         };
         this.discountDetailModel.create(newDiscountDetail);
       });
@@ -92,18 +92,23 @@ export class DiscountService {
   async findOneByIdProductPrice(id: string) {
     const id_productPrice = new Types.ObjectId(id);
     try {
-      const discountDetail = await this.discountDetailModel.findOne({id_productPrice: id_productPrice})
-      .populate({
-        path: 'id_discount',
-        select: 'time_start time_end',
-      })
-      return discountDetail;
+        const discountDetail = await this.discountDetailModel.findOne({ id_productPrice })
+            .populate({
+                path: 'id_discount',
+                select: 'time_start time_end',
+            });
+
+        if (!discountDetail) {
+            return null;
+        }
+
+        return discountDetail;
     } catch (error) {
-      console.log('error findOne discount');
-      console.log(error);
-      throw new InternalServerErrorException();
+        console.log('Error finding discount by product price:', error);
+        throw new InternalServerErrorException();
     }
-  }
+}
+
 
   async update(
     id: string,
@@ -141,7 +146,7 @@ export class DiscountService {
           HttpStatus.FORBIDDEN,
         );
       }
-      await this.discountDetailModel.deleteMany({ id_discocunt: id });
+      await this.discountDetailModel.deleteMany({ id_discount: id });
       await this.discountModel.findByIdAndDelete(id);
       return new HttpException('Xóa thành công!', HttpStatus.OK);
     } catch (error) {

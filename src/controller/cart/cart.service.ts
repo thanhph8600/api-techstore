@@ -41,11 +41,11 @@ export class CartService {
   async findOne(id: string): Promise<Cart> {
     try {
       const customerId = new Types.ObjectId(id);
-
       const cart = await this.cartModel
         .findOne({ customerId: customerId })
+        .populate('cartItems.shopId')
         .populate({
-          path: 'cartItems.productPriceId',
+          path: 'cartItems.items.productPriceId',
           select: 'id_color id_product id_size price stock',
           populate: [
             {
@@ -53,7 +53,6 @@ export class CartService {
               select: 'id_shop , id_categoryDetail, name , thumbnails',
               populate: {
                 path: 'id_shop',
-
               },
             },
             {
@@ -64,7 +63,14 @@ export class CartService {
             },
 
           ],
-        });
+        })
+        .populate({
+          path: 'cartItems.items.discountDetailId',
+          select: 'id_discount percent limit_product limit_customer status',
+          populate: {
+            path: 'id_discount',
+          },
+        })
       if (!cart) {
         throw new NotFoundException(`Cart with customerId ${id} not found`);
       }
@@ -75,76 +81,89 @@ export class CartService {
     }
   }
 
-  async update(id: string, updateCartDto: any): Promise<Cart> {
+  async update(id: string, updateCartDto: any): Promise<any> {
+    const customerId = new Types.ObjectId(id);
     try {
-      const customerId = new Types.ObjectId(id);
-      const cart = await this.cartModel
-        .findOne({ customerId: customerId })
-        .exec();
+      const cart = await this.cartModel.findOne({ customerId: customerId }).exec();
+      const { shopId, items } = updateCartDto;
+      const { productPriceId, quantity, discountDetailId } = items;
       if (!cart) {
-        throw new NotFoundException(
-          `Cart with customerId ${customerId} not found`,
-        );
+        throw new NotFoundException(`Cart with customerId ${id} not found`);
       }
-      const { productPriceId, quantity } = updateCartDto;
-      const checkProductId = cart.cartItems.find(
-        (item: any) => item.productPriceId == productPriceId,
-      );
+      const checkShopId = cart.cartItems.find((item: any) => item.shopId == shopId);
       const productPrice = await this.productPriceService.findOne(productPriceId);
-      if (checkProductId) {
-        checkProductId.quantity += quantity;
-        if (checkProductId.quantity <= 0) {
-          cart.cartItems = cart.cartItems.filter(
-            (item) => item.productPriceId != productPriceId,
-          );
-          const cartSelect = await this.cartSelectService.findOne(id);
-          const checkIfHave = cartSelect.listProductSelect.find(
-            (item: any) => item._id == productPriceId,
-          )
-          if (checkIfHave) {
-            this.cartSelectService.removeChildItem(id, updateCartDto);
+      if (checkShopId) {
+        const checkProductPrice = checkShopId.items.find((item: any) => item.productPriceId == productPriceId);
+        if (checkProductPrice) {
+          checkProductPrice.quantity += quantity;
+          if (checkProductPrice.quantity <= 0) {
+            checkShopId.items = checkShopId.items.filter((item) => item.productPriceId != productPriceId);
+            if (checkShopId.items.length == 0) {
+              cart.cartItems = cart.cartItems.filter((item) => item.shopId != shopId);
+            }
+            const cartSelect = await this.cartSelectService.findOne(id);
+            const checkIfHave = cartSelect.listProductSelect.find(
+              (item: any) => item._id == productPriceId,
+            )
+            if (checkIfHave) {
+              this.cartSelectService.removeChildItem(id, updateCartDto);
+            }
+          } else if (checkProductPrice.quantity > productPrice.stock) {
+            checkProductPrice.quantity -= quantity;
+            const countCanAdd = productPrice.stock - checkProductPrice.quantity;
+            return { status: 299, message: "Số lượng sản phẩm hiện tại trong kho không đủ để cung cấp." , count: countCanAdd };
           }
-        } else if (checkProductId.quantity > productPrice.stock) {
-          checkProductId.quantity -= quantity;
-          throw new HttpException('Số lượng vượt quá kho', 299);
+        } else {
+          if(updateCartDto.items.discountDetailId){
+            checkShopId.items.push(updateCartDto.items);
+          }else {
+           checkShopId.items.push(updateCartDto.items);
+          }
         }
-      } else if (quantity > 0) {
-        cart.cartItems.push({ productPriceId, quantity });
       } else {
-        throw new HttpException('Invalid quantity', 401);
+        cart.cartItems.push(updateCartDto);
       }
       return await cart.save();
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Error in update:', error);
       throw new InternalServerErrorException();
     }
   }
 
   async removeChildItem(id: string, updateCartDto: any) {
-      const customerId = new Types.ObjectId(id);
-      try {
-        const cart = await this.cartModel.findOne({ customerId: customerId }).exec();
-        if (!cart) {
-          throw new NotFoundException(`Cart with customerId ${id} not found`);
-        }
-        cart.cartItems = cart.cartItems.filter(
-          (item: any) => item.productPriceId != updateCartDto.productPriceId,
-        );
-        const cartSelect = await this.cartSelectService.findOne(id);
-        const checkIfHave = cartSelect.listProductSelect.find(
-          (item: any) => item._id == updateCartDto.productPriceId,
-        )
-        if (checkIfHave) {
-          this.cartSelectService.removeChildItem(id, updateCartDto);
-        }
-        return await cart.save();
-      } catch (error) {
-        console.error('Error in removeChildItem:', error);
-        throw new InternalServerErrorException();
+    const customerId = new Types.ObjectId(id);
+    const { productPriceId, shopId } = updateCartDto;
+    // console.log(productPriceId, shopId);
+    
+    try {
+      const cart = await this.cartModel.findOne({ customerId: customerId }).exec();
+      if (!cart) {
+        throw new NotFoundException(`Cart with customerId ${id} not found`);
       }
-    }
-  async remove(id: number): Promise < Cart > {
-      return this.cartModel.findOneAndDelete({ customerId: id }).exec();
+      const checkShopId = cart.cartItems.find((item: any) => item.shopId == shopId);
+      if (!checkShopId) {
+        throw new NotFoundException(`Cart with customerId ${id} not found`);
+      }
+      checkShopId.items = checkShopId.items.filter(
+        (item: any) => item.productPriceId != productPriceId,
+      );
+      if (checkShopId.items.length == 0) {
+        cart.cartItems = cart.cartItems.filter((item) => item.shopId != shopId);
+      }
+      const cartSelect = await this.cartSelectService.findOne(id);
+      const checkIfHave = cartSelect.listProductSelect.find(
+        (item: any) => item._id == productPriceId,
+      )
+      if (checkIfHave) {
+        this.cartSelectService.removeChildItem(id, updateCartDto);
+      }
+      return await cart.save();
+    } catch (error) {
+      console.error('Error in removeChildItem:', error);
+      throw new InternalServerErrorException();
     }
   }
+  async remove(id: number): Promise<Cart> {
+    return this.cartModel.findOneAndDelete({ customerId: id }).exec();
+  }
+}

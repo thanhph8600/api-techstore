@@ -41,7 +41,7 @@ export class ProductPriceController {
     @Param('id') id: string,
     @Body() updateProductPriceDto: UpdateProductPriceDto,
   ) {
-    return this.productPriceService.update(+id, updateProductPriceDto);
+    return this.productPriceService.update(id, updateProductPriceDto);
   }
 
   @Delete(':id')

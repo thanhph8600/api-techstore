@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { UpdateProductPriceDto } from './dto/update-product-price.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { ProductPrice } from './schemas/productPrice.schema';
-import { Model } from 'mongoose';
+import { Model , Types} from 'mongoose';
 import { VariationColor } from './schemas/variationColor.schema';
 import { VariationSize } from './schemas/variationSize.schema';
 
@@ -94,9 +94,22 @@ export class ProductPriceService {
     return this.productpriceModel.findById(id).exec();
   }
 
-  update(id: number, updateProductPriceDto: UpdateProductPriceDto) {
-    console.log(updateProductPriceDto);
-    return `This action updates a #${id} productPrice`;
+  async checkStockIsAvailable(id: string, quantity: number): Promise<boolean> {
+    const productPriceId = new Types.ObjectId(id);
+    const productPrice = await this.productpriceModel.findOne({ _id: productPriceId }).exec();
+    if (!productPrice) {
+      throw new Error(`Product Price with ID ${productPriceId} not found.`);
+    }
+    if (productPrice.stock < quantity) {
+      return false;
+    }
+    return true;
+  }
+  
+  async update(id: string, updateProductPriceDto: UpdateProductPriceDto) {
+    const productPriceId = new Types.ObjectId(id);
+    const update = await this.productpriceModel.findByIdAndUpdate(productPriceId, updateProductPriceDto);
+    return update
   }
 
   remove(id: number) {

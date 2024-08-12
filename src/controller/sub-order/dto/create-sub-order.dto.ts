@@ -2,18 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsOptional, IsNumber, IsArray, ValidateNested, IsMongoId } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class Item {
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsMongoId()
-  productPriceId: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsNumber()
-  quantity: number;
-}
-
 export class CreateSubOrderDto {
   @ApiProperty()
   @IsNotEmpty()
@@ -34,6 +22,11 @@ export class CreateSubOrderDto {
   @IsOptional()
   @IsMongoId()
   voucherShop?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsMongoId()
+  totalDiscountShop?: number;
 
   @ApiProperty({ required: false })
   @IsOptional()
@@ -75,11 +68,9 @@ export class CreateSubOrderDto {
   @IsString()
   methodPayment?: string;
 
-  @ApiProperty({ type: [Item] })
+  @ApiProperty({ required: true })
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => Item)
-  items: Item[];
+  items?: any[];
 
   @ApiProperty({ required: false })
   @IsOptional()
