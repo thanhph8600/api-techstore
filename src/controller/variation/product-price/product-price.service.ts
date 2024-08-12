@@ -93,9 +93,9 @@ export class ProductPriceService {
     return `This action returns a #${id} productPrice`;
   }
 
-  update(id: number, updateProductPriceDto: UpdateProductPriceDto) {
+  async updateVation(id: string, updateProductPriceDto: UpdateProductPriceDto) {
     console.log(updateProductPriceDto);
-    return `This action updates a #${id} productPrice`;
+    await this.productpriceModel.findByIdAndUpdate(id, updateProductPriceDto);
   }
 
   remove(id: number) {

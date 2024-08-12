@@ -19,23 +19,30 @@ export class UploadService {
     return { message: 'Files uploaded successfully', filenames };
   }
 
-  deleteFile(filesToDelete: string[]) {
+  deleteFiles(filesToDelete: string[] | string) {
     try {
-      filesToDelete.forEach((filename) => {
-        const filePath = path.join(
-          __dirname,
-          '../../../uploads',
-          getFilename(filename),
-        );
-        console.log(filePath);
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-        }
-      });
+      if (typeof filesToDelete === 'string') {
+        this.deleteFile(filesToDelete);
+      } else {
+        filesToDelete.forEach((filename) => {
+          this.deleteFile(filename);
+        });
+      }
       return new HttpException('Xóa ảnh thành công!', HttpStatus.OK);
     } catch (error) {
       console.log('error deleteFile' + error);
       throw new InternalServerErrorException();
+    }
+  }
+  deleteFile(filename: string) {
+    const filePath = path.join(
+      __dirname,
+      '../../../uploads',
+      getFilename(filename),
+    );
+    console.log(filePath);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
     }
   }
 }

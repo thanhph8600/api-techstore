@@ -20,9 +20,18 @@ export class ProductPriceController {
 
   @Post()
   create(@Body() createDto: CreateProductPriceDto) {
+    console.log(createDto);
     return this.productPriceService.createProductPrice(
       createDto.id_product,
       createDto.productPrice,
+    );
+  }
+
+  @Post('variation')
+  createVariation(@Body() createDto: CreateProductPriceDto) {
+    return this.productPriceService.createVariation(
+      createDto.id_product,
+      createDto.variation,
     );
   }
 
@@ -37,11 +46,11 @@ export class ProductPriceController {
   }
 
   @Patch(':id')
-  update(
+  updateVarition(
     @Param('id') id: string,
     @Body() updateProductPriceDto: UpdateProductPriceDto,
   ) {
-    return this.productPriceService.update(+id, updateProductPriceDto);
+    return this.productPriceService.updateVation(id, updateProductPriceDto);
   }
 
   @Delete(':id')
