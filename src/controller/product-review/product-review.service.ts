@@ -16,10 +16,9 @@ export class ProductReviewService {
   findAll() {
     return `This action returns all productReview`;
   }
-  async getRatingByProductId(id: Types.ObjectId) {
-    const productReviews = await this.productReviewModel.find({productId : id});
-    console.log(productReviews);
-    
+  async getRatingByProductId(id: string) {
+  const productId = new Types.ObjectId(id);    
+    const productReviews = await this.productReviewModel.find({productId : productId});
     // if(productReviews.length > 0) {
     //   const rating = productReviews.reduce((a, b) => a + b.rating, 0) / productReviews.length;
     //   return rating;

@@ -5,6 +5,7 @@ import { ProductPrice } from './schemas/productPrice.schema';
 import { Model , Types} from 'mongoose';
 import { VariationColor } from './schemas/variationColor.schema';
 import { VariationSize } from './schemas/variationSize.schema';
+import { CartSelectService } from 'src/controller/cart-select/cart-select.service';
 
 @Injectable()
 export class ProductPriceService {
@@ -15,7 +16,7 @@ export class ProductPriceService {
     private readonly variationColorModel: Model<VariationColor>,
     @InjectModel(VariationSize.name)
     private readonly variationSizeModel: Model<VariationSize>,
-    // private readonly discountService : DiscountService
+    private readonly cartSelectService : CartSelectService
   ) {}
   async createProductPrice(idProduct, productPrice) {
     try {
@@ -94,13 +95,14 @@ export class ProductPriceService {
     return this.productpriceModel.findById(id).exec();
   }
 
-  async checkStockIsAvailable(id: string, quantity: number): Promise<boolean> {
+  async checkStockIsAvailable(id: string, quantity: number , customerId: string): Promise<boolean> {
     const productPriceId = new Types.ObjectId(id);
     const productPrice = await this.productpriceModel.findOne({ _id: productPriceId }).exec();
     if (!productPrice) {
       throw new Error(`Product Price with ID ${productPriceId} not found.`);
     }
     if (productPrice.stock < quantity) {
+      await this.cartSelectService.removeChildItem(customerId, { productPriceId: productPrice._id});
       return false;
     }
     return true;
@@ -110,6 +112,10 @@ export class ProductPriceService {
     const productPriceId = new Types.ObjectId(id);
     const update = await this.productpriceModel.findByIdAndUpdate(productPriceId, updateProductPriceDto);
     return update
+  }
+  async updateVation(id: string, updateProductPriceDto: UpdateProductPriceDto) {
+    console.log(updateProductPriceDto);
+    await this.productpriceModel.findByIdAndUpdate(id, updateProductPriceDto);
   }
 
   remove(id: number) {

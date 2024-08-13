@@ -22,7 +22,7 @@ export class OrderService {
     try {
       const checkStockPromises = createOrderDto.items.flatMap((item: any) =>
         item.items.map((subItem: any) =>
-          this.productPriceService.checkStockIsAvailable(subItem.productPriceId._id, subItem.quantity)
+          this.productPriceService.checkStockIsAvailable(subItem.productPriceId._id, subItem.quantity , createOrderDto.customerId)
         )
       );
       const checkStockResults = await Promise.all(checkStockPromises.flat());
@@ -38,18 +38,23 @@ export class OrderService {
         );
         await Promise.all(updateStockPromises.flat());
       }
-      
       const newOrder = new this.orderModel(createOrderDto);
       await newOrder.save();
       await this.customerRewardService.minusCoin(createOrderDto.customerId, createOrderDto.coin);
-      const saveItemsOrderAndRemoveInCart = createOrderDto.items.map(async (item: any) => {
-        const subTotalItem = item.items.reduce((acc: number, item: any) => acc + item.quantity * item.productPriceId.price, 0);
+      const saveItemsOrder = createOrderDto.items.map(async (item: any) => {
+        const subTotalListItem = item.items.reduce((acc: number, item: any) =>{
+          if(item.discountDetailId){
+            return acc + item.productPriceId.price * item.quantity * (100 - item.discountDetailId.percent) / 100;
+          }else {
+            return acc + item.productPriceId.price * item.quantity;
+          }
+        },0);
         if(newOrder.coin > 0){
           item.coin = newOrder.coin / createOrderDto.items.length;
-          item.total = subTotalItem - item.coin + item.costShipping;
+          item.total = subTotalListItem - item.coin + item.costShipping;
         }else {
           item.coin = 0
-          item.total = subTotalItem + item.costShipping;
+          item.total = subTotalListItem + item.costShipping;
         }
         await this.itemsOrderService.create({
           customerId: createOrderDto.customerId,
@@ -58,19 +63,21 @@ export class OrderService {
           items: item.items,
           costShipping: item.costShipping,
           total: item.total,
-          subTotal: subTotalItem,
+          subTotal: subTotalListItem,
           discount: item.discount,
           coin: item.coin,
           voucherShopId: item.voucherShopId?._id
         });
-        for (const subItem of item.items) {
-          await this.cartService.removeChildItem(createOrderDto.customerId, {
-            productPriceId: subItem.productPriceId._id,
-            shopId: item.shopId._id,
-          });
-        }
+        // const removeItemsFromCart = item.items.map(async (subItem: any) => {
+        //   await this.cartService.removeChildItem(createOrderDto.customerId, {
+        //     productPriceId: subItem.productPriceId._id,
+        //     shopId: item.shopId._id,
+        //   });
+        // });
+
+        // await Promise.all(removeItemsFromCart);
       });
-      await Promise.all(saveItemsOrderAndRemoveInCart);
+      await Promise.all(saveItemsOrder);
       await this.SubOrderService.remove(createOrderDto.subOrderId);
       
       return { status: 200, message: 'Đơn hàng đang được xử lý' };

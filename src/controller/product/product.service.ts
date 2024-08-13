@@ -47,10 +47,6 @@ export class ProductService {
       });
     }
 
-    if (createProductDto.variation) {
-      this.createVariationProduct(newProduct._id, createProductDto.variation);
-    }
-
     return newProduct;
   }
 
@@ -58,10 +54,6 @@ export class ProductService {
     createProductSpecification: CreateProductSpecificationDto,
   ) {
     this.productSpecificationModel.create(createProductSpecification);
-  }
-  async createVariationProduct(idProduct, variation) {
-    // await this.productVariation.
-    this.productVariation.createVariation(idProduct, variation);
   }
 
   createProductPrice(idProduct, productPrice) {
@@ -192,10 +184,6 @@ export class ProductService {
   // }
   async update(id: string, updateProductDto: UpdateProductDto) {
     try {
-      if (updateProductDto.variation) {
-        await this.productVariation.removeByIdProduct(id);
-        await this.createVariationProduct(id, updateProductDto.variation);
-      }
       return this.productModel.findByIdAndUpdate(id, updateProductDto);
     } catch (error) {
       console.log('error update product' + error);
@@ -291,7 +279,7 @@ export class ProductService {
         id_product: product._id,
       });
       await this.productVariation.removeByIdProduct(product._id);
-      await this.uploadService.deleteFile(product.thumbnails);
+      await this.uploadService.deleteFiles(product.thumbnails);
     } catch (error) {
       console.log('error remove product' + error);
       throw new InternalServerErrorException();
@@ -311,6 +299,32 @@ export function handleThumbnailproduct(product) {
     }
     return imageUrl;
   });
+  if (product.variation_color) {
+    const updatedThumbnailVariation = product.variation_color.map(
+      (itemVariationColor) => {
+        if (itemVariationColor.thumbnail) {
+          if (
+            !itemVariationColor.thumbnail.startsWith('http://') &&
+            !itemVariationColor.thumbnail.startsWith('https://')
+          ) {
+            return {
+              ...itemVariationColor,
+              thumbnail: `${process.env.URL_API}uploads/${itemVariationColor.thumbnail}`,
+            };
+          } else {
+            return itemVariationColor;
+          }
+        } else {
+          return itemVariationColor;
+        }
+      },
+    );
+    return {
+      ...product,
+      thumbnails: updatedThumbnail,
+      variation: updatedThumbnailVariation,
+    };
+  }
   return { ...product, thumbnails: updatedThumbnail };
 }
 export function getMinMaxPriceAfterDiscount(productPrices: any, discounts: any): { minPrice: number; maxPrice: number } | null {

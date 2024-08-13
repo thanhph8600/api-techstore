@@ -59,6 +59,7 @@ export class IdentificationService {
   }
 }
 function handleThumbnail(identification: Identification) {
+  if (!identification) return identification;
   if (
     !identification.CCCD_photo.startsWith('http://') &&
     !identification.CCCD_photo.startsWith('https://')

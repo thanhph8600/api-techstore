@@ -63,6 +63,8 @@ export class UploadController {
         throw new Error('No files uploaded');
       }
       const result = this.uploadService.handleUploadedFiles(files);
+      console.log('upLoadFile');
+      console.log(result);
       res.status(HttpStatus.OK).json(result);
     } catch (error) {
       console.error('Error uploading files:', error);
@@ -98,7 +100,7 @@ export class UploadController {
   async deleteFiles(@Body() body: DeleteRequest, @Res() res: Response) {
     try {
       const { filesToDelete } = body;
-      return await this.uploadService.deleteFile(filesToDelete);
+      return await this.uploadService.deleteFiles(filesToDelete);
     } catch (error) {
       res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)

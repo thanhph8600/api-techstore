@@ -73,7 +73,7 @@ export class CartSelectService {
         throw new NotFoundError(`Cart with customerId ${id} not found`);
       }
       CartSelect.listProductSelect = CartSelect.listProductSelect.filter(
-        (item: any) => item._id != productPriceId,
+        (item: any) => !item._id.equals(productPriceId),
       );
       return await CartSelect.save();
     } catch (error) {

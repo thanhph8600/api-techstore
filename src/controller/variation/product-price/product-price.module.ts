@@ -14,6 +14,7 @@ import {
   VariationSize,
   VariationSizeSchema,
 } from './schemas/variationSize.schema';
+import { CartSelectModule } from 'src/controller/cart-select/cart-select.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import {
     MongooseModule.forFeature([
       { name: VariationSize.name, schema: VariationSizeSchema },
     ]),
+    CartSelectModule,
   ],
   controllers: [ProductPriceController],
   providers: [ProductPriceService],

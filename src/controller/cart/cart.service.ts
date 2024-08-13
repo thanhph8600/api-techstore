@@ -109,9 +109,13 @@ export class CartService {
               this.cartSelectService.removeChildItem(id, updateCartDto);
             }
           } else if (checkProductPrice.quantity > productPrice.stock) {
-            checkProductPrice.quantity -= quantity;
-            const countCanAdd = productPrice.stock - checkProductPrice.quantity;
-            return { status: 299, message: "Số lượng sản phẩm hiện tại trong kho không đủ để cung cấp." , count: countCanAdd };
+            if(productPrice.stock > 0 && items.quantity === -1 && checkProductPrice.quantity > productPrice.stock){
+              checkProductPrice.quantity = productPrice.stock;
+            }else {
+              checkProductPrice.quantity -= quantity;
+              const countCanAdd = productPrice.stock - checkProductPrice.quantity;
+              return { status: 299, message: "Số lượng sản phẩm hiện tại trong kho không đủ để cung cấp." , count: countCanAdd };
+            }
           }
         } else {
           if(updateCartDto.items.discountDetailId){
@@ -130,11 +134,16 @@ export class CartService {
     }
   }
 
+  async updateQuantityProductPrice(customerId: string , {shopId , productPriceId , quantity}: any) {
+    const cart = await this.cartModel.findOne({ customerId: customerId }).exec();
+    const shop = cart.cartItems.find((item: any) => item.shopId == shopId);
+    const productPrice = shop.items.find((item: any) => item.productPriceId == productPriceId);
+    productPrice.quantity = quantity;
+    return await cart.save();
+  }
   async removeChildItem(id: string, updateCartDto: any) {
     const customerId = new Types.ObjectId(id);
     const { productPriceId, shopId } = updateCartDto;
-    // console.log(productPriceId, shopId);
-    
     try {
       const cart = await this.cartModel.findOne({ customerId: customerId }).exec();
       if (!cart) {
@@ -155,7 +164,7 @@ export class CartService {
         (item: any) => item._id == productPriceId,
       )
       if (checkIfHave) {
-        this.cartSelectService.removeChildItem(id, updateCartDto);
+        this.cartSelectService.removeChildItem(id, { productPriceId });
       }
       return await cart.save();
     } catch (error) {

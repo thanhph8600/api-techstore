@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { UpdateShopDto } from './dto/update-shop.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Shop } from './entities/shop.entity';
 import { CustomerService } from 'src/controller/customer/customer.service';
 import { payload } from 'src/controller/customer/interface/customer.interface';
@@ -33,8 +33,14 @@ export class ShopService {
     return `This action returns all shop`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} shop`;
+  async findById(id: string) {
+    try {
+      const shop = await this.shopModule.findById(id);
+      if(!shop) throw new Error('Shop khong ton tai!');
+      return handleThumbnail(shop);
+    }catch(error){
+      throw new InternalServerErrorException();
+    }
   }
 
   findByCustomer(req) {

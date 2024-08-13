@@ -16,13 +16,22 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 @ApiTags('product-price')
 @Controller('product-price')
 export class ProductPriceController {
-  constructor(private readonly productPriceService: ProductPriceService) {}
+  constructor(private readonly productPriceService: ProductPriceService) { }
 
   @Post()
   create(@Body() createDto: CreateProductPriceDto) {
+    console.log(createDto);
     return this.productPriceService.createProductPrice(
       createDto.id_product,
       createDto.productPrice,
+    );
+  }
+
+  @Post('variation')
+  createVariation(@Body() createDto: CreateProductPriceDto) {
+    return this.productPriceService.createVariation(
+      createDto.id_product,
+      createDto.variation,
     );
   }
 
@@ -37,11 +46,11 @@ export class ProductPriceController {
   }
 
   @Patch(':id')
-  update(
+  updateVarition(
     @Param('id') id: string,
     @Body() updateProductPriceDto: UpdateProductPriceDto,
   ) {
-    return this.productPriceService.update(id, updateProductPriceDto);
+    return this.productPriceService.updateVation(id, updateProductPriceDto);
   }
 
   @Delete(':id')

@@ -13,6 +13,7 @@ import { ShopService } from './shop.service';
 import { UpdateShopDto } from './dto/update-shop.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/middleware/auth/auth.guard';
+import { Public } from 'src/middleware/auth/public';
 
 @ApiBearerAuth()
 @ApiTags('shop')
@@ -29,6 +30,12 @@ export class ShopController {
   @Get()
   findAll() {
     return this.shopService.findAll();
+  }
+
+  @Public()
+  @Get('store/:id')
+  findById(@Param('id') id: string) {
+    return this.shopService.findById(id);
   }
 
   @UseGuards(AuthGuard)
