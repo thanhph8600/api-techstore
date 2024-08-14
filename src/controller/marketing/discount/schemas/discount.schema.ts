@@ -30,6 +30,6 @@ export const DiscountSchema = SchemaFactory.createForClass(Discount);
 DiscountSchema.virtual('discount_detail', {
   ref: 'DiscountDetail',
   localField: '_id',
-  foreignField: 'id_discocunt',
+  foreignField: 'id_discount',
   justOne: false,
 });

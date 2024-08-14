@@ -21,6 +21,12 @@ import { VoucherModule } from './controller/marketing/voucher/voucher.module';
 import { AddressModule } from './controller/address/address.module';
 import { FlashSaleModule } from './controller/marketing/flash-sale/flash-sale.module';
 import { BanShopModule } from './controller/ban_shop/ban_shop.module';
+import { WebSocketModule } from './web-socket/web-socket.module';
+import { RoomChatModule } from './controller/chat/room-chat/room-chat.module';
+import { MessengerModule } from './controller/chat/messenger/messenger.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { AdminVoucherModule } from './controller/admin/admin-voucher/admin-voucher.module';
 
 @Module({
   imports: [
@@ -49,6 +55,13 @@ import { BanShopModule } from './controller/ban_shop/ban_shop.module';
     AddressModule,
     FlashSaleModule,
     BanShopModule,
+    WebSocketModule,
+    RoomChatModule,
+    MessengerModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', '..', 'dist', 'client'),
+    }),
+    AdminVoucherModule,
   ],
   controllers: [AppController],
   providers: [AppService],
