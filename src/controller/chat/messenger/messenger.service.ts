@@ -24,14 +24,13 @@ export class MessengerService {
     private readonly webSocket: WebSocketGateway,
     private readonly shopService: ShopService,
     private readonly productService: ProductService,
-  ) {}
+  ) { }
   async create(createMessengerDto: CreateMessengerDto, payload: payload) {
     try {
       const roomChat = await this.roomChatService.create(
         createMessengerDto,
         payload,
       );
-
       createMessengerDto.id_roomChat = roomChat._id;
       createMessengerDto.id_sender = payload.sub;
       createMessengerDto.senderType = 'Customer';
@@ -56,6 +55,44 @@ export class MessengerService {
       console.log(error);
       throw new InternalServerErrorException();
     }
+  }
+
+  async NewMessage(payload: any, req: any) {
+    payload.senderType = 'Customer';
+    payload.id_sender = payload.id_customer;
+    try {
+      if (payload.id_room) {
+        payload.id_roomChat = payload.id_room;
+        const newMess = await this.MessengerModel.create(payload);
+        await this.roomChatService.updateLastMess(payload.id_room, newMess._id);
+        const payloadSocket = {
+          id_customer: payload.id_customer,
+          id_shop: payload.id_shop,
+          id_sender: payload.sub,
+          id_roomChat: payload.id_room,
+        };
+        await this.webSocket.sendMess(payloadSocket);
+        return newMess;
+      } else {
+        const newRoom = await this.roomChatService.createRoomChat(payload);
+        payload.id_roomChat = newRoom._id;
+        const newMess = await this.MessengerModel.create(payload);
+        await this.roomChatService.updateLastMess(newRoom._id, newMess._id);
+        const payloadSocket = {
+          id_customer: payload.id_customer,
+          id_shop: payload.id_shop,
+          id_sender: payload.sub,
+          id_roomChat: newRoom._id,
+        }
+        await this.webSocket.sendMess(payloadSocket);
+        return newMess;
+      }
+    }
+    catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException();
+    }
+
   }
 
   async findByIdRoomChat(idRoom: string) {

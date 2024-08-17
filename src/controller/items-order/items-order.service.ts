@@ -153,10 +153,20 @@ export class ItemsOrderService {
     return `This action returns a #${id} itemsOrder`;
   }
 
-  update(id: number, updateItemsOrderDto: UpdateItemsOrderDto) {
-    return `This action updates a #${id} itemsOrder`;
+  update(id: string, updateItemsOrderDto: UpdateItemsOrderDto) {
+    const update = this.itemsOrderModel.findByIdAndUpdate(id, updateItemsOrderDto);
+    return update;
   }
 
+  async updateStatusTime ({id, key, value}: any) {
+    try {
+      const item = await this.itemsOrderModel.findById(id);
+      item.statusUpdate.push({key: key, value: value});
+      return await item.save();
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
   remove(id: number) {
     return `This action removes a #${id} itemsOrder`;
   }

@@ -88,6 +88,7 @@ export class RoomChatService {
           },
         })
         .lean();
+        if(!listRoomChat) return [];
       return this.handleThumbnailListRoom(listRoomChat);
     } catch (error) {
       console.log('Error get list Room chat by Id Customer \n', error);
@@ -193,6 +194,79 @@ export class RoomChatService {
     return this.handleThumbnailRoomDetail(roomChatDetail);
   }
 
+
+  async findDetailRoomChat(id: string , payload: payload, skip: number = 1, limit: number = 20) {
+    try {
+      const roomChat = await this.RoomChatModel.findById(id);
+      if (
+        String(roomChat.id_customer) != payload.sub &&
+        String(roomChat.id_shop) != String(roomChat.id_shop)
+      )
+        return new HttpException(
+          'Bạn không có quyền truy cập tin nhắn!',
+          HttpStatus.BAD_REQUEST,
+        );
+      const roomChatDetail = await this.RoomChatModel.findById(id)
+        .populate({
+          path: 'messenger',
+          options: {
+            skip: (skip - 1) * limit,
+            limit: limit,
+            sort: { _id: -1 },
+          },
+          populate: {
+            path: 'id_product',
+            select: ['_id', 'id_shop', 'name', 'thumbnails'],
+            populate: {
+              path: 'product_price',
+              select: ['stock', 'price'],
+              populate: {
+                path: 'discount_detail',
+                select: ['percent', 'status'],
+                populate: {
+                  path: 'id_discount',
+                },
+              },
+            },
+          },
+        })
+        .populate({
+          path: 'id_customer',
+          select: ['_id', 'name', 'avata', 'phone'],
+        })
+        .populate({
+          path: 'id_shop',
+          select: ['_id', 'name', 'thumbnail', 'count_follower', 'star'],
+        })
+        .populate('id_lastMess')
+        .lean();
+        return this.handleThumbnailRoomDetail(roomChatDetail);
+    } catch (error) {
+      console.log('Error get list Room chat by Id Customer \n', error);
+      throw new InternalServerErrorException();
+    }
+  }
+  async findOneByIdShopAndIdCustomer(payload : any) {
+      const newPayload: any = {
+        id_shop: payload.id_shop,
+        id_customer: payload.id_customer,
+        sub: payload.id_customer
+      };
+    try {
+      const findRoomChat = await this.RoomChatModel.findOne({ id_shop: payload.id_shop, id_customer: payload.id_customer });
+        if(!findRoomChat){
+          const newRoom = await this.createRoomChat(payload);
+          const roomchat = await this.findDetailRoomChat(newRoom._id, newPayload, 1, 20)
+          return roomchat;
+        }else {
+          const roomChat = await this.findDetailRoomChat(findRoomChat._id, newPayload, 1, 20);
+          return roomChat;
+        }
+    } catch (error) {
+      console.log('Error get list Room chat by Id Customer \n', error);
+      throw new InternalServerErrorException();
+    }
+  }
   update(id: string, updateRoomChatDto: UpdateRoomChatDto) {
     console.log(updateRoomChatDto);
     return `This action updates a #${id} roomChat`;

@@ -60,8 +60,8 @@ export class ItemsOrder {
   @Prop({ type: String , required: false , default: 'Chờ xác nhận' , enum: ['Chờ xác nhận', 'Xác nhận', 'Đang vận chuyển' , 'Hoàn thành' , 'Huỷ đơn hàng' , 'Hoàn hàng' ] })
   status: string;
 
-  @Prop({ type: Date , required: false , default: null })
-  rateDate: Date;
+  @Prop({ type: Boolean , required: false , default: false })
+  rateDate: boolean;
 
   @Prop({ type: Date , required: false , default: null })
   DeliveryTime: Date;

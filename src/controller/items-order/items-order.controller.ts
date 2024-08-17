@@ -1,3 +1,4 @@
+import { payload } from './../customer/interface/customer.interface';
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ItemsOrderService } from './items-order.service';
 import { CreateItemsOrderDto } from './dto/create-items-order.dto';
@@ -27,9 +28,14 @@ export class ItemsOrderController {
     return this.itemsOrderService.findByIdCustomer(id);
   }
 
+  @Patch('updateStatusTime')
+  updateStatusTime(@Body() payload: {id: string, key: string, value: Date}) {
+    return this.itemsOrderService.updateStatusTime(payload);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateItemsOrderDto: UpdateItemsOrderDto) {
-    return this.itemsOrderService.update(+id, updateItemsOrderDto);
+    return this.itemsOrderService.update(id, updateItemsOrderDto);
   }
 
   @Delete(':id')
