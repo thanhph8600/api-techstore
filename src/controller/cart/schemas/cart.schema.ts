@@ -14,14 +14,18 @@ export class Cart {
         shopId: { type: Types.ObjectId, ref: 'Shop', required: true },
         items: [
           {
-            productPriceId: { type: Types.ObjectId, ref: 'ProductPrice', required: true },
+            productPriceId: {
+              type: Types.ObjectId,
+              ref: 'ProductPrice',
+              required: true,
+            },
             quantity: { type: Number, required: true },
-            discountDetailId: { type: Types.ObjectId , ref:'DiscountDetail' },
-          }
+            discountDetailId: { type: Types.ObjectId, ref: 'DiscountDetail' },
+          },
         ],
-        _id: false
-      }
-    ]
+        _id: false,
+      },
+    ],
   })
   cartItems: {
     shopId: Types.ObjectId;

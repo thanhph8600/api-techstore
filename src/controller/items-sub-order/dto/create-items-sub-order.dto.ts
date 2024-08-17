@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsArray, ValidateNested, IsOptional, IsNumber } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsArray,
+  ValidateNested,
+  IsOptional,
+  IsNumber,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class ItemsSubOrder {
@@ -34,7 +40,6 @@ export class CreateItemsSubOrderDto {
   @IsNotEmpty()
   @Type(() => String)
   shopId: string;
-
 
   @IsArray()
   @ValidateNested({ each: true })

@@ -14,7 +14,7 @@ import { Public } from 'src/middleware/auth/public';
 
 @Controller('cart')
 export class CartController {
-  constructor(private readonly cartService: CartService) { }
+  constructor(private readonly cartService: CartService) {}
 
   @Post()
   create(@Body() createCartDto: CreateCartDto) {
@@ -37,7 +37,9 @@ export class CartController {
   }
   @Patch('/remove-child-item/:id')
   removeChildItem(
-    @Param('id') id: string, @Body() updateCartDto: UpdateCartDto) {
+    @Param('id') id: string,
+    @Body() updateCartDto: UpdateCartDto,
+  ) {
     return this.cartService.removeChildItem(id, updateCartDto);
   }
   @Delete(':id')

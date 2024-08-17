@@ -17,7 +17,11 @@ export class ItemsSubOrder {
   @Prop({
     type: [
       {
-        productPriceId: { type: Types.ObjectId, ref: 'ProductPrice', required: true },
+        productPriceId: {
+          type: Types.ObjectId,
+          ref: 'ProductPrice',
+          required: true,
+        },
         quantity: { type: Number, required: true },
         discountDetailId: { type: Types.ObjectId, ref: 'DiscountDetail' },
       },
@@ -42,7 +46,12 @@ export class ItemsSubOrder {
   @Prop({ type: Number, required: true, default: 0 })
   coin: number;
 
-  @Prop({ type: Types.ObjectId, required: false, default: null , ref: 'Voucher'})
+  @Prop({
+    type: Types.ObjectId,
+    required: false,
+    default: null,
+    ref: 'Voucher',
+  })
   voucherShopId?: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, required: false, default: null })

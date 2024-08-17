@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsOptional, IsNumber, IsArray, ValidateNested, IsMongoId } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsArray,
+  ValidateNested,
+  IsMongoId,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateSubOrderDto {

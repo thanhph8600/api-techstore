@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsOptional, IsNumber, IsArray, ValidateNested, IsMongoId } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsArray,
+  ValidateNested,
+  IsMongoId,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateOrderDto {
@@ -33,8 +41,6 @@ export class CreateOrderDto {
   @IsNumber()
   coinRefunt?: number;
 
-  
-
   @ApiProperty({ required: true })
   @IsOptional()
   @IsNumber()
@@ -54,7 +60,7 @@ export class CreateOrderDto {
   @IsOptional()
   @IsNumber()
   subTotal?: number;
-  
+
   @ApiProperty({ required: false })
   @IsOptional()
   @IsNumber()

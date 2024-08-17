@@ -6,7 +6,9 @@ import { ItemsOrder, ItemsOrderSchema } from './schemas/itemsOrder.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: ItemsOrder.name, schema: ItemsOrderSchema }]),
+    MongooseModule.forFeature([
+      { name: ItemsOrder.name, schema: ItemsOrderSchema },
+    ]),
   ],
   controllers: [ItemsOrderController],
   providers: [ItemsOrderService],

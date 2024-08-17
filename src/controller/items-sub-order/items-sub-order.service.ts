@@ -8,8 +8,9 @@ import { Model, Types } from 'mongoose';
 @Injectable()
 export class ItemsSubOrderService {
   constructor(
-    @InjectModel('ItemsSubOrder') private readonly itemsSubOrderModule: Model<ItemsSubOrder>,
-  ) { }
+    @InjectModel('ItemsSubOrder')
+    private readonly itemsSubOrderModule: Model<ItemsSubOrder>,
+  ) {}
   async create(createItemsSubOrderDto: CreateItemsSubOrderDto) {
     try {
       const itemsSubOrder = await this.itemsSubOrderModule.create(
@@ -18,16 +19,26 @@ export class ItemsSubOrderService {
       const newIdItemsSubOrder = itemsSubOrder._id.toString();
       const item = await this.findById(newIdItemsSubOrder);
       if (item) {
-        const totalPriceInListItem = item.items.reduce((acc: number, item: any) => {
-          if (item.discountDetailId) {
-            const price = item.productPriceId.price * item.quantity * (100 - item.discountDetailId.percent) / 100;
-            return acc + price;
-          } else {
-            const price = item.productPriceId.price * item.quantity;
-            return acc + price;
-          }
-        }, 0);
-        await this.itemsSubOrderModule.updateOne({ _id: item._id }, { total: totalPriceInListItem });
+        const totalPriceInListItem = item.items.reduce(
+          (acc: number, item: any) => {
+            if (item.discountDetailId) {
+              const price =
+                (item.productPriceId.price *
+                  item.quantity *
+                  (100 - item.discountDetailId.percent)) /
+                100;
+              return acc + price;
+            } else {
+              const price = item.productPriceId.price * item.quantity;
+              return acc + price;
+            }
+          },
+          0,
+        );
+        await this.itemsSubOrderModule.updateOne(
+          { _id: item._id },
+          { total: totalPriceInListItem },
+        );
       }
 
       return itemsSubOrder;
@@ -115,20 +126,41 @@ export class ItemsSubOrderService {
       );
       if (updateItemsSubOrderDto.voucherShopId) {
         const item = await this.findById(id);
-        await this.itemsSubOrderModule.updateOne({ _id: item._id }, { discount: 0  , coin: 0 });
+        await this.itemsSubOrderModule.updateOne(
+          { _id: item._id },
+          { discount: 0, coin: 0 },
+        );
         if (item.voucherShopId.type === 'price') {
-          const priceDiscount = discountPrice(item.total, item.voucherShopId.percent);
+          const priceDiscount = discountPrice(
+            item.total,
+            item.voucherShopId.percent,
+          );
           if (priceDiscount > item.voucherShopId.maximum_reduction) {
-            await this.itemsSubOrderModule.updateOne({ _id: item._id }, { discount: item.voucherShopId.maximum_reduction });
+            await this.itemsSubOrderModule.updateOne(
+              { _id: item._id },
+              { discount: item.voucherShopId.maximum_reduction },
+            );
           } else {
-            await this.itemsSubOrderModule.updateOne({ _id: item._id }, { discount: priceDiscount });
+            await this.itemsSubOrderModule.updateOne(
+              { _id: item._id },
+              { discount: priceDiscount },
+            );
           }
         } else {
-          const coinRefunt = discountPrice(item.total, item.voucherShopId.percent);
+          const coinRefunt = discountPrice(
+            item.total,
+            item.voucherShopId.percent,
+          );
           if (coinRefunt > item.voucherShopId.maximum_reduction) {
-            await this.itemsSubOrderModule.updateOne({ _id: item._id }, { coin: item.voucherShopId.maximum_reduction });
+            await this.itemsSubOrderModule.updateOne(
+              { _id: item._id },
+              { coin: item.voucherShopId.maximum_reduction },
+            );
           } else {
-            await this.itemsSubOrderModule.updateOne({ _id: item._id }, { coin: coinRefunt });
+            await this.itemsSubOrderModule.updateOne(
+              { _id: item._id },
+              { coin: coinRefunt },
+            );
           }
         }
       }
@@ -153,14 +185,18 @@ export class ItemsSubOrderService {
 export function totalPriceOfArray(arr: any) {
   return arr.reduce((acc: number, item: any) => {
     if (item.discountDetailId) {
-      const price = item.productPriceId.price * item.quantity * (100 - item.discountDetailId.percent) / 100;
+      const price =
+        (item.productPriceId.price *
+          item.quantity *
+          (100 - item.discountDetailId.percent)) /
+        100;
       return acc + price;
     } else {
       const price = item.productPriceId.price * item.quantity;
       return acc + price;
     }
-  }, 0)
+  }, 0);
 }
 export function discountPrice(price: number, percent: number) {
-  return  price * percent / 100;
+  return (price * percent) / 100;
 }

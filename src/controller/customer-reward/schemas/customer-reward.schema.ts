@@ -7,12 +7,13 @@ export type CustomerRewardDocument = HydratedDocument<CustomerReward>;
 export class CustomerReward {
   @Prop({ type: Types.ObjectId, ref: 'Customer' })
   customerId: Types.ObjectId;
-  
-  @Prop({type: Number, default: 0})
+
+  @Prop({ type: Number, default: 0 })
   coin: number;
 
-  @Prop([{type: Types.ObjectId, ref: 'Voucher'}])
+  @Prop([{ type: Types.ObjectId, ref: 'Voucher' }])
   voucher: Types.ObjectId[];
 }
 
-export const CustomerRewardSchema = SchemaFactory.createForClass(CustomerReward);
+export const CustomerRewardSchema =
+  SchemaFactory.createForClass(CustomerReward);

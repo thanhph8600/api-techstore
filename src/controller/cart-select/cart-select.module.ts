@@ -6,7 +6,9 @@ import { CartSelect, CartSelectSchema } from './schemas/cartSelect.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: CartSelect.name, schema: CartSelectSchema }]),
+    MongooseModule.forFeature([
+      { name: CartSelect.name, schema: CartSelectSchema },
+    ]),
   ],
   controllers: [CartSelectController],
   providers: [CartSelectService],

@@ -67,7 +67,7 @@ export class CategoryService {
   remove(id: number) {
     return `This action removes a #${id} category`;
   }
-  async search(query: string) {    
+  async search(query: string) {
     try {
       const categories = await this.categoryModel
         .find({
@@ -75,7 +75,8 @@ export class CategoryService {
             { name: { $regex: query, $options: 'i' } },
             { slug: { $regex: query, $options: 'i' } },
           ],
-        }).select('name slug')
+        })
+        .select('name slug')
         .limit(10);
       return categories;
     } catch (error) {

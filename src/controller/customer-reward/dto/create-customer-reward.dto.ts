@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 export class CreateCustomerRewardDto {
-    @ApiProperty()
-    @IsNotEmpty()
-    customerId: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  customerId: string;
 
-    coin: number;
+  coin: number;
 
-    voucher: string[];
+  voucher: string[];
 }

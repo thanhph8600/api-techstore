@@ -2,17 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { CreateCustomerRewardDto } from './dto/create-customer-reward.dto';
 import { UpdateCustomerRewardDto } from './dto/update-customer-reward.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose'
+import { Model, Types } from 'mongoose';
 import { CustomerReward } from './schemas/customer-reward.schema';
 
 @Injectable()
 export class CustomerRewardService {
   constructor(
-    @InjectModel ('CustomerReward') private readonly customerRewardModel: Model<CustomerReward>,
+    @InjectModel('CustomerReward')
+    private readonly customerRewardModel: Model<CustomerReward>,
   ) {}
   async create(createCustomerRewardDto: CreateCustomerRewardDto) {
-    try  {
-      const newCustomerReward = new this.customerRewardModel(createCustomerRewardDto);
+    try {
+      const newCustomerReward = new this.customerRewardModel(
+        createCustomerRewardDto,
+      );
       await newCustomerReward.save();
       return newCustomerReward;
     } catch (error) {
@@ -25,27 +28,39 @@ export class CustomerRewardService {
   }
 
   async findOne(id: string): Promise<CustomerReward> {
-    const customerReward = await this.customerRewardModel.findOne({ customerId: id }).exec();
-    if(!customerReward) {
-      const newCustomerReward = this.create({customerId: id, coin: 0, voucher: []});
+    const customerReward = await this.customerRewardModel
+      .findOne({ customerId: id })
+      .exec();
+    if (!customerReward) {
+      const newCustomerReward = this.create({
+        customerId: id,
+        coin: 0,
+        voucher: [],
+      });
       return newCustomerReward;
     }
     return customerReward;
   }
 
   async update(id: string, updateCustomerRewardDto: UpdateCustomerRewardDto) {
-     try {
-      const customerReward = await this.customerRewardModel.findByIdAndUpdate(id, updateCustomerRewardDto);
+    try {
+      const customerReward = await this.customerRewardModel.findByIdAndUpdate(
+        id,
+        updateCustomerRewardDto,
+      );
       return customerReward;
-     }catch (error) {
+    } catch (error) {
       throw new Error(error);
-     }
+    }
   }
   async minusCoin(id: string, coin: number) {
     try {
-      const customerReward = await this.customerRewardModel.findOneAndUpdate({ customerId: id }, { $inc: { coin: -coin } });
+      const customerReward = await this.customerRewardModel.findOneAndUpdate(
+        { customerId: id },
+        { $inc: { coin: -coin } },
+      );
       return customerReward;
-    }catch (error) {
+    } catch (error) {
       throw new Error(error);
     }
   }

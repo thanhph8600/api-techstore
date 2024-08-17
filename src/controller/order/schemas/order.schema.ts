@@ -13,7 +13,7 @@ export class Order {
   @Prop({ type: String, default: 'processing' })
   status: string;
 
-  @Prop({ type: Types.ObjectId, required: true , ref: 'Address'})
+  @Prop({ type: Types.ObjectId, required: true, ref: 'Address' })
   address: string;
 
   @Prop({ type: String, default: '' })

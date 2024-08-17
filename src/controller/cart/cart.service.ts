@@ -19,7 +19,7 @@ export class CartService {
     private readonly productPriceService: ProductPriceService,
     private readonly cartSelectService: CartSelectService,
     // private readonly discountService: DiscountService
-  ) { }
+  ) {}
   async create(createCartDto: CreateCartDto) {
     try {
       const newCart = new this.cartModel(createCartDto);
@@ -61,7 +61,6 @@ export class CartService {
             {
               path: 'id_size',
             },
-
           ],
         })
         .populate({
@@ -70,7 +69,7 @@ export class CartService {
           populate: {
             path: 'id_discount',
           },
-        })
+        });
       if (!cart) {
         throw new NotFoundException(`Cart with customerId ${id} not found`);
       }
@@ -84,44 +83,65 @@ export class CartService {
   async update(id: string, updateCartDto: any): Promise<any> {
     const customerId = new Types.ObjectId(id);
     try {
-      const cart = await this.cartModel.findOne({ customerId: customerId }).exec();
+      const cart = await this.cartModel
+        .findOne({ customerId: customerId })
+        .exec();
       const { shopId, items } = updateCartDto;
       const { productPriceId, quantity, discountDetailId } = items;
       if (!cart) {
         throw new NotFoundException(`Cart with customerId ${id} not found`);
       }
-      const checkShopId = cart.cartItems.find((item: any) => item.shopId == shopId);
-      const productPrice = await this.productPriceService.findOne(productPriceId);
+      const checkShopId = cart.cartItems.find(
+        (item: any) => item.shopId == shopId,
+      );
+      const productPrice =
+        await this.productPriceService.findOne(productPriceId);
       if (checkShopId) {
-        const checkProductPrice = checkShopId.items.find((item: any) => item.productPriceId == productPriceId);
+        const checkProductPrice = checkShopId.items.find(
+          (item: any) => item.productPriceId == productPriceId,
+        );
         if (checkProductPrice) {
           checkProductPrice.quantity += quantity;
           if (checkProductPrice.quantity <= 0) {
-            checkShopId.items = checkShopId.items.filter((item) => item.productPriceId != productPriceId);
+            checkShopId.items = checkShopId.items.filter(
+              (item) => item.productPriceId != productPriceId,
+            );
             if (checkShopId.items.length == 0) {
-              cart.cartItems = cart.cartItems.filter((item) => item.shopId != shopId);
+              cart.cartItems = cart.cartItems.filter(
+                (item) => item.shopId != shopId,
+              );
             }
             const cartSelect = await this.cartSelectService.findOne(id);
             const checkIfHave = cartSelect.listProductSelect.find(
               (item: any) => item._id == productPriceId,
-            )
+            );
             if (checkIfHave) {
               this.cartSelectService.removeChildItem(id, updateCartDto);
             }
           } else if (checkProductPrice.quantity > productPrice.stock) {
-            if(productPrice.stock > 0 && items.quantity === -1 && checkProductPrice.quantity > productPrice.stock){
+            if (
+              productPrice.stock > 0 &&
+              items.quantity === -1 &&
+              checkProductPrice.quantity > productPrice.stock
+            ) {
               checkProductPrice.quantity = productPrice.stock;
-            }else {
+            } else {
               checkProductPrice.quantity -= quantity;
-              const countCanAdd = productPrice.stock - checkProductPrice.quantity;
-              return { status: 299, message: "Số lượng sản phẩm hiện tại trong kho không đủ để cung cấp." , count: countCanAdd };
+              const countCanAdd =
+                productPrice.stock - checkProductPrice.quantity;
+              return {
+                status: 299,
+                message:
+                  'Số lượng sản phẩm hiện tại trong kho không đủ để cung cấp.',
+                count: countCanAdd,
+              };
             }
           }
         } else {
-          if(updateCartDto.items.discountDetailId){
+          if (updateCartDto.items.discountDetailId) {
             checkShopId.items.push(updateCartDto.items);
-          }else {
-           checkShopId.items.push(updateCartDto.items);
+          } else {
+            checkShopId.items.push(updateCartDto.items);
           }
         }
       } else {
@@ -134,10 +154,17 @@ export class CartService {
     }
   }
 
-  async updateQuantityProductPrice(customerId: string , {shopId , productPriceId , quantity}: any) {
-    const cart = await this.cartModel.findOne({ customerId: customerId }).exec();
+  async updateQuantityProductPrice(
+    customerId: string,
+    { shopId, productPriceId, quantity }: any,
+  ) {
+    const cart = await this.cartModel
+      .findOne({ customerId: customerId })
+      .exec();
     const shop = cart.cartItems.find((item: any) => item.shopId == shopId);
-    const productPrice = shop.items.find((item: any) => item.productPriceId == productPriceId);
+    const productPrice = shop.items.find(
+      (item: any) => item.productPriceId == productPriceId,
+    );
     productPrice.quantity = quantity;
     return await cart.save();
   }
@@ -145,11 +172,15 @@ export class CartService {
     const customerId = new Types.ObjectId(id);
     const { productPriceId, shopId } = updateCartDto;
     try {
-      const cart = await this.cartModel.findOne({ customerId: customerId }).exec();
+      const cart = await this.cartModel
+        .findOne({ customerId: customerId })
+        .exec();
       if (!cart) {
         throw new NotFoundException(`Cart with customerId ${id} not found`);
       }
-      const checkShopId = cart.cartItems.find((item: any) => item.shopId == shopId);
+      const checkShopId = cart.cartItems.find(
+        (item: any) => item.shopId == shopId,
+      );
       if (!checkShopId) {
         throw new NotFoundException(`Cart with customerId ${id} not found`);
       }
@@ -162,7 +193,7 @@ export class CartService {
       const cartSelect = await this.cartSelectService.findOne(id);
       const checkIfHave = cartSelect.listProductSelect.find(
         (item: any) => item._id == productPriceId,
-      )
+      );
       if (checkIfHave) {
         this.cartSelectService.removeChildItem(id, { productPriceId });
       }

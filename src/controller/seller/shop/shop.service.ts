@@ -36,9 +36,9 @@ export class ShopService {
   async findById(id: string) {
     try {
       const shop = await this.shopModule.findById(id);
-      if(!shop) throw new Error('Shop khong ton tai!');
+      if (!shop) throw new Error('Shop khong ton tai!');
       return handleThumbnail(shop);
-    }catch(error){
+    } catch (error) {
       throw new InternalServerErrorException();
     }
   }
@@ -70,7 +70,8 @@ export class ShopService {
     const shop = await this.shopModule
       .find({
         name: { $regex: 'ao ba lo', $options: 'i' },
-      }).select('name')
+      })
+      .select('name')
       .exec();
     return shop;
   }

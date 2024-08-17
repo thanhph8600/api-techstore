@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsArray, ValidateNested, IsOptional, IsNumber } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsArray,
+  ValidateNested,
+  IsOptional,
+  IsNumber,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CartItemDto {
@@ -27,7 +33,7 @@ export class CreateCartDto {
 
   @ApiProperty({
     type: [CartItemDto],
-    description: 'Array of cart items grouped by shopId'
+    description: 'Array of cart items grouped by shopId',
   })
   @IsArray()
   @ValidateNested({ each: true })

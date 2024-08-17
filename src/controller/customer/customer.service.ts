@@ -45,7 +45,7 @@ export class CustomerService {
       const newUserCart = {
         customerId: newUserCreated._id,
         cartItems: [],
-      }
+      };
 
       this.cartService.create(newUserCart);
       return new HttpException('Đăng ký thành công!', HttpStatus.OK);

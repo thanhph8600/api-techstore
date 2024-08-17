@@ -8,8 +8,9 @@ import { ItemsOrder } from './schemas/itemsOrder.schema';
 @Injectable()
 export class ItemsOrderService {
   constructor(
-    @InjectModel('ItemsOrder') private readonly itemsOrderModel: Model<ItemsOrder>,
-  ) { }
+    @InjectModel('ItemsOrder')
+    private readonly itemsOrderModel: Model<ItemsOrder>,
+  ) {}
   async create(createItemsOrderDto: CreateItemsOrderDto) {
     try {
       const itemsOrder = new this.itemsOrderModel(createItemsOrderDto);
@@ -95,7 +96,7 @@ export class ItemsOrderService {
             {
               path: 'voucher2t',
             },
-          ]
+          ],
         })
         .exec();
       return items.reverse();
@@ -105,7 +106,8 @@ export class ItemsOrderService {
   }
   async findById(id: string) {
     try {
-      const item: any = await this.itemsOrderModel.findById(id)
+      const item: any = await this.itemsOrderModel
+        .findById(id)
         .populate({
           path: 'customerId',
           select: 'name phone avata',
@@ -141,7 +143,7 @@ export class ItemsOrderService {
             {
               path: 'voucher2t',
             },
-          ]
+          ],
         })
         .exec();
       return item;

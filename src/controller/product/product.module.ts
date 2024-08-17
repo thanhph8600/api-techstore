@@ -25,7 +25,7 @@ import { ProductReviewModule } from '../product-review/product-review.module';
     CategoryDetailModule,
     UploadModule,
     DiscountModule,
-    ProductReviewModule
+    ProductReviewModule,
   ],
   controllers: [ProductController],
   providers: [ProductService],

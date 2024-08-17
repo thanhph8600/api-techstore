@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { CartSelectService } from './cart-select.service';
 import { CreateCartSelectDto } from './dto/create-cart-select.dto';
 import { UpdateCartSelectDto } from './dto/update-cart-select.dto';
@@ -23,16 +31,25 @@ export class CartSelectController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCartSelectDto: UpdateCartSelectDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCartSelectDto: UpdateCartSelectDto,
+  ) {
     return this.cartSelectService.update(id, updateCartSelectDto);
   }
 
   @Patch('select-all/:id')
-  selectAll(@Param('id') id: string, @Body() updateCartSelectDto: UpdateCartSelectDto) {
+  selectAll(
+    @Param('id') id: string,
+    @Body() updateCartSelectDto: UpdateCartSelectDto,
+  ) {
     return this.cartSelectService.selectAll(id, updateCartSelectDto);
   }
   @Patch('remove-child-item/:id')
-  removeChildItem(@Param('id') id: string, @Body() updateCartSelectDto: UpdateCartSelectDto) {
+  removeChildItem(
+    @Param('id') id: string,
+    @Body() updateCartSelectDto: UpdateCartSelectDto,
+  ) {
     return this.cartSelectService.removeChildItem(id, updateCartSelectDto);
   }
   @Delete(':id')
