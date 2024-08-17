@@ -27,6 +27,7 @@ import { MessengerModule } from './controller/chat/messenger/messenger.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AdminVoucherModule } from './controller/admin/admin-voucher/admin-voucher.module';
+import { VoucherWalletModule } from './controller/voucher-wallet/voucher-wallet.module';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { AdminVoucherModule } from './controller/admin/admin-voucher/admin-vouch
       rootPath: join(__dirname, '..', '..', '..', 'dist', 'client'),
     }),
     AdminVoucherModule,
+    VoucherWalletModule,
   ],
   controllers: [AppController],
   providers: [AppService],

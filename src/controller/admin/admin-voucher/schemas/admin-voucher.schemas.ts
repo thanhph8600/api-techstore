@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema, ObjectId } from 'mongoose';
+import { Document, Schema as MongooseSchema, ObjectId, Types, } from 'mongoose';
 
 @Schema()
 export class AdminVoucher extends Document {
     _id: string;
   
     @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Customer' }] })
-    id_customer: ObjectId[];
+    id_customer: Types.ObjectId[];
   
     @Prop()
     type: string;

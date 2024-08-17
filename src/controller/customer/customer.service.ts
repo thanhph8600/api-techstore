@@ -13,12 +13,13 @@ import { Customer } from './schemas/customer.schema';
 import * as bcrypt from 'bcrypt';
 import { payload } from './interface/customer.interface';
 import { UpdatePassword } from './dto/update-customer.dto';
-import { Multer } from 'multer';
+import { VoucherWalletService } from './../voucher-wallet/voucher-wallet.service';
 
 @Injectable()
 export class CustomerService {
   constructor(
     private readonly cartService: CartService,
+    private readonly voucherWalletService: VoucherWalletService,
     @InjectModel('Customer') private readonly customerModel: Model<Customer>,
   ) {}
   async create(createCustomerDto: CreateCustomerDto) {
@@ -49,6 +50,12 @@ export class CustomerService {
         cartItems: [],
       };
       this.cartService.create(newUserCart);
+      
+      const id_customer = {
+        id_customer: newUserCreated._id
+      }
+      await this.voucherWalletService.createVoucherWallet(id_customer);
+
       return new HttpException('Đăng ký thành công!', HttpStatus.OK);
     } catch (error) {
       console.log('error', error);
