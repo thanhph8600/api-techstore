@@ -1,6 +1,5 @@
 import { CreateSubOrderDto } from './dto/create-sub-order.dto';
 import {
-  HttpException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,

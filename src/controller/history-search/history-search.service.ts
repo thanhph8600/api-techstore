@@ -1,10 +1,5 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  Query,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateHistorySearchDto } from './dto/create-history-search.dto';
-import { UpdateHistorySearchDto } from './dto/update-history-search.dto';
 import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { HistorySearch } from './schemas/history-search.schema';

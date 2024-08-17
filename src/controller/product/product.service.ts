@@ -1,4 +1,3 @@
-import { Length } from 'class-validator';
 import {
   HttpException,
   Injectable,
@@ -8,7 +7,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product } from './schemas/product.schema';
-import { Model, ObjectId, Types } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { ShopService } from '../seller/shop/shop.service';
 import { ProductSpecification } from './schemas/product_specification.schema';
 import { CreateProductSpecificationDto } from './dto/create-product_specification.dto';

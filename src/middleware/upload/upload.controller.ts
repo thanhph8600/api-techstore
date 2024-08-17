@@ -111,10 +111,10 @@ export class UploadController {
   }
 }
 
-function getFilename(input) {
-  if (input.includes('/')) {
-    const parts = input.split('/');
-    return parts[parts.length - 1];
-  }
-  return input;
-}
+// function getFilename(input) {
+//   if (input.includes('/')) {
+//     const parts = input.split('/');
+//     return parts[parts.length - 1];
+//   }
+//   return input;
+// }

@@ -89,6 +89,7 @@ export class AddressController {
     @Param('addressId') addressId: string,
     @Body() updateAddressDto: UpdateAddressDto,
   ) {
+    console.log(updateAddressDto);
     const updatedAddress = await this.addressService.delete(addressId);
     if (!updatedAddress) {
       throw new NotFoundException(`Address with ID ${addressId} not found`);

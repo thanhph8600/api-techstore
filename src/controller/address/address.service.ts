@@ -42,6 +42,7 @@ export class AddressService {
     const updatedAddress = await this.addressModel
       .findByIdAndUpdate(addressId, updateAddressDto, { new: true })
       .exec();
+    console.log(updatedAddress);
     return { message: 'Địa chỉ của bạn đã được cập nhật thành công' };
   }
 

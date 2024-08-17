@@ -16,7 +16,7 @@ export class OrderService {
     @InjectModel(Order.name) private orderModel: Model<Order>,
     private readonly itemsOrderService: ItemsOrderService,
     private readonly productPriceService: ProductPriceService,
-    private readonly SubOrderService: SubOrderService,
+    private readonly subOrderService: SubOrderService,
     private readonly cartService: CartService,
     private readonly customerRewardService: CustomerRewardService,
   ) {}
@@ -34,7 +34,7 @@ export class OrderService {
       const checkStockResults = await Promise.all(checkStockPromises.flat());
       const allInStock = checkStockResults.every((result) => result);
       if (!allInStock) {
-        this.SubOrderService.remove(createOrderDto.subOrderId);
+        this.subOrderService.remove(createOrderDto.subOrderId);
         return {
           status: 290,
           message: 'Có sản phẩm hiện không khả dụng vui lòng thử lại',
@@ -98,7 +98,7 @@ export class OrderService {
         // await Promise.all(removeItemsFromCart);
       });
       await Promise.all(saveItemsOrder);
-      await this.SubOrderService.remove(createOrderDto.subOrderId);
+      await this.subOrderService.remove(createOrderDto.subOrderId);
 
       return { status: 200, message: 'Đơn hàng đang được xử lý' };
     } catch (error) {
@@ -140,6 +140,7 @@ export class OrderService {
   }
 
   update(id: number, updateOrderDto: UpdateOrderDto) {
+    console.log(updateOrderDto);
     return `This action updates a #${id} order`;
   }
 

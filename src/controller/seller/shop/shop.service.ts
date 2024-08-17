@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { UpdateShopDto } from './dto/update-shop.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { Shop } from './entities/shop.entity';
 import { CustomerService } from 'src/controller/customer/customer.service';
 import { payload } from 'src/controller/customer/interface/customer.interface';
@@ -77,6 +77,7 @@ export class ShopService {
     return `This action removes a #${id} shop`;
   }
   async search(query: string) {
+    console.log(query);
     const shop = await this.shopModule
       .find({
         name: { $regex: 'ao ba lo', $options: 'i' },

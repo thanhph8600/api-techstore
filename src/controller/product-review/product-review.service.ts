@@ -22,6 +22,7 @@ export class ProductReviewService {
     const productReviews = await this.productReviewModel.find({
       productId: productId,
     });
+    console.log(productReviews);
     // if(productReviews.length > 0) {
     //   const rating = productReviews.reduce((a, b) => a + b.rating, 0) / productReviews.length;
     //   return rating;
@@ -35,6 +36,7 @@ export class ProductReviewService {
   }
 
   update(id: number, updateProductReviewDto: UpdateProductReviewDto) {
+    console.log(updateProductReviewDto);
     return `This action updates a #${id} productReview`;
   }
 

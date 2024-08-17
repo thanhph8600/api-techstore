@@ -13,7 +13,6 @@ import { Customer } from './schemas/customer.schema';
 import * as bcrypt from 'bcrypt';
 import { payload } from './interface/customer.interface';
 import { UpdatePassword } from './dto/update-customer.dto';
-import { Multer } from 'multer';
 
 @Injectable()
 export class CustomerService {

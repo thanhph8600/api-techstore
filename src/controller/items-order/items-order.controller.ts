@@ -6,10 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { ItemsOrderService } from './items-order.service';
 import { CreateItemsOrderDto } from './dto/create-items-order.dto';
 import { UpdateItemsOrderDto } from './dto/update-items-order.dto';
+import { AuthGuard } from 'src/middleware/auth/auth.guard';
 
 @Controller('items-order')
 export class ItemsOrderController {
@@ -33,6 +36,12 @@ export class ItemsOrderController {
   @Get('customer/:id')
   findByCustomerId(@Param('id') id: string) {
     return this.itemsOrderService.findByIdCustomer(id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('shop/:id')
+  findByShop(@Request() req) {
+    return this.itemsOrderService.findByShop(req.user);
   }
 
   @Patch(':id')

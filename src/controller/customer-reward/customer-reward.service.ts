@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateCustomerRewardDto } from './dto/create-customer-reward.dto';
 import { UpdateCustomerRewardDto } from './dto/update-customer-reward.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { CustomerReward } from './schemas/customer-reward.schema';
 
 @Injectable()

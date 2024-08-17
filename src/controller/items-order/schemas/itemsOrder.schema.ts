@@ -82,6 +82,7 @@ export class ItemsOrder {
       'Hoàn thành',
       'Huỷ đơn hàng',
       'Hoàn hàng',
+      'Giao không thành công',
     ],
   })
   status: string;

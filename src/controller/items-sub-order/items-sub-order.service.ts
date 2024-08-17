@@ -1,6 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateItemsSubOrderDto } from './dto/create-items-sub-order.dto';
-import { UpdateItemsSubOrderDto } from './dto/update-items-sub-order.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { ItemsSubOrder } from './schemas/itemsSubOrder.schema';
 import { Model, Types } from 'mongoose';

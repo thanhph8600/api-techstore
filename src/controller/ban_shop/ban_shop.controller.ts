@@ -3,14 +3,12 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   NotFoundException,
   HttpException,
   HttpStatus,
   Put,
-  BadRequestException,
 } from '@nestjs/common';
 import { BanShopService } from './ban_shop.service';
 import { CreateBanShopDto } from './dto/create-ban_shop.dto';

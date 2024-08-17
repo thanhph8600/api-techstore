@@ -4,11 +4,8 @@ import {
   IsString,
   IsOptional,
   IsNumber,
-  IsArray,
-  ValidateNested,
   IsMongoId,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 
 export class CreateOrderDto {
   @ApiProperty()

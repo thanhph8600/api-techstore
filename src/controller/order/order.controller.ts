@@ -26,11 +26,6 @@ export class OrderController {
     return this.orderService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.orderService.findOne(+id);
-  }
-
   @Public()
   @Get('customer/:id')
   findByCustomerId(@Param('id') id: string) {

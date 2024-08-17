@@ -8,9 +8,7 @@ import {
   Patch,
   Request,
   UseGuards,
-  Put,
   UseInterceptors,
-  UploadedFiles,
   BadRequestException,
   UploadedFile,
 } from '@nestjs/common';
@@ -20,7 +18,7 @@ import { Public } from 'src/middleware/auth/public';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/middleware/auth/auth.guard';
 import { UpdatePassword } from './dto/update-customer.dto';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
@@ -103,6 +101,7 @@ export class CustomerController {
     }
 
     const avatarUrl = `/uploads/${file.filename}`;
+    console.log(avatarUrl);
 
     // Cập nhật avatarUrl vào cơ sở dữ liệu
     const oldAvatarPath = await this.customerService.updateAvatar(

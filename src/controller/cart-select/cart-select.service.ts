@@ -1,6 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateCartSelectDto } from './dto/create-cart-select.dto';
-import { UpdateCartSelectDto } from './dto/update-cart-select.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { CartSelect } from './schemas/cartSelect.schema';
 import { Model, Types } from 'mongoose';
