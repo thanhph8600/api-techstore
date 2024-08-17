@@ -20,6 +20,7 @@ import { DiscountModule } from './controller/marketing/discount/discount.module'
 import { VoucherModule } from './controller/marketing/voucher/voucher.module';
 import { AddressModule } from './controller/address/address.module';
 import { FlashSaleModule } from './controller/marketing/flash-sale/flash-sale.module';
+import { BanShopModule } from './controller/ban_shop/ban_shop.module';
 import { WebSocketModule } from './web-socket/web-socket.module';
 import { RoomChatModule } from './controller/chat/room-chat/room-chat.module';
 import { MessengerModule } from './controller/chat/messenger/messenger.module';
@@ -52,6 +53,7 @@ import { join } from 'path';
     VoucherModule,
     AddressModule,
     FlashSaleModule,
+    BanShopModule,
     WebSocketModule,
     RoomChatModule,
     MessengerModule,

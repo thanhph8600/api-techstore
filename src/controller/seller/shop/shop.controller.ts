@@ -13,6 +13,7 @@ import { ShopService } from './shop.service';
 import { UpdateShopDto } from './dto/update-shop.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/middleware/auth/auth.guard';
+import { Public } from 'src/middleware/auth/public';
 
 @ApiBearerAuth()
 @ApiTags('shop')
@@ -26,6 +27,7 @@ export class ShopController {
     return this.shopService.create(req.user);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.shopService.findAll();

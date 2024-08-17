@@ -27,9 +27,7 @@ export class AddressController {
 
   @Post()
   @UsePipes(new ValidationPipe({ transform: true }))
-  async create(
-    @Body() createAddressDto: CreateAddressDto,
-  ): Promise<HttpException> {
+  async create(@Body() createAddressDto: CreateAddressDto): Promise<HttpException> {
     // try {
     //   const address = await this.addressService.create(createAddressDto);
     //   return address;
@@ -41,24 +39,16 @@ export class AddressController {
 
   @Public()
   @Patch('default')
-  async setDefaultAddress(
-    @Body() body: { addressId: string; customerId: string },
-  ): Promise<{ message: string }> {
+  async setDefaultAddress(@Body() body: { addressId: string; customerId: string }): Promise<{ message: string }> {
     const { addressId, customerId } = body;
     try {
-      const message = await this.addressService.setDefaultAddress(
-        addressId,
-        customerId,
-      );
+      const message = await this.addressService.setDefaultAddress(addressId, customerId);
       return { message };
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
-      throw new HttpException(
-        'Đặt địa chỉ thành mặc định thất bại',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Đặt địa chỉ thành mặc định thất bại', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -73,10 +63,10 @@ export class AddressController {
       updateAddressDto,
     );
     if (!updatedAddress) {
-      throw new NotFoundException(`Address with ID ${addressId} not found`);
+      throw new NotFoundException(`Địa chỉ với ID ${addressId} không được tìm thấy`);
     }
     return {
-      message: 'Address updated successfully',
+      message: 'Cập nhật địa chỉ thành công',
       address: updatedAddress,
     };
   }
@@ -85,9 +75,19 @@ export class AddressController {
   @Delete(':addressId')
   async delete(
     @Param('addressId') addressId: string,
-  ): Promise<{ message: string }> {
-    return this.addressService.delete(addressId);
+    @Body() updateAddressDto: UpdateAddressDto,
+  ) {
+    const updatedAddress = await this.addressService.delete(addressId);
+    if (!updatedAddress) {
+      throw new NotFoundException(`Address with ID ${addressId} not found`);
+    }
+    return {
+      message: 'Address updated successfully',
+      address: updatedAddress,
+    };
   }
+
+
 
   @Get()
   async findAll() {
@@ -100,10 +100,17 @@ export class AddressController {
   }
 
   @Public()
+  @Get('byaddressid/:addressId')
+  async findByAddressId(@Param('addressId') addressId: string) {
+    return this.addressService.findByAddressId(addressId);
+  }
+
+  @Public()
   @Get('customer/:customerId')
-  async findAllByCustomerId(
-    @Param('customerId') customerId: string,
-  ): Promise<Address[]> {
+  async findAllByCustomerId(@Param('customerId') customerId: string): Promise<Address[]> {
     return this.addressService.findAllByCustomerId(customerId);
   }
+
+
+
 }
