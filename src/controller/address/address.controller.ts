@@ -73,10 +73,12 @@ export class AddressController {
       updateAddressDto,
     );
     if (!updatedAddress) {
-      throw new NotFoundException(`Address with ID ${addressId} not found`);
+      throw new NotFoundException(
+        `Địa chỉ với ID ${addressId} không được tìm thấy`,
+      );
     }
     return {
-      message: 'Address updated successfully',
+      message: 'Cập nhật địa chỉ thành công',
       address: updatedAddress,
     };
   }
@@ -85,8 +87,16 @@ export class AddressController {
   @Delete(':addressId')
   async delete(
     @Param('addressId') addressId: string,
-  ): Promise<{ message: string }> {
-    return this.addressService.delete(addressId);
+    @Body() updateAddressDto: UpdateAddressDto,
+  ) {
+    const updatedAddress = await this.addressService.delete(addressId);
+    if (!updatedAddress) {
+      throw new NotFoundException(`Address with ID ${addressId} not found`);
+    }
+    return {
+      message: 'Address updated successfully',
+      address: updatedAddress,
+    };
   }
 
   @Get()
@@ -97,6 +107,12 @@ export class AddressController {
   @Get(':customerId')
   async findByCustomerId(@Param('customerId') customerId: string) {
     return this.addressService.findByCustomerId(customerId);
+  }
+
+  @Public()
+  @Get('byaddressid/:addressId')
+  async findByAddressId(@Param('addressId') addressId: string) {
+    return this.addressService.findByAddressId(addressId);
   }
 
   @Public()

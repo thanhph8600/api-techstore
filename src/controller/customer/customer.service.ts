@@ -4,6 +4,7 @@ import {
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -12,6 +13,7 @@ import { Customer } from './schemas/customer.schema';
 import * as bcrypt from 'bcrypt';
 import { payload } from './interface/customer.interface';
 import { UpdatePassword } from './dto/update-customer.dto';
+import { Multer } from 'multer';
 
 @Injectable()
 export class CustomerService {
@@ -87,6 +89,14 @@ export class CustomerService {
     return this.customerModel.findOne({ email });
   }
 
+  async findUserById(payload: payload): Promise<Customer> {
+    const user = await this.customerModel.findById(payload.sub).exec();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
   async changePass(payload: payload, updatePassword: UpdatePassword) {
     try {
       if (updatePassword.new_password.length < 6) {
@@ -134,5 +144,22 @@ export class CustomerService {
   }
   async comparePass(pass: string, hash: string) {
     return await bcrypt.compare(pass, hash);
+  }
+
+  async updateAvatar(
+    payload: payload,
+    avatarPath: Express.Multer.File,
+  ): Promise<string> {
+    const customer = await this.customerModel.findById(payload.sub);
+    if (!customer) {
+      throw new NotFoundException('Không tìm thấy khách hàng');
+    }
+
+    const oldPathAvatar = customer.avata;
+
+    customer.avata = avatarPath.filename;
+    await customer.save();
+
+    return oldPathAvatar;
   }
 }
