@@ -10,6 +10,6 @@ import { BanShopSchema } from './schemas/ban_shop.schemas';
   ],
   controllers: [BanShopController],
   providers: [BanShopService],
-  exports: [BanShopService]
+  exports: [BanShopService],
 })
 export class BanShopModule {}

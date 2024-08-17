@@ -145,17 +145,20 @@ export class CustomerService {
     return await bcrypt.compare(pass, hash);
   }
 
-  async updateAvatar(payload: payload, avatarPath: Express.Multer.File): Promise<string> {
+  async updateAvatar(
+    payload: payload,
+    avatarPath: Express.Multer.File,
+  ): Promise<string> {
     const customer = await this.customerModel.findById(payload.sub);
     if (!customer) {
       throw new NotFoundException('Không tìm thấy khách hàng');
     }
-    
-    const oldPathAvatar = customer.avata
-    
-    customer.avata =avatarPath.filename;
+
+    const oldPathAvatar = customer.avata;
+
+    customer.avata = avatarPath.filename;
     await customer.save();
-  
+
     return oldPathAvatar;
   }
 }

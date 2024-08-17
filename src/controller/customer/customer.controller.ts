@@ -69,8 +69,7 @@ export class CustomerController {
   // @Public()
   @Post('update-avatar')
   @UseInterceptors(
-    FileInterceptor('avatar',
-      {
+    FileInterceptor('avatar', {
       storage: diskStorage({
         destination: (req, file, cb) => {
           const uploadPath = './uploads';
@@ -91,12 +90,11 @@ export class CustomerController {
           cb(null, true);
         }
       },
-    }
-  ),
+    }),
   )
   async updateAvatar(
     @UploadedFile() file: Express.Multer.File,
-    @Request() req
+    @Request() req,
   ) {
     console.log(file);
 
@@ -107,22 +105,26 @@ export class CustomerController {
     const avatarUrl = `/uploads/${file.filename}`;
 
     // Cập nhật avatarUrl vào cơ sở dữ liệu
-    const oldAvatarPath = await this.customerService.updateAvatar(req.user, file);
-    console.log("oldAvatarPath",oldAvatarPath);
-    const finalOldAvatarPath = `/DATN/api-techstore/uploads/${oldAvatarPath}`
+    const oldAvatarPath = await this.customerService.updateAvatar(
+      req.user,
+      file,
+    );
+    console.log('oldAvatarPath', oldAvatarPath);
+    const finalOldAvatarPath = `/DATN/api-techstore/uploads/${oldAvatarPath}`;
 
-    const avatarDefault = `/DATN/api-techstore/uploads/avata-default.jpg`
-    
+    const avatarDefault = `/DATN/api-techstore/uploads/avata-default.jpg`;
 
-    if (finalOldAvatarPath ) {
-      if(finalOldAvatarPath === avatarDefault) {
-        return
-      }else {
+    if (finalOldAvatarPath) {
+      if (finalOldAvatarPath === avatarDefault) {
+        return;
+      } else {
         fs.unlink(finalOldAvatarPath, (err) => {
           if (err) {
             console.error(`Error deleting old avatar: ${err}`);
           } else {
-            console.log(`Successfully deleted old avatar: ${finalOldAvatarPath}`);
+            console.log(
+              `Successfully deleted old avatar: ${finalOldAvatarPath}`,
+            );
           }
         });
       }

@@ -12,7 +12,7 @@ export class ShopService {
   constructor(
     @InjectModel('Shop') private readonly shopModule: Model<Shop>,
     private readonly customerService: CustomerService,
-    private banShopService: BanShopService
+    private banShopService: BanShopService,
   ) {}
 
   async create(payload) {
@@ -31,14 +31,13 @@ export class ShopService {
 
     await this.banShopService.create({
       id_shop: shop.id,
-      reasonBan: "",
+      reasonBan: '',
       banStartDate: new Date(),
       banEndDate: new Date(),
-    })
+    });
 
     return shop;
   }
-
 
   async findAll() {
     return await this.shopModule.find();

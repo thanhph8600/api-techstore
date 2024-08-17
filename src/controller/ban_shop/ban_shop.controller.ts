@@ -1,4 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, HttpException, HttpStatus, Put, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  NotFoundException,
+  HttpException,
+  HttpStatus,
+  Put,
+  BadRequestException,
+} from '@nestjs/common';
 import { BanShopService } from './ban_shop.service';
 import { CreateBanShopDto } from './dto/create-ban_shop.dto';
 import { UpdateBanShopDto } from './dto/update-ban_shop.dto';
@@ -31,23 +44,26 @@ export class BanShopController {
   @Public()
   @Put(':id_shop')
   async update(
-    @Param('id_shop') id_shop: string, 
-    @Body() updateBanShopDto: UpdateBanShopDto
+    @Param('id_shop') id_shop: string,
+    @Body() updateBanShopDto: UpdateBanShopDto,
   ): Promise<HttpException | BanShop> {
-    const updatedBanShop = await this.banShopService.updateByIdShop(id_shop, updateBanShopDto);
-    
+    const updatedBanShop = await this.banShopService.updateByIdShop(
+      id_shop,
+      updateBanShopDto,
+    );
+
     if (!updatedBanShop) {
       throw new NotFoundException(`Shop với địa chỉ ${id_shop} không tồn tại`);
     }
-    
+
     return new HttpException('Sửa cấm cửa hàng thành công', HttpStatus.CREATED);
   }
 
   @Public()
   @Get(':id_shop')
-  async findByIdShop(@Param('id_shop') id_shop: string){
+  async findByIdShop(@Param('id_shop') id_shop: string) {
     const shop = await this.banShopService.findByIdShop(id_shop);
-    
+
     if (!shop) {
       throw new NotFoundException(`Shop với id_shop ${id_shop} không tồn tại`);
     }
@@ -57,20 +73,19 @@ export class BanShopController {
   @Public()
   @Get('check-ban/:id_shop')
   async checkBanStatus(@Param('id_shop') id_shop: string) {
-    const {isBanned, remainingBanTime} = await this.banShopService.checkIfShopIsBanned(id_shop)
+    const { isBanned, remainingBanTime } =
+      await this.banShopService.checkIfShopIsBanned(id_shop);
 
-    if(!isBanned) {
+    if (!isBanned) {
       return { message: 'Shop is not banned', isBanned };
-    }else {
-      return {isBanned, remainingBanTime}
+    } else {
+      return { isBanned, remainingBanTime };
     }
     // if (isBanned) {
     //   throw new BadRequestException(`Shop is banned ${isBanned} for ${remainingBanTime} milliseconds`);
     //   return {isBanned, remainingBanTime}
     // }
-
   }
-
 
   @Delete(':id')
   remove(@Param('id') id: string) {

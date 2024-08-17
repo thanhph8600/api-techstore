@@ -15,7 +15,7 @@ import { BanShopSchema } from 'src/controller/ban_shop/schemas/ban_shop.schemas'
     MongooseModule.forFeature([{ name: 'BanShop', schema: BanShopSchema }]),
   ],
   controllers: [ShopController],
-  providers: [ShopService,BanShopService],
+  providers: [ShopService, BanShopService],
   exports: [ShopService],
 })
 export class ShopModule {}

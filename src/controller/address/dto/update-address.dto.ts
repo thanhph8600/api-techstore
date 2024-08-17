@@ -36,5 +36,3 @@ export class UpdateIsDefault {
   @IsNotEmpty()
   customerId: string;
 }
-
-
