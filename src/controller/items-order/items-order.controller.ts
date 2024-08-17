@@ -1,8 +1,18 @@
-import { payload } from './../customer/interface/customer.interface';
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { ItemsOrderService } from './items-order.service';
 import { CreateItemsOrderDto } from './dto/create-items-order.dto';
 import { UpdateItemsOrderDto } from './dto/update-items-order.dto';
+import { AuthGuard } from 'src/middleware/auth/auth.guard';
 
 @Controller('items-order')
 export class ItemsOrderController {
@@ -38,6 +48,13 @@ export class ItemsOrderController {
     return this.itemsOrderService.update(id, updateItemsOrderDto);
   }
 
+  @UseGuards(AuthGuard)
+  @Get('shop/:id')
+  findByShop(@Request() req) {
+    return this.itemsOrderService.findByShop(req.user);
+  }
+
+  
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.itemsOrderService.remove(+id);

@@ -114,14 +114,20 @@ export class CategoryDetailService {
   }
   async search(query: string) {
     try {
-      const normalizedQuery = diacritics.remove(query)
-        .replace(/[^\w\s]/g, '')  
-        .replace(/\s+/g, '\\s*'); 
-      const categorydetails = await this.detailCategoryModel.find().select('name slug');
-      const result = categorydetails.filter(cat => {
+      const normalizedQuery = diacritics
+        .remove(query)
+        .replace(/[^\w\s]/g, '')
+        .replace(/\s+/g, '\\s*');
+      const categorydetails = await this.detailCategoryModel
+        .find()
+        .select('name slug');
+      const result = categorydetails.filter((cat) => {
         const normalizedCatName = diacritics.remove(cat.name);
         const normalizedCatSlug = diacritics.remove(cat.slug);
-        return new RegExp(normalizedQuery, 'i').test(normalizedCatName) || new RegExp(normalizedQuery, 'i').test(normalizedCatSlug);
+        return (
+          new RegExp(normalizedQuery, 'i').test(normalizedCatName) ||
+          new RegExp(normalizedQuery, 'i').test(normalizedCatSlug)
+        );
       });
       return result;
     } catch (error) {
@@ -129,5 +135,4 @@ export class CategoryDetailService {
       throw new InternalServerErrorException();
     }
   }
-  
 }

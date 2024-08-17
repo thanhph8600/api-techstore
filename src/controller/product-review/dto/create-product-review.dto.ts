@@ -3,7 +3,7 @@ import { Type } from 'class-transformer';
 import { IsNotEmpty } from 'class-validator';
 import { ObjectId } from 'mongoose';
 export class CreateProductReviewDto {
-    _id: ObjectId;
+  _id: ObjectId;
 
     @ApiProperty()
     @IsNotEmpty()

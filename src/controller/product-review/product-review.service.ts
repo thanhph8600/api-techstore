@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateProductReviewDto } from './dto/create-product-review.dto';
 import { UpdateProductReviewDto } from './dto/update-product-review.dto';
 import { ProductReview } from './schemas/product-review.schema';
-import { InjectModel} from '@nestjs/mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { ItemsOrderService } from '../items-order/items-order.service';
 import { CustomerRewardService } from '../customer-reward/customer-reward.service';
@@ -61,6 +61,7 @@ export class ProductReviewService {
   }
 
   update(id: number, updateProductReviewDto: UpdateProductReviewDto) {
+    console.log(updateProductReviewDto);
     return `This action updates a #${id} productReview`;
   }
 

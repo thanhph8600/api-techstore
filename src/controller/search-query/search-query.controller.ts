@@ -11,5 +11,4 @@ export class SearchQueryController {
   async search(@Query('q') query: string) {
     return this.searchQueryService.searchQuery(query);
   }
-
 }

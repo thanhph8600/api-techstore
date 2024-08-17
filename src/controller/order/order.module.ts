@@ -16,7 +16,7 @@ import { CustomerRewardModule } from '../customer-reward/customer-reward.module'
     ProductPriceModule,
     SubOrderModule,
     CartModule,
-    CustomerRewardModule
+    CustomerRewardModule,
   ],
   controllers: [OrderController],
   providers: [OrderService],

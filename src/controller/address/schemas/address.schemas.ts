@@ -12,6 +12,9 @@ export class Address extends Document {
   @Prop({})
   phoneNumber: string;
 
+  @Prop({})
+  address: string;
+
   @Prop({ default: false })
   addressType: boolean;
 

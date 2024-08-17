@@ -7,7 +7,7 @@ import { CategoryModule } from '../category/category.module';
 import { CategoryDetailModule } from '../category-detail/category-detail.module';
 
 @Module({
-  imports: [ShopModule , ProductModule, CategoryModule , CategoryDetailModule],
+  imports: [ShopModule, ProductModule, CategoryModule, CategoryDetailModule],
   controllers: [SearchQueryController],
   providers: [SearchQueryService],
 })

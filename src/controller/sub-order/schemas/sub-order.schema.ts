@@ -43,7 +43,6 @@ export class SubOrder {
   @Prop({ type: String, default: null })
   methodPayment: string;
 
-  
   items: any;
 
   @Prop({ type: Number, default: 0 })
@@ -52,9 +51,9 @@ export class SubOrder {
   @Prop({ type: Number, default: 0 })
   total: number;
 
-  customerReward?: any
+  customerReward?: any;
 
-  listProduct?: any
+  listProduct?: any;
 }
 
 export const SubOrderSchema = SchemaFactory.createForClass(SubOrder);

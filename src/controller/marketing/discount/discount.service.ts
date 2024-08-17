@@ -21,7 +21,7 @@ export class DiscountService {
     @InjectModel(DiscountDetail.name)
     private readonly discountDetailModel: Model<Discount>,
     private readonly shopService: ShopService,
-  ) { }
+  ) {}
   async create(createDiscountDto: CreateDiscountDto[], payload: payload) {
     try {
       const shop = await this.shopService.create(payload);
@@ -92,23 +92,23 @@ export class DiscountService {
   async findOneByIdProductPrice(id: string) {
     const id_productPrice = new Types.ObjectId(id);
     try {
-        const discountDetail = await this.discountDetailModel.findOne({ id_productPrice })
-            .populate({
-                path: 'id_discount',
-                select: 'time_start time_end',
-            });
+      const discountDetail = await this.discountDetailModel
+        .findOne({ id_productPrice })
+        .populate({
+          path: 'id_discount',
+          select: 'time_start time_end',
+        });
 
-        if (!discountDetail) {
-            return null;
-        }
+      if (!discountDetail) {
+        return null;
+      }
 
-        return discountDetail;
+      return discountDetail;
     } catch (error) {
-        console.log('Error finding discount by product price:', error);
-        throw new InternalServerErrorException();
+      console.log('Error finding discount by product price:', error);
+      throw new InternalServerErrorException();
     }
-}
-
+  }
 
   async update(
     id: string,

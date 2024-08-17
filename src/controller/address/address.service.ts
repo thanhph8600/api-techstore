@@ -39,9 +39,10 @@ export class AddressService {
     addressId: string,
     updateAddressDto: UpdateAddressDto,
   ): Promise<{ message: string }> {
-    await this.addressModel
+    const updatedAddress = await this.addressModel
       .findByIdAndUpdate(addressId, updateAddressDto, { new: true })
       .exec();
+    console.log(updatedAddress);
     return { message: 'Địa chỉ của bạn đã được cập nhật thành công' };
   }
 
@@ -99,19 +100,21 @@ export class AddressService {
       session.endSession();
     }
   }
-  async findByAddressId(addressId: string): Promise<Address> {
-    const address = await this.addressModel.findById(addressId).exec();
-    if (!address) {
-      throw new NotFoundException(`Address with ID ${addressId} not found`);
-    }
-    return address;
-  }
+
   async findAll(): Promise<Address[]> {
     return this.addressModel.find().exec();
   }
 
   async findByCustomerId(customerId: string): Promise<Address[]> {
     return this.addressModel.find({ customerId }).exec();
+  }
+
+  async findByAddressId(addressId: string): Promise<Address> {
+    const address = await this.addressModel.findById(addressId).exec();
+    if (!address) {
+      throw new NotFoundException(`Address with ID ${addressId} not found`);
+    }
+    return address;
   }
 
   async findAllByCustomerId(customerId: string): Promise<Address[]> {

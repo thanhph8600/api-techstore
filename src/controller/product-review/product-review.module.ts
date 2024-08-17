@@ -19,6 +19,6 @@ import { CustomerRewardModule } from '../customer-reward/customer-reward.module'
   ],
   controllers: [ProductReviewController],
   providers: [ProductReviewService],
-  exports: [ProductReviewService]
+  exports: [ProductReviewService],
 })
 export class ProductReviewModule {}

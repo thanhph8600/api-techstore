@@ -27,6 +27,7 @@ export class ShopController {
     return this.shopService.create(req.user);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.shopService.findAll();

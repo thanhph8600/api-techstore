@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { HistorySearchService } from './history-search.service';
 import { CreateHistorySearchDto } from './dto/create-history-search.dto';
 import { UpdateHistorySearchDto } from './dto/update-history-search.dto';
@@ -21,7 +29,10 @@ export class HistorySearchController {
     return this.historySearchService.findOne(id);
   }
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateHistorySearchDto: UpdateHistorySearchDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateHistorySearchDto: UpdateHistorySearchDto,
+  ) {
     return this.historySearchService.update(id, updateHistorySearchDto);
   }
 

@@ -8,7 +8,7 @@ export class HistorySearch {
   @Prop({ type: Types.ObjectId, required: true })
   customerId: Types.ObjectId;
 
-  @Prop([String]) 
+  @Prop([String])
   query: string[];
 }
 

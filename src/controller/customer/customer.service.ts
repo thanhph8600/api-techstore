@@ -4,6 +4,7 @@ import {
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -45,7 +46,7 @@ export class CustomerService {
       const newUserCart = {
         customerId: newUserCreated._id,
         cartItems: [],
-      }
+      };
 
       this.cartService.create(newUserCart);
       return new HttpException('Đăng ký thành công!', HttpStatus.OK);
@@ -85,6 +86,14 @@ export class CustomerService {
 
   findOneWithEmail(email: string) {
     return this.customerModel.findOne({ email });
+  }
+
+  async findUserById(payload: payload): Promise<Customer> {
+    const user = await this.customerModel.findById(payload.sub).exec();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   async changePass(payload: payload, updatePassword: UpdatePassword) {
@@ -134,5 +143,22 @@ export class CustomerService {
   }
   async comparePass(pass: string, hash: string) {
     return await bcrypt.compare(pass, hash);
+  }
+
+  async updateAvatar(
+    payload: payload,
+    avatarPath: Express.Multer.File,
+  ): Promise<string> {
+    const customer = await this.customerModel.findById(payload.sub);
+    if (!customer) {
+      throw new NotFoundException('Không tìm thấy khách hàng');
+    }
+
+    const oldPathAvatar = customer.avata;
+
+    customer.avata = avatarPath.filename;
+    await customer.save();
+
+    return oldPathAvatar;
   }
 }

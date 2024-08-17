@@ -1,16 +1,18 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { UpdateShopDto } from './dto/update-shop.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { Shop } from './entities/shop.entity';
 import { CustomerService } from 'src/controller/customer/customer.service';
 import { payload } from 'src/controller/customer/interface/customer.interface';
+import { BanShopService } from 'src/controller/ban_shop/ban_shop.service';
 
 @Injectable()
 export class ShopService {
   constructor(
     @InjectModel('Shop') private readonly shopModule: Model<Shop>,
     private readonly customerService: CustomerService,
+    private banShopService: BanShopService,
   ) {}
 
   async create(payload) {
@@ -26,19 +28,27 @@ export class ShopService {
       thumbnail: payload.avata,
     };
     const shop = await this.shopModule.create(newShop);
+
+    await this.banShopService.create({
+      id_shop: shop.id,
+      reasonBan: '',
+      banStartDate: new Date(),
+      banEndDate: new Date(),
+    });
+
     return shop;
   }
 
-  findAll() {
-    return `This action returns all shop`;
+  async findAll() {
+    return await this.shopModule.find();
   }
 
   async findById(id: string) {
     try {
       const shop = await this.shopModule.findById(id);
-      if(!shop) throw new Error('Shop khong ton tai!');
+      if (!shop) throw new Error('Shop khong ton tai!');
       return handleThumbnail(shop);
-    }catch(error){
+    } catch (error) {
       throw new InternalServerErrorException();
     }
   }
@@ -67,10 +77,12 @@ export class ShopService {
     return `This action removes a #${id} shop`;
   }
   async search(query: string) {
+    console.log(query);
     const shop = await this.shopModule
       .find({
         name: { $regex: 'ao ba lo', $options: 'i' },
-      }).select('name')
+      })
+      .select('name')
       .exec();
     return shop;
   }

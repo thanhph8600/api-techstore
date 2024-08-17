@@ -10,7 +10,7 @@ import { ItemsSubOrderModule } from '../items-sub-order/items-sub-order.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: SubOrder.name, schema: SubOrderSchema }
+      { name: SubOrder.name, schema: SubOrderSchema },
     ]),
     CustomerRewardModule,
     VoucherModule,
@@ -18,6 +18,6 @@ import { ItemsSubOrderModule } from '../items-sub-order/items-sub-order.module';
   ],
   controllers: [SubOrderController],
   providers: [SubOrderService],
-  exports: [SubOrderService]
+  exports: [SubOrderService],
 })
 export class SubOrderModule {}

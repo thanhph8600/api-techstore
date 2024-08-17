@@ -1,4 +1,3 @@
-import { Length } from 'class-validator';
 import {
   HttpException,
   Injectable,
@@ -8,7 +7,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product } from './schemas/product.schema';
-import { Model, ObjectId, Types } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { ShopService } from '../seller/shop/shop.service';
 import { ProductSpecification } from './schemas/product_specification.schema';
 import { CreateProductSpecificationDto } from './dto/create-product_specification.dto';
@@ -28,8 +27,8 @@ export class ProductService {
     private readonly productVariation: ProductPriceService,
     private readonly uploadService: UploadService,
     private readonly discountService: DiscountService,
-    private readonly productReviewService: ProductReviewService
-  ) { }
+    private readonly productReviewService: ProductReviewService,
+  ) {}
 
   async create(createProductDto: CreateProductDto, payload) {
     const shop = await this.shopService.create(payload);
@@ -68,7 +67,7 @@ export class ProductService {
       .populate('id_categoryDetail')
       .lean()
       .exec();
-    let listProducts: any[] = [];
+    const listProducts: any[] = [];
     await Promise.all(
       products.map(async (item: any) => {
         if (item.product_price.length > 0) {
@@ -76,39 +75,47 @@ export class ProductService {
             const maxPrice = getMaxPrice(item.product_price);
             item.priceMax = maxPrice;
           }
-          const listIdProductPrice = item.product_price.map((price: any) => price._id);
+          const listIdProductPrice = item.product_price.map(
+            (price: any) => price._id,
+          );
           const listDiscountByProductPrice = await Promise.all(
             listIdProductPrice.map(async (id: any) => {
               return await this.discountService.findOneByIdProductPrice(id);
-            })
+            }),
           );
-          const checkListIsAvailibale = listDiscountByProductPrice.filter((item: any) => {
-            if (item?.id_discount) {
-              const isSale = checkDiscount(item.id_discount.time_start, item.id_discount.time_end);
-              if (isSale && item.status === true) {
-                return item;
+          const checkListIsAvailibale = listDiscountByProductPrice.filter(
+            (item: any) => {
+              if (item?.id_discount) {
+                const isSale = checkDiscount(
+                  item.id_discount.time_start,
+                  item.id_discount.time_end,
+                );
+                if (isSale && item.status === true) {
+                  return item;
+                }
               }
-            }
-          })
+            },
+          );
           if (checkListIsAvailibale.length > 0) {
             item.discount = checkListIsAvailibale;
             const maxPerent = getMaxPercent(checkListIsAvailibale);
             item.percent = maxPerent;
-            const minMaxPriceAfferDiscount = getMinMaxPriceAfterDiscount(item.product_price, checkListIsAvailibale);
+            const minMaxPriceAfferDiscount = getMinMaxPriceAfterDiscount(
+              item.product_price,
+              checkListIsAvailibale,
+            );
             if (minMaxPriceAfferDiscount) {
               item.valuePriceDiscount = minMaxPriceAfferDiscount;
-            }
-            else {
+            } else {
               item.valuePriceDiscount = null;
             }
           }
           listProducts.push(item);
         }
-      })
+      }),
     );
     return handleThumbnailListProduct(listProducts);
   }
-
 
   async findOne(id: ObjectId) {
     try {
@@ -117,7 +124,10 @@ export class ProductService {
         .populate('id_categoryDetail')
         .populate({
           path: 'product_specifications',
-          populate: [{ path: 'id_specifications' }, { path: 'id_specifications_detail' }],
+          populate: [
+            { path: 'id_specifications' },
+            { path: 'id_specifications_detail' },
+          ],
         })
         .populate('variation_color')
         .populate('variation_size')
@@ -129,27 +139,44 @@ export class ProductService {
         .lean()
         .exec();
       if (!product) throw new HttpException('Không tìm thấy sản phẩm', 404);
-      const getRating = await this.productReviewService.getRatingByProductId(product?._id);
-      if(getRating) product.rating = getRating;     
+      const getRating = await this.productReviewService.getRatingByProductId(
+        product?._id,
+      );
+      if (getRating) product.rating = getRating;
       if (product?.product_price?.length > 0) {
-        const listIdProductPrice = product.product_price.map((item: any) => item._id);
-        const listDiscountByProductPrice = await Promise.all(
-          listIdProductPrice.map((item: any) => this.discountService.findOneByIdProductPrice(item))
+        const listIdProductPrice = product.product_price.map(
+          (item: any) => item._id,
         );
-        if (!listDiscountByProductPrice || listDiscountByProductPrice.length === 0) {
+        const listDiscountByProductPrice = await Promise.all(
+          listIdProductPrice.map((item: any) =>
+            this.discountService.findOneByIdProductPrice(item),
+          ),
+        );
+        if (
+          !listDiscountByProductPrice ||
+          listDiscountByProductPrice.length === 0
+        ) {
           return handleThumbnailproduct(product);
         }
-        const checkListIsAvailable = listDiscountByProductPrice.filter((item: any) => {
-          if (item) {
-            const checkDiscountIsSale = checkDiscount(item.id_discount.time_start, item.id_discount.time_end);
-            if (checkDiscountIsSale && item.status === true) {
-              return item;
+        const checkListIsAvailable = listDiscountByProductPrice.filter(
+          (item: any) => {
+            if (item) {
+              const checkDiscountIsSale = checkDiscount(
+                item.id_discount.time_start,
+                item.id_discount.time_end,
+              );
+              if (checkDiscountIsSale && item.status === true) {
+                return item;
+              }
             }
-          }
-        });
+          },
+        );
         if (checkListIsAvailable.length > 0) {
           product.discount = checkListIsAvailable;
-          const minMaxPriceAfterDiscount = getMinMaxPriceAfterDiscount(product.product_price, checkListIsAvailable);
+          const minMaxPriceAfterDiscount = getMinMaxPriceAfterDiscount(
+            product.product_price,
+            checkListIsAvailable,
+          );
           product.valuePriceDiscount = minMaxPriceAfterDiscount || null;
         }
       }
@@ -180,7 +207,6 @@ export class ProductService {
   // async productQuery(q: any) {
   //   console.log(q);
 
-
   // }
   async update(id: string, updateProductDto: UpdateProductDto) {
     try {
@@ -190,7 +216,6 @@ export class ProductService {
       throw new InternalServerErrorException();
     }
   }
-
 
   async updateUnlisted(
     idProduct,
@@ -327,14 +352,20 @@ export function handleThumbnailproduct(product) {
   }
   return { ...product, thumbnails: updatedThumbnail };
 }
-export function getMinMaxPriceAfterDiscount(productPrices: any, discounts: any): { minPrice: number; maxPrice: number } | null {
+export function getMinMaxPriceAfterDiscount(
+  productPrices: any,
+  discounts: any,
+): { minPrice: number; maxPrice: number } | null {
   if (productPrices?.length === 0) return null;
 
   let minPrice = 0;
   let maxPrice = 0;
   productPrices?.forEach((priceObj: any) => {
     const price = priceObj?.price;
-    const check = discounts?.find((item: any) => item?.id_productPrice.toString() === priceObj?._id.toString())
+    const check = discounts?.find(
+      (item: any) =>
+        item?.id_productPrice.toString() === priceObj?._id.toString(),
+    );
     //  console.log(check);
 
     if (check) {
@@ -350,10 +381,10 @@ export function getMinMaxPriceAfterDiscount(productPrices: any, discounts: any):
   });
 
   return { minPrice, maxPrice };
-};
+}
 
 export function discountPrice(price: number, percent: number) {
-  return price - (price * percent) / 100
+  return price - (price * percent) / 100;
 }
 export function getMaxPercent(discounts: any) {
   let maxPercent = 0;
@@ -379,5 +410,3 @@ export const checkDiscount = (startTime: string, endTime: string) => {
   const end = new Date(endTime);
   return now >= start && now <= end;
 };
-
-

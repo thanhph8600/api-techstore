@@ -34,6 +34,7 @@ import { join } from 'path';
 import { ItemsSubOrderModule } from './controller/items-sub-order/items-sub-order.module';
 import { ItemsOrderModule } from './controller/items-order/items-order.module';
 import { ProductReviewModule } from './controller/product-review/product-review.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
@@ -69,7 +70,6 @@ import { ProductReviewModule } from './controller/product-review/product-review.
     VoucherModule,
     AddressModule,
     FlashSaleModule,
-
     WebSocketModule,
     RoomChatModule,
     MessengerModule,

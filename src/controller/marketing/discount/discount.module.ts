@@ -29,6 +29,6 @@ import { CartModule } from 'src/controller/cart/cart.module';
   ],
   controllers: [DiscountController],
   providers: [DiscountService],
-  exports: [DiscountService ],
+  exports: [DiscountService],
 })
 export class DiscountModule {}

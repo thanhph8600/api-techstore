@@ -1,5 +1,9 @@
 import { CreateSubOrderDto } from './dto/create-sub-order.dto';
-import { HttpException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { SubOrder } from './schemas/sub-order.schema';
 import { Model, Types } from 'mongoose';
@@ -9,11 +13,12 @@ import { VoucherService } from '../marketing/voucher/voucher.service';
 import { ItemsSubOrderService } from '../items-sub-order/items-sub-order.service';
 @Injectable()
 export class SubOrderService {
-  constructor(@InjectModel('SubOrder') private subOrderModel: Model<SubOrder>,
+  constructor(
+    @InjectModel('SubOrder') private subOrderModel: Model<SubOrder>,
     private readonly customerReward: CustomerRewardService,
     private readonly voucherService: VoucherService,
-    private readonly itemsSubOrderService: ItemsSubOrderService
-  ) { }
+    private readonly itemsSubOrderService: ItemsSubOrderService,
+  ) {}
   async create(createSubOrderDto: CreateSubOrderDto) {
     try {
       const newSubOrder = new this.subOrderModel(createSubOrderDto);
@@ -22,7 +27,7 @@ export class SubOrderService {
           ...item,
           subOrderId: newSubOrder._id,
           customerId: newSubOrder.customerId,
-          shopId: item.shopId._id
+          shopId: item.shopId._id,
         });
       });
       await Promise.all(saveItems);
@@ -30,7 +35,7 @@ export class SubOrderService {
 
       const response = {
         status: 200,
-        data: newSubOrder
+        data: newSubOrder,
       };
       return response;
     } catch (error) {
@@ -55,20 +60,22 @@ export class SubOrderService {
           path: 'voucher2t',
           select: 'name , percent , code, maximum_reduction',
         })
-        .populate('address')
-      const listProduct = await this.itemsSubOrderService.findByIdSubOrder(subOrder._id);
+        .populate('address');
+      const listProduct = await this.itemsSubOrderService.findByIdSubOrder(
+        subOrder._id,
+      );
       const customerReward = await this.customerReward.findOne(id);
       const totalSubOrder = listProduct.reduce((acc: number, item: any) => {
-        if(item.discount > 0){
+        if (item.discount > 0) {
           const price = item.total - item.discount + item.costShipping;
           return acc + price;
-        }else {
+        } else {
           return acc + item.total + item.costShipping;
         }
-      },0);
-      if(subOrder.coin > 0){
+      }, 0);
+      if (subOrder.coin > 0) {
         subOrder.total = totalSubOrder - subOrder.coin;
-      }else {
+      } else {
         subOrder.total = totalSubOrder;
       }
       const coinRefunt = listProduct.reduce((acc: number, item: any) => {
@@ -95,19 +102,22 @@ export class SubOrderService {
 
   async update(id: string, updateSubOrderDto: UpdateSubOrderDto) {
     try {
-      const subOrder = await this.subOrderModel
-        .findByIdAndUpdate(id, updateSubOrderDto, { new: true, runValidators: true });
+      const subOrder = await this.subOrderModel.findByIdAndUpdate(
+        id,
+        updateSubOrderDto,
+        { new: true, runValidators: true },
+      );
       if (updateSubOrderDto.shipping) {
         subOrder.total = subOrder.total + subOrder.costShipping - 25000;
         await subOrder.save();
       }
       if (updateSubOrderDto.coin) {
         const checkCoin = updateSubOrderDto.coin >= subOrder.total;
-        if(checkCoin){
+        if (checkCoin) {
           subOrder.coin = subOrder.total;
           subOrder.total = subOrder.total - updateSubOrderDto.coin;
           await subOrder.save();
-        }else {
+        } else {
           throw new NotFoundException(`Đã có lỗi xảy ra`);
         }
       }
@@ -115,7 +125,9 @@ export class SubOrderService {
         throw new NotFoundException(`SubOrder with ID ${id} not found`);
       }
       if (updateSubOrderDto.voucher2t) {
-        const dataVoucher = await this.voucherService.findByIdVoucher(updateSubOrderDto.voucher2t);
+        const dataVoucher = await this.voucherService.findByIdVoucher(
+          updateSubOrderDto.voucher2t,
+        );
         if (dataVoucher.type === 'price') {
           const discountAmount = subOrder.total * (dataVoucher.percent / 100);
           if (discountAmount > dataVoucher.maximum_reduction) {
@@ -139,7 +151,7 @@ export class SubOrderService {
             await subOrder.save();
           }
         } else {
-          return subOrder
+          return subOrder;
         }
       }
       return subOrder;
@@ -150,8 +162,9 @@ export class SubOrderService {
   }
   async remove(id: string) {
     try {
-      const delItemsSubOrder = await this.itemsSubOrderService.removeByIdSubOrder(id);
-      if(delItemsSubOrder) {
+      const delItemsSubOrder =
+        await this.itemsSubOrderService.removeByIdSubOrder(id);
+      if (delItemsSubOrder) {
         return this.subOrderModel.deleteOne({ _id: new Types.ObjectId(id) });
       }
     } catch (error) {
