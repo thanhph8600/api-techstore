@@ -34,6 +34,8 @@ import { join } from 'path';
 import { ItemsSubOrderModule } from './controller/items-sub-order/items-sub-order.module';
 import { ItemsOrderModule } from './controller/items-order/items-order.module';
 import { ProductReviewModule } from './controller/product-review/product-review.module';
+import { CustomerFollowModule } from './controller/customer-follow/customer-follow.module';
+import { NotificationModule } from './controller/notification/notification.module';
 
 @Module({
   imports: [
@@ -79,6 +81,8 @@ import { ProductReviewModule } from './controller/product-review/product-review.
     ItemsSubOrderModule,
     ItemsOrderModule,
     ProductReviewModule,
+    CustomerFollowModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

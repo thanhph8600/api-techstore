@@ -31,6 +31,10 @@ export class ProductReviewService {
       return 0;
     }
   }
+
+  async getRatetingByShopId(id: string) {
+   
+  }
   async getReviewByIdProduct (id: string) {
     const productReviews = await this.productReviewModel.find({productId: id.toString()})
     .populate({

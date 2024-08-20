@@ -80,7 +80,7 @@ export class ItemsOrder {
       'Xác nhận',
       'Đang vận chuyển',
       'Hoàn thành',
-      'Huỷ đơn hàng',
+      'Đã huỷ',
       'Hoàn hàng',
       'Giao không thành công',
     ],

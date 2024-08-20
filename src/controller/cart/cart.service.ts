@@ -19,7 +19,7 @@ export class CartService {
     private readonly productPriceService: ProductPriceService,
     private readonly cartSelectService: CartSelectService,
     // private readonly discountService: DiscountService
-  ) {}
+  ) { }
   async create(createCartDto: CreateCartDto) {
     try {
       const newCart = new this.cartModel(createCartDto);
@@ -73,12 +73,40 @@ export class CartService {
       if (!cart) {
         throw new NotFoundException(`Cart with customerId ${id} not found`);
       }
+      const checkStockItemNotValid = cart?.cartItems?.map((item: any) => {
+        return item.items.find((itemOfItems: any) => {
+          return itemOfItems.productPriceId.stock < itemOfItems.quantity;
+        });
+      }).filter((item: any) => item !== undefined);
+  
+      if (checkStockItemNotValid.length > 0) {
+        const cartSelect = await this.cartSelectService.findOne(id);
+        if (!cartSelect) {
+          throw new NotFoundException(`Cart with customerId ${id} not found`);
+        }
+        const checkStockItemNotValidIds = checkStockItemNotValid.map((item: any) => item?.productPriceId?._id).filter((id: any) => id); // Filter out undefined IDs
+  
+        const updatedListProductSelect = cartSelect.listProductSelect.filter((item: any) => {
+          return checkStockItemNotValidIds.every((invalidId: any) => {
+            if (item._id && invalidId) {
+              return !invalidId.equals(item._id);
+            }
+            return true;
+          });
+        });
+  
+        await this.cartSelectService.updateSelect(id, {
+          listProductSelect: updatedListProductSelect,
+        });
+        return cart;
+      }
       return cart;
     } catch (error) {
       console.error('Error in findOne:', error);
       throw new InternalServerErrorException();
     }
   }
+  
 
   async update(id: string, updateCartDto: any): Promise<any> {
     const customerId = new Types.ObjectId(id);
@@ -174,6 +202,7 @@ export class CartService {
     try {
       const cart = await this.cartModel
         .findOne({ customerId: customerId })
+        .select('-__v')
         .exec();
       if (!cart) {
         throw new NotFoundException(`Cart with customerId ${id} not found`);
@@ -181,9 +210,6 @@ export class CartService {
       const checkShopId = cart.cartItems.find(
         (item: any) => item.shopId == shopId,
       );
-      if (!checkShopId) {
-        throw new NotFoundException(`Cart with customerId ${id} not found`);
-      }
       checkShopId.items = checkShopId.items.filter(
         (item: any) => item.productPriceId != productPriceId,
       );

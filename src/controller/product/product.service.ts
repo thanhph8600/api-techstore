@@ -16,6 +16,7 @@ import { payload } from '../customer/interface/customer.interface';
 import { UploadService } from 'src/middleware/upload/upload.service';
 import { DiscountService } from '../marketing/discount/discount.service';
 import { ProductReviewService } from '../product-review/product-review.service';
+import { ItemsOrderService } from '../items-order/items-order.service';
 
 @Injectable()
 export class ProductService {
@@ -28,6 +29,7 @@ export class ProductService {
     private readonly uploadService: UploadService,
     private readonly discountService: DiscountService,
     private readonly productReviewService: ProductReviewService,
+    private readonly itemsOrderService: ItemsOrderService
   ) {}
 
   async create(createProductDto: CreateProductDto, payload) {
@@ -139,6 +141,9 @@ export class ProductService {
         .lean()
         .exec();
       if (!product) throw new HttpException('Không tìm thấy sản phẩm', 404);
+      const listItems = await this.itemsOrderService.findAll();
+      console.log(listItems);
+      
       const getRating = await this.productReviewService.getRatingByProductId(
         product?._id,
       );
@@ -204,10 +209,10 @@ export class ProductService {
     return handleThumbnailListProduct(products);
   }
 
-  // async productQuery(q: any) {
-  //   console.log(q);
-
-  // }
+  async productQuery(q: string, page?: number, limit?: number, sort?: string) {
+    console.log('Received q:', q);
+    return ['Test Product 1', 'Test Product 2'];
+}
   async update(id: string, updateProductDto: UpdateProductDto) {
     try {
       return this.productModel.findByIdAndUpdate(id, updateProductDto);

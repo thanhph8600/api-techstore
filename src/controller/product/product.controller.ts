@@ -9,6 +9,10 @@ import {
   UseGuards,
   Request,
   Put,
+  Query,
+  DefaultValuePipe,
+  ParseIntPipe,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -22,7 +26,7 @@ import { Public } from 'src/middleware/auth/public';
 @ApiTags('product')
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(private readonly productService: ProductService) { }
 
   @UseGuards(AuthGuard)
   @Post()
@@ -48,12 +52,20 @@ export class ProductController {
     return this.productService.findByIdShop(idShop);
   }
 
-  //   @Public()
-  //   @Get('search')
-  //    search(@Query('q') q: string) {
-  //   return this.productService.productQuery(q);
-  // }
-
+  @Get('query')
+    async search(
+        @Query('q') q: string, 
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1, 
+        @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10, 
+        @Query('sort') sort?: string
+    ) {
+        try {
+            return await this.productService.productQuery(q, page, limit, sort);
+        } catch (error) {
+            console.error('Error in search:', error);
+            throw new InternalServerErrorException('An error occurred while processing the request.');
+        }
+    }
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.update(id, updateProductDto);

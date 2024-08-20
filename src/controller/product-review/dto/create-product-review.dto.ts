@@ -26,7 +26,6 @@ export class CreateProductReviewDto {
     rating: number;
 
     @ApiProperty()
-    @IsNotEmpty()
     @Type(() => String)
     content: string;
 

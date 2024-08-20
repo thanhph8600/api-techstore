@@ -28,10 +28,22 @@ export class CartSelectService {
     const customerId = new Types.ObjectId(id);
     const cartSelecte = await this.cartSelectModal
       .findOne({ customerId: customerId })
+      .select('-__v')
       .exec();
     return cartSelecte;
   }
 
+  async updateSelect (id: string, payload: any): Promise<CartSelect> {
+    const customerId = new Types.ObjectId(id);
+    const cartSelecte = await this.cartSelectModal
+      .findOne({ customerId: customerId })
+      .exec();
+    if (!cartSelecte) {
+      throw new NotFoundError(`Cart with customerId ${id} not found`);
+    }
+    cartSelecte.listProductSelect = payload.listProductSelect
+    return await cartSelecte.save();
+  }
   async update(id: string, updateCartSlecteDto: any): Promise<CartSelect> {
     const customerId = new Types.ObjectId(id);
     const { productPriceId } = updateCartSlecteDto;
@@ -90,6 +102,7 @@ export class CartSelectService {
     try {
       const CartSelect = await this.cartSelectModal
         .findOne({ customerId: customerId })
+        .select('-__v')
         .exec();
       if (!CartSelect) {
         throw new NotFoundError(`Cart with customerId ${id} not found`);

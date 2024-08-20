@@ -13,6 +13,7 @@ import { CategoryDetailModule } from '../category-detail/category-detail.module'
 import { UploadModule } from 'src/middleware/upload/upload.module';
 import { DiscountModule } from '../marketing/discount/discount.module';
 import { ProductReviewModule } from '../product-review/product-review.module';
+import { ItemsOrderModule } from '../items-order/items-order.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ProductReviewModule } from '../product-review/product-review.module';
     UploadModule,
     DiscountModule,
     ProductReviewModule,
+    ItemsOrderModule, 
   ],
   controllers: [ProductController],
   providers: [ProductService],

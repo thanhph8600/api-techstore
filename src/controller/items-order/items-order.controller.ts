@@ -33,9 +33,19 @@ export class ItemsOrderController {
     return this.itemsOrderService.findById(id);
   }
 
+  @Get('query/:customerId/:query')
+  findByQuery(@Param('customerId') customerId: string,@Param('query') query: string) {
+    return this.itemsOrderService.findByQuery(customerId,query);
+  }
+
   @Get('customer/:id')
   findByCustomerId(@Param('id') id: string) {
     return this.itemsOrderService.findByIdCustomer(id);
+  }
+
+  @Post('cancel/:id')
+  cancelOrder(@Param('id') id: string) {
+    return this.itemsOrderService.cancelOrder(id);
   }
 
   @Patch('updateStatusTime')

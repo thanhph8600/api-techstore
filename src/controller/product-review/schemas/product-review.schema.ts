@@ -16,7 +16,7 @@ export class ProductReview {
    @Prop({ type: Types.ObjectId, required: true, ref: 'Customer' })
    customerId: Types.ObjectId;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   content: string;
 
    @Prop({ type: [String] , required: false })

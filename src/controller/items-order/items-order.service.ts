@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { HttpException, Injectable, InternalServerErrorException, Query } from '@nestjs/common';
 import { CreateItemsOrderDto } from './dto/create-items-order.dto';
 import { UpdateItemsOrderDto } from './dto/update-items-order.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -6,6 +6,9 @@ import { Model, Types } from 'mongoose';
 import { ItemsOrder } from './schemas/itemsOrder.schema';
 import { payload } from '../customer/interface/customer.interface';
 import { ShopService } from '../seller/shop/shop.service';
+import { ProductPriceService } from '../variation/product-price/product-price.service';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationType } from '../notification/Schemas/notification.schema';
 
 @Injectable()
 export class ItemsOrderService {
@@ -13,10 +16,19 @@ export class ItemsOrderService {
     @InjectModel('ItemsOrder')
     private readonly itemsOrderModel: Model<ItemsOrder>,
     private readonly shopService: ShopService,
-  ) {}
+    private readonly productPriceService: ProductPriceService,
+    private readonly notificationService: NotificationService
+  ) { }
   async create(createItemsOrderDto: CreateItemsOrderDto) {
     try {
       const itemsOrder = new this.itemsOrderModel(createItemsOrderDto);
+      await this.notificationService.create({
+        customerId: createItemsOrderDto.customerId,
+        title: `Đặt hàng thành công`,
+        content: `Đơn hàng với mã ${itemsOrder._id} của bạn đã được đặt thành công`,
+        type: NotificationType.ORDER,
+        orderItemsId: itemsOrder._id.toString(),
+      })
       return await itemsOrder.save();
     } catch (error) {
       console.log('error itemsOrder create', error);
@@ -25,7 +37,12 @@ export class ItemsOrderService {
   }
 
   findAll() {
-    return `This action returns all itemsOrder`;
+    try {
+      return this.itemsOrderModel.find();
+    } catch (error) {
+      console.log('error itemsOrder findAll ', error);
+      throw new InternalServerErrorException();
+    }
   }
   async findByIdOrder(id: string): Promise<any> {
     try {
@@ -59,6 +76,90 @@ export class ItemsOrderService {
         .populate('voucherShopId')
         .exec();
       return itemsSubOrder;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+  async findByQuery(customerId: string ,query: string): Promise<any> {
+    try {
+      const items: any = await this.itemsOrderModel
+        .find({ customerId: customerId })
+        .populate({
+          path: 'customerId',
+          select: 'name phone avata',
+        })
+        .populate('shopId')
+        .populate({
+          path: 'items.productPriceId',
+          select: 'id_color id_product id_size price stock',
+          populate: [
+            {
+              path: 'id_color',
+              select: 'value',
+            },
+            {
+              path: 'id_product',
+              select: 'name , thumbnails',
+            },
+            {
+              path: 'id_size',
+              select: 'value',
+            },
+          ],
+        })
+        .populate('items.discountDetailId')
+        .populate('voucherShopId')
+        .populate({
+          path: 'orderId',
+          select: 'address voucher2t methodPayment total coin',
+          populate: [
+            {
+              path: 'address',
+            },
+            {
+              path: 'voucher2t',
+            },
+          ],
+        })
+        .exec();
+        const listItemQuery = items.filter((item: any) => {
+          switch (query) {
+            case '0':
+              return true;
+            case '1':
+              return item.status === 'Chờ xác nhận' || item.status === 'Đã xác nhận';
+            case '2':
+              return item.status === 'Đang vận chuyển';
+            case '3':
+              return item.status === 'Hoàn thành' || item.statusShipping === 'Đã giao hàng';
+            case "4":
+              return item.status === 'Đã huỷ';
+            default:
+              return item.status === 'Hoàn hàng';
+          }
+        });
+        const listItemsUnConfirm = items.filter(
+          (item: any) => item.status === 'Chờ xác nhận',
+        )
+        if (listItemsUnConfirm.length > 0) {
+          const currentTime = new Date().getTime();
+          const itemsToUpdate = listItemsUnConfirm.filter((item: any) => {
+            const timeElapsed = currentTime - item.created.getTime();
+            return timeElapsed > 259200000;
+          });
+          for (const item of itemsToUpdate) {
+            await this.cancelOrder(item._id);
+            await this.notificationService.create({
+              customerId: item.customerId._id.toString(),
+              type: NotificationType.ORDER,
+              title: 'Đơn hàng bị huỷ',
+              content: `Đơn hàng ${item._id} bị huỷ, vì không có phản hồi từ shop.`,
+              orderItemsId: item._id
+            })
+            await this.updateStatusTime({ id: item._id, key: 'auto_cancel', value: new Date() });
+          }
+        }
+      return listItemQuery.reverse();
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
@@ -105,6 +206,28 @@ export class ItemsOrderService {
           ],
         })
         .exec();
+      const listItemsUnConfirm = items.filter(
+        (item: any) => item.status === 'Chờ xác nhận',
+      )
+      if (listItemsUnConfirm.length > 0) {
+        const currentTime = new Date().getTime();
+        const itemsToUpdate = listItemsUnConfirm.filter((item: any) => {
+          const timeElapsed = currentTime - item.created.getTime();
+          return timeElapsed > 259200000;
+        });
+        for (const item of itemsToUpdate) {
+          await this.cancelOrder(item._id);
+          await this.notificationService.create({
+            customerId: item.customerId._id.toString(),
+            type: NotificationType.ORDER,
+            title: 'Đơn hàng bị huỷ',
+            content: `Đơn hàng ${item._id} bị huỷ, vì không có phản hồi từ shop.`,
+            orderItemsId: item._id
+          })
+          await this.updateStatusTime({ id: item._id, key: 'auto_cancel', value: new Date() });
+        }
+      }
+      
       return items.reverse();
     } catch (error) {
       throw new InternalServerErrorException(error);
@@ -214,10 +337,33 @@ export class ItemsOrderService {
     return update;
   }
 
-  async updateStatusTime ({id, key, value}: any) {
+  async cancelOrder(id: string) {
     try {
       const item = await this.itemsOrderModel.findById(id);
-      item.statusUpdate.push({key: key, value: value});
+      if(item.statusShipping){
+        return new HttpException('Đơn hàng đang được gửi không thể huỷ', 280);
+      }
+      item.status = 'Đã huỷ';
+      await item.save();  
+      const refundStockPromises = [];
+        for (const subItem of item.items) {
+          const refundPromise = this.productPriceService.refuntStock(
+            subItem.productPriceId.toString(),
+            subItem.quantity
+          );
+          refundStockPromises.push(refundPromise);
+      }
+    await Promise.all(refundStockPromises);
+      return item;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  async updateStatusTime({ id, key, value }: any) {
+    try {
+      const item = await this.itemsOrderModel.findById(id);
+      item.statusUpdate.push({ key: key, value: value });
       return await item.save();
     } catch (error) {
       throw new InternalServerErrorException(error);
