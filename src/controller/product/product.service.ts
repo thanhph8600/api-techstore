@@ -126,7 +126,7 @@ export class ProductService {
           path: 'product_specifications',
           populate: [
             { path: 'id_specifications' },
-            { path: 'id_specifications_detail' },
+            // { path: 'id_specifications_detail' },
           ],
         })
         .populate('variation_color')

@@ -49,7 +49,17 @@ export class ItemsOrderController {
     @Param('id') id: string,
     @Body() updateItemsOrderDto: UpdateItemsOrderDto,
   ) {
-    return this.itemsOrderService.update(+id, updateItemsOrderDto);
+    return this.itemsOrderService.update(id, updateItemsOrderDto);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('update-status/:id')
+  updateStatusOrder(
+    @Param('id') id: string,
+    @Request() req,
+    @Body() data: { status: string },
+  ) {
+    return this.itemsOrderService.updateStatusOrder(id, req.user, data.status);
   }
 
   @Delete(':id')

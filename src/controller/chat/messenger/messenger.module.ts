@@ -7,6 +7,7 @@ import { RoomChatModule } from '../room-chat/room-chat.module';
 import { WebSocketModule } from 'src/web-socket/web-socket.module';
 import { ShopModule } from 'src/controller/seller/shop/shop.module';
 import { ProductModule } from 'src/controller/product/product.module';
+import { AutoReplyModule } from 'src/controller/chat/auto-reply/auto-reply.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ProductModule } from 'src/controller/product/product.module';
     WebSocketModule,
     ShopModule,
     ProductModule,
+    AutoReplyModule,
   ],
   controllers: [MessengerController],
   providers: [MessengerService],

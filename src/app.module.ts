@@ -34,6 +34,8 @@ import { join } from 'path';
 import { ItemsSubOrderModule } from './controller/items-sub-order/items-sub-order.module';
 import { ItemsOrderModule } from './controller/items-order/items-order.module';
 import { ProductReviewModule } from './controller/product-review/product-review.module';
+import { AutoReplyModule } from './controller/chat/auto-reply/auto-reply.module';
+import { MessageShortCutModule } from './controller/chat/message-short-cut/message-short-cut.module';
 
 @Module({
   imports: [
@@ -74,11 +76,13 @@ import { ProductReviewModule } from './controller/product-review/product-review.
     RoomChatModule,
     MessengerModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', '..', 'dist', 'client'),
+      rootPath: join(__dirname, '..', 'dist', 'client'),
     }),
     ItemsSubOrderModule,
     ItemsOrderModule,
     ProductReviewModule,
+    AutoReplyModule,
+    MessageShortCutModule,
   ],
   controllers: [AppController],
   providers: [AppService],

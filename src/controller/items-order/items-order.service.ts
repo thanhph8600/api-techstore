@@ -1,4 +1,9 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateItemsOrderDto } from './dto/create-items-order.dto';
 import { UpdateItemsOrderDto } from './dto/update-items-order.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -209,9 +214,78 @@ export class ItemsOrderService {
     return `This action returns a #${id} itemsOrder`;
   }
 
-  update(id: number, updateItemsOrderDto: UpdateItemsOrderDto) {
-    console.log(updateItemsOrderDto);
-    return `This action updates a #${id} itemsOrder`;
+  update(id: string, updateItemsOrderDto: UpdateItemsOrderDto) {
+    const update = this.itemsOrderModel.findByIdAndUpdate(
+      id,
+      updateItemsOrderDto,
+    );
+    return update;
+  }
+
+  async updateStatusTime({ id, key, value }: any) {
+    try {
+      const item = await this.itemsOrderModel.findById(id);
+      item.statusUpdate.push({ key: key, value: value });
+      return await item.save();
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  async updateStatusOrder(id: string, payload: payload, status: string) {
+    try {
+      const order = await this.itemsOrderModel.findById(id);
+      const shop = await this.shopService.create(payload);
+      if (
+        status === 'Xác nhận' &&
+        order.status === 'Chờ xác nhận' &&
+        String(shop._id) === String(order.shopId)
+      ) {
+        return this.updateOrder(order, id, status);
+      } else if (
+        status === 'Đang vận chuyển' &&
+        order.status === 'Xác nhận' &&
+        String(shop._id) === String(order.shopId)
+      ) {
+        return this.updateOrder(order, id, status, 'Đã gửi hàng');
+      }
+      return new HttpException(
+        'Bạn không thể cập nhật đơn hàng!',
+        HttpStatus.CONFLICT,
+      );
+    } catch (error) {
+      console.log('error update status order');
+      console.log(error);
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  async updateOrder(
+    order,
+    id: string,
+    status: string,
+    statusShipping?: string,
+  ) {
+    try {
+      const dataUpdateTime = {
+        id: id,
+        key: statusShipping || status,
+        value: new Date(),
+      };
+      order.statusUpdate.push(dataUpdateTime);
+      if (statusShipping) order.statusShipping = statusShipping;
+      order.status = status;
+      await this.itemsOrderModel.findByIdAndUpdate(id, order);
+      return new HttpException(
+        'Cập nhật tình trạng đơn hàng thành công!',
+        HttpStatus.CREATED,
+      );
+    } catch (error) {
+      console.log('error update status order');
+      console.log(error);
+      throw new InternalServerErrorException(error);
+    }
   }
 
   remove(id: number) {

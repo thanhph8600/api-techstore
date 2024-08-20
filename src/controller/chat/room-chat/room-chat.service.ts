@@ -119,12 +119,24 @@ export class RoomChatService {
             },
           },
         })
+        .sort({ 'id_lastMess.created_at': -1 })
         .lean();
-      return this.handleThumbnailListRoom(listRoomChat);
+      return this.handleThumbnailListRoom(
+        this.handleByTimeCreateLastMess(listRoomChat),
+      );
     } catch (error) {
       console.log('Error get list Room chat by Id Customer \n', error);
       throw new InternalServerErrorException();
     }
+  }
+
+  handleByTimeCreateLastMess(listRoomChat) {
+    const sortedListRoomChat = listRoomChat.sort((a, b) => {
+      const dateA = new Date(a.id_lastMess?.created_at || 0).getTime();
+      const dateB = new Date(b.id_lastMess?.created_at || 0).getTime();
+      return dateB - dateA;
+    });
+    return sortedListRoomChat;
   }
 
   async updateLastMess(_id: string, id_lastMess: string) {
@@ -163,21 +175,36 @@ export class RoomChatService {
           limit: limit,
           sort: { _id: -1 },
         },
-        populate: {
-          path: 'id_product',
-          select: ['_id', 'id_shop', 'name', 'thumbnails'],
-          populate: {
-            path: 'product_price',
-            select: ['stock', 'price'],
+        populate: [
+          {
+            path: 'id_product',
+            select: ['_id', 'id_shop', 'name', 'thumbnails'],
             populate: {
-              path: 'discount_detail',
-              select: ['percent', 'status'],
+              path: 'product_price',
+              select: ['stock', 'price'],
               populate: {
-                path: 'id_discount',
+                path: 'discount_detail',
+                select: ['percent', 'status'],
+                populate: {
+                  path: 'id_discount',
+                },
               },
             },
           },
-        },
+          {
+            path: 'id_order',
+            populate: {
+              path: 'items.productPriceId',
+              select: 'id_color id_product id_size price stock',
+              populate: [
+                {
+                  path: 'id_product',
+                  select: 'name , thumbnails',
+                },
+              ],
+            },
+          },
+        ],
       })
       .populate({
         path: 'id_customer',
@@ -250,6 +277,15 @@ export class RoomChatService {
             mess.id_product.thumbnails = mess.id_product.thumbnails.map(
               (thumb) => ensureUrl(thumb),
             );
+          }
+        }
+        if (mess.id_order) {
+          if (mess.id_order.items) {
+            mess.id_order.items[0].productPriceId.id_product[0].thumbnails[0] =
+              ensureUrl(
+                mess.id_order.items[0].productPriceId.id_product[0]
+                  .thumbnails[0],
+              );
           }
         }
       });
