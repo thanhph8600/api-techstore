@@ -80,15 +80,15 @@ export class ItemsOrder {
       'Xác nhận',
       'Đang vận chuyển',
       'Hoàn thành',
-      'Huỷ đơn hàng',
+      'Đã huỷ',
       'Hoàn hàng',
       'Giao không thành công',
     ],
   })
   status: string;
 
-  @Prop({ type: Date, required: false, default: null })
-  rateDate: Date;
+  @Prop({ type: Boolean, required: false, default: false })
+  rateDate: boolean;
 
   @Prop({ type: Date, required: false, default: null })
   DeliveryTime: Date;

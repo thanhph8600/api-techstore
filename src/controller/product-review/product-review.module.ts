@@ -6,6 +6,8 @@ import {
   ProductReview,
   ProductReviewSchema,
 } from './schemas/product-review.schema';
+import { ItemsOrderModule } from '../items-order/items-order.module';
+import { CustomerRewardModule } from '../customer-reward/customer-reward.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import {
         schema: ProductReviewSchema,
       },
     ]),
+    ItemsOrderModule,
+    CustomerRewardModule,
   ],
   controllers: [ProductReviewController],
   providers: [ProductReviewService],

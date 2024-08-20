@@ -10,14 +10,17 @@ export class ProductReview {
   @Prop({ type: Types.ObjectId, required: true, ref: 'Product' })
   productId: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, required: true, ref: 'User' })
+  @Prop({ type: Types.ObjectId, required: true, ref: 'ProductPrice' })
+  productPriceId: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, required: true, ref: 'Customer' })
   customerId: Types.ObjectId;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   content: string;
 
-  @Prop({ type: String })
-  image: string;
+  @Prop({ type: [String], required: false })
+  images: [string];
 
   @Prop({ required: true })
   rating: number;

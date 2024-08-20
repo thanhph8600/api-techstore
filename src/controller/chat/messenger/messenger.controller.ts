@@ -29,6 +29,15 @@ export class MessengerController {
     return this.messengerService.create(messenger, req.user);
   }
 
+  // @Post('newMess')
+  // NewMessage(
+  //   @Request() req,
+  //   @Body()
+  //   payload: any,
+  // ) {
+  //   return this.messengerService.NewMessage(payload, req.user);
+  // }
+
   @Patch(':id')
   updateWatch(@Param('id') id: string) {
     return this.messengerService.updateIsWatch(id);

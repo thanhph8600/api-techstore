@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { IsNotEmpty } from 'class-validator';
 import { ObjectId } from 'mongoose';
 export class CreateProductReviewDto {
@@ -6,23 +7,29 @@ export class CreateProductReviewDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  productId: ObjectId;
+  @Type(() => String)
+  productPriceId: string;
 
   @ApiProperty()
   @IsNotEmpty()
-  customerId: ObjectId;
+  @Type(() => String)
+  productId: string;
 
   @ApiProperty()
   @IsNotEmpty()
+  @Type(() => String)
+  customerId: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @Type(() => Number)
   rating: number;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @Type(() => String)
   content: string;
 
-  @ApiProperty()
-  image?: string;
+  images?: string[];
 
-  @ApiProperty()
-  created: Date;
+  itemsOrderId?: string;
 }

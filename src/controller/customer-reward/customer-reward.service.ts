@@ -64,6 +64,19 @@ export class CustomerRewardService {
       throw new Error(error);
     }
   }
+  async addCoinRewardReviewProduct(id: string, coin = 200) {
+    console.log(id);
+    try {
+      const customerReward = await this.customerRewardModel.findOneAndUpdate(
+        { customerId: id },
+        { $inc: { coin: +coin } },
+        { new: true },
+      );
+      return customerReward;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
   remove(id: number) {
     return `This action removes a #${id} customerReward`;
   }

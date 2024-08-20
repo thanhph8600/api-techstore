@@ -72,6 +72,12 @@ export class OrderService {
         if (newOrder.coin > 0) {
           item.coin = newOrder.coin / createOrderDto.items.length;
           item.total = subTotalListItem - item.coin + item.costShipping;
+        } else if (item.discount > 0) {
+          item.total = subTotalListItem - item.discount + item.costShipping;
+        } else if (item.coin > 0 && item.discount > 0) {
+          const coin = item.coin / createOrderDto.items.length;
+          item.total =
+            subTotalListItem - item.discount + item.costShipping - coin;
         } else {
           item.coin = 0;
           item.total = subTotalListItem + item.costShipping;
@@ -88,18 +94,17 @@ export class OrderService {
           coin: item.coin,
           voucherShopId: item.voucherShopId?._id,
         });
-        // const removeItemsFromCart = item.items.map(async (subItem: any) => {
-        //   await this.cartService.removeChildItem(createOrderDto.customerId, {
-        //     productPriceId: subItem.productPriceId._id,
-        //     shopId: item.shopId._id,
-        //   });
-        // });
-
-        // await Promise.all(removeItemsFromCart);
       });
+      for (const item of createOrderDto.items) {
+        for (const subItem of item.items) {
+          await this.cartService.removeChildItem(createOrderDto.customerId, {
+            productPriceId: subItem.productPriceId._id,
+            shopId: item.shopId._id,
+          });
+        }
+      }
       await Promise.all(saveItemsOrder);
       await this.subOrderService.remove(createOrderDto.subOrderId);
-
       return { status: 200, message: 'Đơn hàng đang được xử lý' };
     } catch (error) {
       console.log('error cartSlecte create', error);
