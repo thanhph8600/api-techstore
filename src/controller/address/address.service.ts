@@ -34,7 +34,6 @@ export class AddressService {
       }
     }
   }
-
   async updateAddress(
     addressId: string,
     updateAddressDto: UpdateAddressDto,
@@ -45,7 +44,6 @@ export class AddressService {
     console.log(updatedAddress);
     return { message: 'Địa chỉ của bạn đã được cập nhật thành công' };
   }
-
   async delete(addressId: string): Promise<{ message: string }> {
     const deletedAddress = await this.addressModel
       .findByIdAndDelete(addressId)
