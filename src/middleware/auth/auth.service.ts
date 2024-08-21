@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { Customer } from 'src/controller/customer/schemas/customer.schema';
 import { CreateCustomerDto } from 'src/controller/customer/dto/create-customer.dto';
 import { RefreshTokenDto } from './dto/refres_token.dto';
+import { VoucherWalletService } from 'src/controller/voucher-wallet/voucher-wallet.service';
 
 @Injectable()
 export class AuthService {

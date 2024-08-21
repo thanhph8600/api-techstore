@@ -25,6 +25,7 @@ import { RoomChatModule } from './controller/chat/room-chat/room-chat.module';
 import { MessengerModule } from './controller/chat/messenger/messenger.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { BanShopModule } from './controller/ban_shop/ban_shop.module';
 import { ItemsSubOrderModule } from './controller/items-sub-order/items-sub-order.module';
 import { ItemsOrderModule } from './controller/items-order/items-order.module';
 import { ProductReviewModule } from './controller/product-review/product-review.module';
@@ -68,6 +69,7 @@ import { MessageShortCutModule } from './controller/chat/message-short-cut/messa
     ProductReviewModule,
     AutoReplyModule,
     MessageShortCutModule,
+    BanShopModule,
   ],
   controllers: [AppController],
   providers: [AppService],

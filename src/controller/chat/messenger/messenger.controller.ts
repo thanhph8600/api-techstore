@@ -32,7 +32,7 @@ export class MessengerController {
   @UseGuards(AuthGuard)
   @Get('shop/manage')
   manageMess(@Request() req) {
-    return this.messengerService.findFistMess(req.user);
+    return this.messengerService.manageMessgase(req.user);
   }
   // @Post('newMess')
   // NewMessage(
