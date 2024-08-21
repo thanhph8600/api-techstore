@@ -61,7 +61,7 @@ import { MessageShortCutModule } from './controller/chat/message-short-cut/messa
     RoomChatModule,
     MessengerModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'dist', 'client'),
+      rootPath: join(__dirname, '..', '..', '..', 'dist', 'client'),
     }),
     ItemsSubOrderModule,
     ItemsOrderModule,

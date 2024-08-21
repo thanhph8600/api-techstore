@@ -29,6 +29,11 @@ export class MessengerController {
     return this.messengerService.create(messenger, req.user);
   }
 
+  @UseGuards(AuthGuard)
+  @Get('shop/manage')
+  manageMess(@Request() req) {
+    return this.messengerService.findFistMess(req.user);
+  }
   // @Post('newMess')
   // NewMessage(
   //   @Request() req,

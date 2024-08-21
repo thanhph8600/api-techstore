@@ -187,6 +187,79 @@ export class MessengerService {
       .exec();
     return handleProductPriceAndDiscount(mess);
   }
+
+  async manageMessgase(payload: payload) {
+    const manage = {
+      countChat: 0,
+      aveTime: 0,
+      resRate: 100,
+    };
+    const listRoomMess = await this.roomChatService.findByIdShop(payload);
+    const firstMess = listRoomMess.flatMap(
+      (item) => item.messenger[item.messenger.length - 1],
+    );
+    const itemMessCustomer = firstMess.filter(
+      (item) => item.senderType == 'Customer',
+    );
+
+    if (itemMessCustomer.length > 0) {
+      manage.countChat = itemMessCustomer.length;
+      for (const element of itemMessCustomer) {
+        const listMess = await this.MessengerModel.find({
+          id_roomChat: element.id_roomChat,
+        });
+
+        const customerMessages = listMess.filter(
+          (msg) => msg.senderType === 'Customer',
+        );
+        const shopMessages = listMess.filter(
+          (msg) => msg.senderType === 'Shop',
+        );
+
+        if (shopMessages.length == 0) {
+          manage.resRate = manage.resRate - (1 / itemMessCustomer.length) * 100;
+        } else {
+          let totalResponseTime = 0;
+          let responseCount = 0;
+
+          let i = 0; // Index cho tin nhắn của người dùng
+          let j = 0; // Index cho tin nhắn của shop
+
+          while (i < customerMessages.length) {
+            const customerMessage = customerMessages[i];
+
+            // Tìm tin nhắn của shop đầu tiên đến sau tin nhắn của khách hàng
+            while (
+              j < shopMessages.length &&
+              new Date(shopMessages[j].created_at).getTime() <=
+                new Date(customerMessage.created_at).getTime()
+            ) {
+              j++;
+            }
+
+            // Nếu có tin nhắn của shop phản hồi
+            if (j < shopMessages.length) {
+              const shopReply = shopMessages[j];
+              if (shopReply.created_at > customerMessage.created_at) {
+                const responseTime =
+                  new Date(shopReply.created_at).getTime() -
+                  new Date(customerMessage.created_at).getTime();
+                totalResponseTime += responseTime;
+                responseCount++;
+                j++; // Chuyển sang tin nhắn tiếp theo của shop
+              }
+            }
+            i++; // Chuyển sang tin nhắn tiếp theo của khách hàng
+          }
+          // Tính thời gian trả lời trung bình
+          const averageResponseTime =
+            responseCount > 0 ? totalResponseTime / responseCount : 0;
+          manage.aveTime = manage.aveTime + averageResponseTime;
+        }
+      }
+    }
+    return manage;
+  }
 }
 export function handleProductPriceAndDiscount(mess) {
   const currentTime = new Date();

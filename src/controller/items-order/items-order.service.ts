@@ -144,20 +144,9 @@ export class ItemsOrderService {
         })
         .populate('items.discountDetailId')
         .populate('voucherShopId')
-        .populate({
-          path: 'orderId',
-          select: 'address voucher2t methodPayment total coin',
-          populate: [
-            {
-              path: 'address',
-            },
-            {
-              path: 'voucher2t',
-            },
-          ],
-        })
+        .lean()
         .exec();
-      return item;
+      return this.handleThumbnailOrder(item);
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
@@ -165,8 +154,10 @@ export class ItemsOrderService {
   async findByShop(payload: payload): Promise<any> {
     try {
       const shop = await this.shopService.create(payload);
-      const items: any = await this.itemsOrderModel
-        .find({ shopId: String(shop._id) })
+      const check = await this.itemsOrderModel
+        .find({
+          shopId: String(shop._id),
+        })
         .populate({
           path: 'customerId',
           select: 'name phone avata',
@@ -191,21 +182,9 @@ export class ItemsOrderService {
           ],
         })
         .populate('items.discountDetailId')
-        .populate('voucherShopId')
-        .populate({
-          path: 'orderId',
-          select: 'address voucher2t methodPayment total coin',
-          populate: [
-            {
-              path: 'address',
-            },
-            {
-              path: 'voucher2t',
-            },
-          ],
-        })
+        .lean()
         .exec();
-      return this.handleThumbnailItemOrder(items.reverse());
+      return this.handleThumbnailListOrder(check.reverse());
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
@@ -291,33 +270,35 @@ export class ItemsOrderService {
   remove(id: number) {
     return `This action removes a #${id} itemsOrder`;
   }
-  handleThumbnailItemOrder(listOrder) {
+  handleThumbnailListOrder(listOrder) {
     if (listOrder.length > 0) {
       listOrder.map((order) => {
-        if (order.customerId && order.customerId.avata) {
-          const avata = order.customerId.avata;
-          if (!avata.startsWith('http://') && !avata.startsWith('https://')) {
-            order.customerId.avata = `${process.env.URL_API}uploads/${avata}`;
-          }
-        }
-        if (order.items && order.items.length > 0) {
-          order.items.map((itemPrice) => {
-            const thumbnail =
-              itemPrice.productPriceId.id_product[0].thumbnails[0];
-            if (
-              !thumbnail.startsWith('http://') &&
-              !thumbnail.startsWith('https://')
-            ) {
-              itemPrice.productPriceId.id_product[0].thumbnails[0] = `${process.env.URL_API}uploads/${thumbnail}`;
-            }
-            return itemPrice;
-          });
-        }
-        return {
-          ...order,
-        };
+        return this.handleThumbnailOrder(order);
       });
     }
     return listOrder;
+  }
+  handleThumbnailOrder(order) {
+    if (order.customerId && order.customerId.avata) {
+      const avata = order.customerId.avata;
+      if (!avata.startsWith('http://') && !avata.startsWith('https://')) {
+        order.customerId.avata = `${process.env.URL_API}uploads/${avata}`;
+      }
+    }
+    if (order.items && order.items.length > 0) {
+      order.items.map((itemPrice) => {
+        const thumbnail = itemPrice.productPriceId.id_product[0].thumbnails[0];
+        if (
+          !thumbnail.startsWith('http://') &&
+          !thumbnail.startsWith('https://')
+        ) {
+          itemPrice.productPriceId.id_product[0].thumbnails[0] = `${process.env.URL_API}uploads/${thumbnail}`;
+        }
+        return itemPrice;
+      });
+    }
+    return {
+      ...order,
+    };
   }
 }

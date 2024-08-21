@@ -1,9 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateProductReviewDto } from './dto/create-product-review.dto';
 import { UpdateProductReviewDto } from './dto/update-product-review.dto';
 import { ProductReview } from './schemas/product-review.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { ItemsOrderService } from '../items-order/items-order.service';
 import { CustomerRewardService } from '../customer-reward/customer-reward.service';
 @Injectable()
@@ -39,7 +39,6 @@ export class ProductReviewService {
     }
   }
 
-  async getRatetingByShopId(id: string) {}
   async getReviewByIdProduct(id: string) {
     const productReviews = await this.productReviewModel
       .find({ productId: id.toString() })
