@@ -37,6 +37,7 @@ export class ShopService {
       banStartDate: new Date(),
       banEndDate: new Date(),
     });
+
     return shop;
   }
 
