@@ -8,9 +8,9 @@ import {
   Patch,
   Request,
   UseGuards,
-  UseInterceptors,
-  BadRequestException,
   UploadedFile,
+  BadRequestException,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
@@ -20,9 +20,9 @@ import { AuthGuard } from 'src/middleware/auth/auth.guard';
 import { UpdatePassword } from './dto/update-customer.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import * as fs from 'fs';
 import { extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import * as fs from 'fs';
 
 @ApiBearerAuth()
 @ApiTags('customer')

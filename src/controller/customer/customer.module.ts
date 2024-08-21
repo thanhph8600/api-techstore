@@ -4,15 +4,13 @@ import { CustomerController } from './customer.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Customer, CustomerSchema } from './schemas/customer.schema';
 import { CartModule } from '../cart/cart.module';
+
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Customer.name, schema: CustomerSchema },
     ]),
     forwardRef(() => CartModule),
-    // MulterModule.register({
-    //   dest: './uploads'
-    // })
   ],
   controllers: [CustomerController],
   providers: [CustomerService],
