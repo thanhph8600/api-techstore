@@ -23,14 +23,13 @@ import { FlashSaleModule } from './controller/marketing/flash-sale/flash-sale.mo
 import { WebSocketModule } from './web-socket/web-socket.module';
 import { RoomChatModule } from './controller/chat/room-chat/room-chat.module';
 import { MessengerModule } from './controller/chat/messenger/messenger.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { BanShopModule } from './controller/ban_shop/ban_shop.module';
 import { ItemsSubOrderModule } from './controller/items-sub-order/items-sub-order.module';
 import { ItemsOrderModule } from './controller/items-order/items-order.module';
 import { ProductReviewModule } from './controller/product-review/product-review.module';
 import { AutoReplyModule } from './controller/chat/auto-reply/auto-reply.module';
 import { MessageShortCutModule } from './controller/chat/message-short-cut/message-short-cut.module';
+import { OrderModule } from './controller/order/order.module';
 
 @Module({
   imports: [
@@ -61,10 +60,11 @@ import { MessageShortCutModule } from './controller/chat/message-short-cut/messa
     WebSocketModule,
     RoomChatModule,
     MessengerModule,
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', '..', 'dist', 'client'),
-    }),
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '..', '..', '..', 'dist', 'client'),
+    // }),
     ItemsSubOrderModule,
+    OrderModule,
     ItemsOrderModule,
     ProductReviewModule,
     AutoReplyModule,

@@ -125,6 +125,18 @@ export class ItemsOrderService {
         })
         .populate('shopId')
         .populate({
+          path: 'orderId',
+          select: 'address voucher2t methodPayment total coin',
+          populate: [
+            {
+              path: 'address',
+            },
+            {
+              path: 'voucher2t',
+            },
+          ],
+        })
+        .populate({
           path: 'items.productPriceId',
           select: 'id_color id_product id_size price stock',
           populate: [
@@ -148,6 +160,7 @@ export class ItemsOrderService {
         .exec();
       return this.handleThumbnailOrder(item);
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException(error);
     }
   }
@@ -186,6 +199,7 @@ export class ItemsOrderService {
         .exec();
       return this.handleThumbnailListOrder(check.reverse());
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException(error);
     }
   }

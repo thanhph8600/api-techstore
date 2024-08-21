@@ -191,8 +191,8 @@ export class MessengerService {
   async manageMessgase(payload: payload) {
     const manage = {
       countChat: 0,
+      resRate: 0,
       aveTime: 0,
-      resRate: 100,
     };
     const listRoomMess = await this.roomChatService.findByIdShop(payload);
     const firstMess = listRoomMess.flatMap(
@@ -204,6 +204,7 @@ export class MessengerService {
 
     if (itemMessCustomer.length > 0) {
       manage.countChat = itemMessCustomer.length;
+      manage.resRate = 100;
       for (const element of itemMessCustomer) {
         const listMess = await this.MessengerModel.find({
           id_roomChat: element.id_roomChat,
@@ -257,6 +258,7 @@ export class MessengerService {
           manage.aveTime = manage.aveTime + averageResponseTime;
         }
       }
+      manage.aveTime = Math.floor(manage.aveTime / itemMessCustomer.length);
     }
     return manage;
   }
