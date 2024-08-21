@@ -31,14 +31,12 @@ export class ShopService {
       thumbnail: payload.avata,
     };
     const shop = await this.shopModule.create(newShop);
-
     await this.banShopService.create({
       id_shop: shop.id,
       reasonBan: '',
       banStartDate: new Date(),
       banEndDate: new Date(),
     });
-
     return shop;
   }
 

@@ -60,9 +60,6 @@ import { OrderModule } from './controller/order/order.module';
     WebSocketModule,
     RoomChatModule,
     MessengerModule,
-    // ServeStaticModule.forRoot({
-    //   rootPath: join(__dirname, '..', '..', '..', 'dist', 'client'),
-    // }),
     ItemsSubOrderModule,
     OrderModule,
     ItemsOrderModule,
