@@ -29,14 +29,14 @@ import { FlashSaleModule } from './controller/marketing/flash-sale/flash-sale.mo
 import { WebSocketModule } from './web-socket/web-socket.module';
 import { RoomChatModule } from './controller/chat/room-chat/room-chat.module';
 import { MessengerModule } from './controller/chat/messenger/messenger.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { ItemsSubOrderModule } from './controller/items-sub-order/items-sub-order.module';
 import { ItemsOrderModule } from './controller/items-order/items-order.module';
 import { ProductReviewModule } from './controller/product-review/product-review.module';
 import { CustomerFollowModule } from './controller/customer-follow/customer-follow.module';
 import { NotificationModule } from './controller/notification/notification.module';
-
+import { ViolateModule } from './controller/violate/violate.module';
+import { WalletModule } from './controller/wallet/wallet.module';
+import { WalletTransactionsModule } from './controller/wallet-transactions/wallet-transactions.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
@@ -75,14 +75,14 @@ import { NotificationModule } from './controller/notification/notification.modul
     WebSocketModule,
     RoomChatModule,
     MessengerModule,
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', '..', 'dist', 'client'),
-    }),
     ItemsSubOrderModule,
     ItemsOrderModule,
     ProductReviewModule,
     CustomerFollowModule,
     NotificationModule,
+    ViolateModule,
+    WalletModule,
+    WalletTransactionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

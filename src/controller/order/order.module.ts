@@ -8,6 +8,7 @@ import { ProductPriceModule } from '../variation/product-price/product-price.mod
 import { SubOrderModule } from '../sub-order/sub-order.module';
 import { CartModule } from '../cart/cart.module';
 import { CustomerRewardModule } from '../customer-reward/customer-reward.module';
+import { WalletModule } from '../wallet/wallet.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { CustomerRewardModule } from '../customer-reward/customer-reward.module'
     SubOrderModule,
     CartModule,
     CustomerRewardModule,
+    WalletModule
   ],
   controllers: [OrderController],
   providers: [OrderService],

@@ -18,9 +18,15 @@ export class SubOrderService {
     private readonly customerReward: CustomerRewardService,
     private readonly voucherService: VoucherService,
     private readonly itemsSubOrderService: ItemsSubOrderService,
-  ) {}
+  ) { }
   async create(createSubOrderDto: CreateSubOrderDto) {
     try {
+      const checkSubOrderIsExist = await this.subOrderModel.findOne({
+        customerId: createSubOrderDto.customerId,
+      })
+      if(checkSubOrderIsExist) {
+        await this.remove(checkSubOrderIsExist._id)
+      }
       const newSubOrder = new this.subOrderModel(createSubOrderDto);
       const saveItems = createSubOrderDto.items.map(async (item) => {
         await this.itemsSubOrderService.create({
@@ -107,10 +113,6 @@ export class SubOrderService {
         updateSubOrderDto,
         { new: true, runValidators: true },
       );
-      if (updateSubOrderDto.shipping) {
-        subOrder.total = subOrder.total + subOrder.costShipping - 25000;
-        await subOrder.save();
-      }
       if (updateSubOrderDto.coin) {
         const checkCoin = updateSubOrderDto.coin >= subOrder.total;
         if (checkCoin) {
@@ -128,33 +130,26 @@ export class SubOrderService {
         const dataVoucher = await this.voucherService.findByIdVoucher(
           updateSubOrderDto.voucher2t,
         );
+
         if (dataVoucher.type === 'price') {
           const discountAmount = subOrder.total * (dataVoucher.percent / 100);
-          if (discountAmount > dataVoucher.maximum_reduction) {
-            subOrder.totalDisCount = dataVoucher.maximum_reduction;
-            subOrder.coinRefunt = 0;
-            await subOrder.save();
-          } else {
-            subOrder.totalDisCount = discountAmount;
-            subOrder.coinRefunt = 0;
-            await subOrder.save();
-          }
+          const discountToApply = discountAmount > dataVoucher.maximum_reduction
+            ? dataVoucher.maximum_reduction
+            : discountAmount;
+          subOrder.totalDisCount = discountToApply;
+          subOrder.coinRefunt = 0;
+          subOrder.total = subOrder.total - discountToApply;
         } else if (dataVoucher.type === 'coin') {
           const coinAmount = subOrder.total * (dataVoucher.percent / 100);
-          if (coinAmount > dataVoucher.maximum_reduction) {
-            subOrder.coinRefunt = dataVoucher.maximum_reduction;
-            subOrder.totalDisCount = 0;
-            await subOrder.save();
-          } else {
-            subOrder.coinRefunt = coinAmount;
-            subOrder.totalDisCount = 0;
-            await subOrder.save();
-          }
-        } else {
-          return subOrder;
+          const coinToApply = coinAmount > dataVoucher.maximum_reduction
+            ? dataVoucher.maximum_reduction
+            : coinAmount;
+          subOrder.coinRefunt = coinToApply;
+          subOrder.totalDisCount = 0;
         }
       }
-      return subOrder;
+      const savedOrder = await subOrder.save();
+      return savedOrder;
     } catch (error) {
       console.error('Error updating sub-order:', error.message || error);
       throw new InternalServerErrorException('Failed to update sub-order');
