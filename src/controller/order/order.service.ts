@@ -136,8 +136,9 @@ export class OrderService {
       throw new InternalServerErrorException();
     }
   }
-  findAll() {
-    return `This action returns all order`;
+
+  async findAll() {
+    return await this.orderModel.find();
   }
 
   findOne(id: number) {

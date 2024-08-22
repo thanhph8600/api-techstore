@@ -117,11 +117,7 @@ export class AdminVoucherService {
   }
 
   async remove(id: string) {
-<<<<<<< HEAD
     await this.adminVoucherModal.findByIdAndDelete(id)
     return new HttpException("Xóa voucher thành công", HttpStatus.OK)
-=======
-    return await this.adminVoucherModal.deleteOne({ _id: id });
->>>>>>> 192941930440a8d9b9a668a2b7039170c36e39a7
   }
 }

@@ -12,6 +12,6 @@ import { VoucherWalletSchemas } from './schemas/voucher-wallet.schemas';
   ],
   controllers: [VoucherWalletController],
   providers: [VoucherWalletService],
-  // exports: [VoucherWalletService]
+  exports: [VoucherWalletService]
 })
 export class VoucherWalletModule {}
