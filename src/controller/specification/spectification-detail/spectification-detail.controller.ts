@@ -39,6 +39,12 @@ export class SpectificationDetailController {
     return this.spectificationDetailService.findOne(+id);
   }
 
+  @Public()
+  @Get('get-by-idspecifi/:id_specification')
+  async findByIdSpecification(@Param('id_specification') id_specification: string) {
+    return await this.spectificationDetailService.findByIdSpecification(id_specification)
+  }
+
   @Patch(':id')
   update(
     @Param('id') id: string,

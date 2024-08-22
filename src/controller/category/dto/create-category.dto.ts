@@ -6,11 +6,7 @@ export class CreateCategoryDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  thumbnail: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  slug: string;
+  // @ApiProperty()
+  // @IsNotEmpty()
+  // slug: string;
 }

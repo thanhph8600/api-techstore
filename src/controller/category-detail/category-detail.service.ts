@@ -1,5 +1,6 @@
 import {
   HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -9,6 +10,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { CategoryService } from '../category/category.service';
 import { CategoryDetail } from './schemas/category-detail.schema';
+import slugify from 'slugify';
 
 @Injectable()
 export class CategoryDetailService {
@@ -22,12 +24,12 @@ export class CategoryDetailService {
       const category = await this.findOneByIDCategory(
         createCategoryDetailDto.id_category,
       );
+      const slug = this.createSlugByName(createCategoryDetailDto.name)
       const checkSlugCategory = await this.categoryModel.findOneBySlug(
-        createCategoryDetailDto.slug,
+        slug,
       );
-      createCategoryDetailDto.slug =
-        category.slug + '-' + createCategoryDetailDto.slug;
-      const checkSlug = await this.findOneBySlug(createCategoryDetailDto.slug);
+      const newSlug = category.slug + '-' + slug;
+      const checkSlug = await this.findOneBySlug(newSlug);
       if (checkSlug || checkSlugCategory) {
         return new HttpException('Tên danh mục đã được dùng!', 401);
       }
@@ -35,7 +37,9 @@ export class CategoryDetailService {
       const newDetailCategory = await this.detailCategoryModel.create(
         createCategoryDetailDto,
       );
-      return newDetailCategory;
+      newDetailCategory.slug = newSlug
+      await newDetailCategory.save()
+      return new HttpException("Tạo danh mục chi tiết thành công", HttpStatus.CREATED);
     } catch (error) {
       console.log('error add category detail', error);
       throw new InternalServerErrorException();
@@ -51,11 +55,71 @@ export class CategoryDetailService {
     }
   }
 
+  slugifyOptions = {
+    lower: true,
+    remove: /[*+~.()'"!:@]/g,
+    replacement: '-',
+    locale: 'vi', // Thiết lập locale là 'vi' cho tiếng Việt
+    customReplacements: {
+    'Đ': 'D', 'đ': 'd',
+    'Á': 'A', 'á': 'a',
+    'À': 'A', 'à': 'a',
+    'Ả': 'A', 'ả': 'a',
+    'Ã': 'A', 'ã': 'a',
+    'Ạ': 'A', 'ạ': 'a',
+    'Ă': 'A', 'ă': 'a',
+    'Ắ': 'A', 'ắ': 'a',
+    'Ằ': 'A', 'ằ': 'a',
+    'Ẳ': 'A', 'ẳ': 'a',
+    'Ẵ': 'A', 'ẵ': 'a',
+    'Ặ': 'A', 'ặ': 'a',
+    'Â': 'A', 'â': 'a',
+    'Ấ': 'A', 'ấ': 'a',
+    'Ầ': 'A', 'ầ': 'a',
+    'Ẩ': 'A', 'ẩ': 'a',
+    'Ẫ': 'A', 'ẫ': 'a',
+    'Ậ': 'A', 'ậ': 'a',
+  },
+  }
+  createSlugByName(name: string) {
+    return slugify(name, this.slugifyOptions)
+  }
+
   findOneByID(_id: ObjectId) {
     try {
       return this.detailCategoryModel.findById({ _id });
     } catch (error) {
       return null;
+    }
+  }
+
+  async findWhenIdCategoryById (id: string) {
+    const category: CategoryDetail[] = await this.detailCategoryModel.find({id_category: id})
+    if(category.length < 0) {
+      return new HttpException("Danh mục không tồn tại", HttpStatus.NOT_FOUND)
+    }
+    return category
+  }
+
+  async updateSpecification(_id: ObjectId, specifications: string[]) {
+    try {
+      const category = await this.findOneByID(_id)
+      if(!category) {
+        return new HttpException("Danh mục không tồn tại", HttpStatus.NOT_FOUND)
+      }
+      if(specifications.length === 0) {
+        return new HttpException("Dữ liệu thông số gửi đi không được rỗng", HttpStatus.BAD_REQUEST)
+      }
+
+      const newSpecifi = specifications.filter((spec) => !category.id_specification.includes(spec))
+
+      const addSpecifications = this.detailCategoryModel.findByIdAndUpdate(_id,{
+        $push: {id_specification: { $each: newSpecifi} }
+      },{new: true}).exec()
+
+      return new HttpException("Thêm thông số vào danh mục thành công", HttpStatus.OK)
+    }catch(error) {
+      return new HttpException("Lỗi khi thêm thông số vào danh mục", error)
     }
   }
 
@@ -69,7 +133,16 @@ export class CategoryDetailService {
     }
   }
 
-  async findByIDCategory(id_category: string) {
+  async findSpecificationById(id: string) {
+    const category = await this.detailCategoryModel.findById(id)
+    if(!category) {
+      return new HttpException("Danh mục không tồn tại", HttpStatus.NOT_FOUND)
+    }
+
+    return category.id_specification
+  }
+
+  async findByIDCategory(id_category: ObjectId) {
     try {
       const categorydetails = await this.detailCategoryModel.find({
         id_category: id_category,
@@ -106,7 +179,8 @@ export class CategoryDetailService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} categoryDetail`;
+  async remove(id: string) {
+    await this.detailCategoryModel.findByIdAndDelete(id);
+    return new HttpException("Xóa danh mục thành công", HttpStatus.OK)
   }
 }

@@ -1,5 +1,6 @@
 import {
   HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -8,6 +9,7 @@ import { UpdateSpecificationDto } from './dto/update-specification.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Specification } from './schemas/specigication.schema';
 import { Model } from 'mongoose';
+import { payload } from 'src/controller/customer/interface/customer.interface';
 
 @Injectable()
 export class SpecificationService {
@@ -21,8 +23,9 @@ export class SpecificationService {
       if (brand.length != 0) {
         return new HttpException('Tên thông số kĩ thuật đã được dùng!', 401);
       }
-      const newCategory = await this.specificationModel.create(create);
-      return newCategory;
+      const newCategory =  new this.specificationModel(create);
+      await newCategory.save();
+      return new HttpException("Thông số được tạo thành công", HttpStatus.CREATED) 
     } catch (error) {
       console.log('error brand create', error);
       throw new InternalServerErrorException();
@@ -44,8 +47,7 @@ export class SpecificationService {
             as: 'details',
           },
         },
-      ])
-      .exec();
+      ]).sort({ _id: -1 }).exec();
   }
 
   findOne(id: number) {
@@ -57,7 +59,9 @@ export class SpecificationService {
     return `This action updates a #${id} specification`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} specification`;
+  async remove(id: string) {
+    await this.specificationModel.findByIdAndDelete(id) ;
+    return new HttpException("Xóa thông số thành công", HttpStatus.OK)
+
   }
 }

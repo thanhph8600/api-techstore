@@ -43,7 +43,7 @@ export class AdminVoucherController {
 
   @Public()
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.adminVoucherService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.adminVoucherService.remove(id);
   }
 }

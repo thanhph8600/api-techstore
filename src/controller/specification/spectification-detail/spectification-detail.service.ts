@@ -1,5 +1,6 @@
 import {
   HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -24,8 +25,9 @@ export class SpectificationDetailService {
       if (checkName) {
         return new HttpException('Tên đã được dùng!', 401);
       }
-      const newCategory = await this.model.create(create);
-      return newCategory;
+      const newCategory = new this.model(create);
+      await newCategory.save()
+      return new HttpException("Tạo thông số chi tiết thành công", HttpStatus.CREATED);
     } catch (error) {
       console.log('error specification detail create', error);
       throw new InternalServerErrorException();
@@ -34,6 +36,10 @@ export class SpectificationDetailService {
 
   findAll() {
     return this.model.find();
+  }
+
+  async findByIdSpecification(id_specification : string) {
+    return await this.model.find({id_specification})
   }
 
   findOne(id: number) {

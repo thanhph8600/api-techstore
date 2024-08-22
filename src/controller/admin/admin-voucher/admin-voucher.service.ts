@@ -84,6 +84,7 @@ export class AdminVoucherService {
   }
 
   async remove(id: string) {
-    return await this.adminVoucherModal.deleteOne({_id: id})
+    await this.adminVoucherModal.findByIdAndDelete(id)
+    return new HttpException("Xóa voucher thành công", HttpStatus.OK)
   }
 }
