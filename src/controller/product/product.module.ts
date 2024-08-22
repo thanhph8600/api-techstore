@@ -11,6 +11,9 @@ import {
 import { ProductPriceModule } from '../variation/product-price/product-price.module';
 import { CategoryDetailModule } from '../category-detail/category-detail.module';
 import { UploadModule } from 'src/middleware/upload/upload.module';
+import { DiscountModule } from '../marketing/discount/discount.module';
+import { ProductReviewModule } from '../product-review/product-review.module';
+import { ItemsOrderModule } from '../items-order/items-order.module';
 
 @Module({
   imports: [
@@ -22,6 +25,9 @@ import { UploadModule } from 'src/middleware/upload/upload.module';
     ProductPriceModule,
     CategoryDetailModule,
     UploadModule,
+    DiscountModule,
+    ProductReviewModule,
+    ItemsOrderModule,
   ],
   controllers: [ProductController],
   providers: [ProductService],

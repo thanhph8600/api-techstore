@@ -1,5 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as MongooseSchema, ObjectId } from 'mongoose';
+import {
+  HydratedDocument,
+  Schema as MongooseSchema,
+  ObjectId,
+  Types,
+} from 'mongoose';
 
 export type ShopDocument = HydratedDocument<Shop>;
 
@@ -23,10 +28,13 @@ export class Shop {
   address: string;
 
   @Prop({ default: 0 })
-  count_follower: string;
+  count_follower: number;
 
   @Prop({ default: 0 })
   star: string;
+
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Customer' }] })
+  follows?: Types.ObjectId[];
 }
 
 export const shopSchema = SchemaFactory.createForClass(Shop);

@@ -17,6 +17,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as fs from 'fs';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Public } from '../auth/public';
 
 interface DeleteRequest {
   filesToDelete: string[];
@@ -26,6 +27,7 @@ interface DeleteRequest {
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
+  @Public()
   @Post('files')
   @UseInterceptors(
     FilesInterceptor('files', 10, {
@@ -59,10 +61,12 @@ export class UploadController {
     @Res() res: Response,
   ) {
     try {
+      console.log(files);
       if (!files || files.length === 0) {
         throw new Error('No files uploaded');
       }
       const result = this.uploadService.handleUploadedFiles(files);
+      console.log('upLoadFile');
       res.status(HttpStatus.OK).json(result);
     } catch (error) {
       console.error('Error uploading files:', error);
@@ -98,7 +102,7 @@ export class UploadController {
   async deleteFiles(@Body() body: DeleteRequest, @Res() res: Response) {
     try {
       const { filesToDelete } = body;
-      return await this.uploadService.deleteFile(filesToDelete);
+      return await this.uploadService.deleteFiles(filesToDelete);
     } catch (error) {
       res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -106,3 +110,11 @@ export class UploadController {
     }
   }
 }
+
+// function getFilename(input) {
+//   if (input.includes('/')) {
+//     const parts = input.split('/');
+//     return parts[parts.length - 1];
+//   }
+//   return input;
+// }

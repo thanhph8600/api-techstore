@@ -6,7 +6,9 @@ import { VoucherWalletSchemas } from './schemas/voucher-wallet.schemas';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'VoucherWallet', schema: VoucherWalletSchemas }]),
+    MongooseModule.forFeature([
+      { name: 'VoucherWallet', schema: VoucherWalletSchemas },
+    ]),
   ],
   controllers: [VoucherWalletController],
   providers: [VoucherWalletService],

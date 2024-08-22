@@ -4,7 +4,6 @@ import { IsNotEmpty } from 'class-validator';
 import { ObjectId } from 'mongoose';
 
 export class CreateAdminVoucherDto {
-
   @ApiProperty()
   @IsNotEmpty()
   type: string;
@@ -42,7 +41,7 @@ export class CreateAdminVoucherDto {
   maximum_total_usage: number;
 
   @ApiProperty()
-  is_public: boolean
+  is_public: boolean;
 
   @ApiProperty()
   time_created: Date;

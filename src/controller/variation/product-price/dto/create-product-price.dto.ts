@@ -22,5 +22,15 @@ export class CreateProductPriceDto {
     name_size: string;
     price: number;
     stock: number;
+    _id: string;
+  }[];
+
+  @ApiProperty()
+  variation: {
+    _id: string;
+    name_color: string;
+    name_size: string;
+    price: number;
+    stock: number;
   }[];
 }

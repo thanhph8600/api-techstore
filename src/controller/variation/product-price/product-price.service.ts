@@ -2,9 +2,10 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { UpdateProductPriceDto } from './dto/update-product-price.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { ProductPrice } from './schemas/productPrice.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { VariationColor } from './schemas/variationColor.schema';
 import { VariationSize } from './schemas/variationSize.schema';
+import { CartSelectService } from 'src/controller/cart-select/cart-select.service';
 
 @Injectable()
 export class ProductPriceService {
@@ -15,6 +16,7 @@ export class ProductPriceService {
     private readonly variationColorModel: Model<VariationColor>,
     @InjectModel(VariationSize.name)
     private readonly variationSizeModel: Model<VariationSize>,
+    private readonly cartSelectService: CartSelectService,
   ) {}
   async createProductPrice(idProduct, productPrice) {
     try {
@@ -75,7 +77,7 @@ export class ProductPriceService {
         await Promise.all(sizePromises);
       }
     });
-
+    console.log(variationPromises);
     await Promise.all(variationPromises);
   }
   itemVariation(idProduct, value, thumbnail?) {
@@ -89,13 +91,143 @@ export class ProductPriceService {
     return `This action returns all productPrice`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} productPrice`;
+  findOne(id: string) {
+    return this.productpriceModel.findById(id).exec();
   }
 
-  update(id: number, updateProductPriceDto: UpdateProductPriceDto) {
-    console.log(updateProductPriceDto);
-    return `This action updates a #${id} productPrice`;
+  async checkStockIsAvailable(
+    id: string,
+    quantity: number,
+    customerId: string,
+  ): Promise<boolean> {
+    const productPriceId = new Types.ObjectId(id);
+    const productPrice = await this.productpriceModel
+      .findOne({ _id: productPriceId })
+      .exec();
+    if (!productPrice) {
+      throw new Error(`Product Price with ID ${productPriceId} not found.`);
+    }
+    if (productPrice.stock < quantity) {
+      await this.cartSelectService.removeChildItem(customerId, {
+        productPriceId: productPrice._id,
+      });
+      return false;
+    }
+    return true;
+  }
+
+  async update(id: string, updateProductPriceDto: UpdateProductPriceDto) {
+    const productPriceId = new Types.ObjectId(id);
+    const update = await this.productpriceModel.findByIdAndUpdate(
+      productPriceId,
+      updateProductPriceDto,
+    );
+    return update;
+  }
+
+  async refuntStock(id: string, quantity: number) {
+    const productPriceId = new Types.ObjectId(id);
+    const item = await this.productpriceModel.findById(productPriceId);
+    item.stock += quantity;
+    await item.save();
+  }
+
+  async updateVation(updateProductPriceDto: UpdateProductPriceDto) {
+    const variation = updateProductPriceDto.variation;
+    const keys = Object.keys(variation);
+    const listId = [];
+    for (const key of keys) {
+      for (const item of variation[key]) {
+        const update = {
+          id_product: updateProductPriceDto.id_product,
+          value: item.name,
+        };
+        if (key === 'Size') {
+          if (item._id) {
+            await this.variationSizeModel.findByIdAndUpdate(item._id, update);
+            listId.push(String(item._id));
+          } else {
+            const newVariation = this.itemVariation(
+              updateProductPriceDto.id_product,
+              item.name,
+            );
+            const newSize = await this.variationSizeModel.create(newVariation);
+            listId.push(String(newSize._id));
+          }
+        } else if (key === 'Màu sắc') {
+          if (item._id) {
+            await this.variationColorModel.findByIdAndUpdate(item._id, {
+              ...update,
+              thumbnail: item.thumbnail,
+            });
+            listId.push(String(item._id));
+          } else {
+            const newVariation = this.itemVariation(
+              updateProductPriceDto.id_product,
+              item.name,
+              item.thumbnail,
+            );
+            const newColor =
+              await this.variationColorModel.create(newVariation);
+            listId.push(String(newColor._id));
+          }
+        }
+      }
+    }
+    const listColor = await this.variationColorModel.find({
+      id_product: updateProductPriceDto.id_product,
+    });
+    const listSize = await this.variationSizeModel.find({
+      id_product: updateProductPriceDto.id_product,
+    });
+    if (listColor.length > 0) {
+      const idColor = listColor.map((item) => String(item._id));
+      for (const id of idColor) {
+        if (!listId.includes(id)) {
+          await this.variationColorModel.findByIdAndDelete(id);
+        }
+      }
+    }
+    if (listSize.length > 0) {
+      const idSize = listSize.map((item) => String(item._id));
+      for (const id of idSize) {
+        if (!listId.includes(id)) {
+          await this.variationSizeModel.findByIdAndDelete(id);
+        }
+      }
+    }
+  }
+  async updateProductPrice(updateProductPriceDto: UpdateProductPriceDto) {
+    if (updateProductPriceDto.productPrice) {
+      const listId: string[] = [];
+      const listCreate = [];
+      for (const item of updateProductPriceDto.productPrice) {
+        if (item._id) {
+          const update = {
+            price: item.price,
+            stock: item.stock,
+          };
+          await this.productpriceModel.findByIdAndUpdate(item._id, update);
+          listId.push(item._id);
+        } else {
+          listCreate.push(item);
+        }
+      }
+      const listProductPrice = await this.productpriceModel.find({
+        id_product: updateProductPriceDto.id_product,
+      });
+      if (listProductPrice.length > 0) {
+        for (const item of listProductPrice) {
+          if (!listId.includes(String(item._id))) {
+            await this.productpriceModel.findByIdAndDelete(String(item._id));
+          }
+        }
+      }
+      await this.createProductPrice(
+        updateProductPriceDto.id_product,
+        listCreate,
+      );
+    }
   }
 
   remove(id: number) {

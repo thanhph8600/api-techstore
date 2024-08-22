@@ -1,23 +1,22 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsMongoId, IsNotEmpty } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsMongoId, IsNotEmpty } from 'class-validator';
 import { Types } from 'mongoose';
 
 export class CreateBanShopDto {
+  @IsNotEmpty()
+  @IsMongoId()
+  @ApiProperty()
+  id_shop: Types.ObjectId;
 
-    @IsNotEmpty()
-    @IsMongoId()
-    @ApiProperty()
-    id_shop: Types.ObjectId
+  @ApiProperty()
+  banStartDate?: Date;
 
-    @ApiProperty()
-    banStartDate?: Date
+  @ApiProperty()
+  banEndDate?: Date;
 
-    @ApiProperty()
-    banEndDate?: Date
+  @ApiProperty()
+  numberOfBan?: number;
 
-    @ApiProperty()
-    numberOfBan?: number
-
-    @ApiProperty()
-    reasonBan?: string
+  @ApiProperty()
+  reasonBan?: string;
 }

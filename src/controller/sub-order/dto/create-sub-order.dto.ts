@@ -1,0 +1,85 @@
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsArray,
+  IsMongoId,
+} from 'class-validator';
+
+export class CreateSubOrderDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsMongoId()
+  customerId: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  address?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  shipping?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsMongoId()
+  voucherShop?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsMongoId()
+  totalDiscountShop?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsMongoId()
+  voucher2t?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumber()
+  coin?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumber()
+  coinRefunt?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumber()
+  costShipping?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumber()
+  subTotal?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumber()
+  totalDisCount?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsMongoId()
+  voucherShipping?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  methodPayment?: string;
+
+  @ApiProperty({ required: true })
+  @IsArray()
+  items?: any[];
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumber()
+  total?: number;
+}

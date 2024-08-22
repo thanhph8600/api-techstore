@@ -18,7 +18,9 @@ import { VoucherWalletSchemas } from 'src/controller/voucher-wallet/schemas/vouc
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: process.env.JWT_TOKEN_EXPIRATION_TIME },
     }),
-    MongooseModule.forFeature([{ name: 'VoucherWallet', schema: VoucherWalletSchemas }]),
+    MongooseModule.forFeature([
+      { name: 'VoucherWallet', schema: VoucherWalletSchemas },
+    ]),
   ],
   controllers: [AuthController],
   providers: [

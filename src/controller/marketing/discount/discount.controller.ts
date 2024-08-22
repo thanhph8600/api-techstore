@@ -46,6 +46,10 @@ export class DiscountController {
     return this.discountService.findByIdDiscount(id);
   }
 
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.discountService.findOneByIdProductPrice(id);
+  }
   @UseGuards(AuthGuard)
   @Patch(':id')
   update(

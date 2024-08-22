@@ -13,13 +13,11 @@ import { Customer } from './schemas/customer.schema';
 import * as bcrypt from 'bcrypt';
 import { payload } from './interface/customer.interface';
 import { UpdatePassword } from './dto/update-customer.dto';
-import { VoucherWalletService } from './../voucher-wallet/voucher-wallet.service';
 
 @Injectable()
 export class CustomerService {
   constructor(
     private readonly cartService: CartService,
-    private readonly voucherWalletService: VoucherWalletService,
     @InjectModel('Customer') private readonly customerModel: Model<Customer>,
   ) {}
   async create(createCustomerDto: CreateCustomerDto) {
@@ -49,13 +47,8 @@ export class CustomerService {
         customerId: newUserCreated._id,
         cartItems: [],
       };
-      this.cartService.create(newUserCart);
-      
-      const id_customer = {
-        id_customer: newUserCreated._id
-      }
-      await this.voucherWalletService.createVoucherWallet(id_customer);
 
+      this.cartService.create(newUserCart);
       return new HttpException('Đăng ký thành công!', HttpStatus.OK);
     } catch (error) {
       console.log('error', error);
@@ -152,17 +145,20 @@ export class CustomerService {
     return await bcrypt.compare(pass, hash);
   }
 
-  async updateAvatar(payload: payload, avatarPath: Express.Multer.File): Promise<string> {
+  async updateAvatar(
+    payload: payload,
+    avatarPath: Express.Multer.File,
+  ): Promise<string> {
     const customer = await this.customerModel.findById(payload.sub);
     if (!customer) {
       throw new NotFoundException('Không tìm thấy khách hàng');
     }
-    
-    const oldPathAvatar = customer.avata
-    
-    customer.avata =avatarPath.filename;
+
+    const oldPathAvatar = customer.avata;
+
+    customer.avata = avatarPath.filename;
     await customer.save();
-  
+
     return oldPathAvatar;
   }
 }

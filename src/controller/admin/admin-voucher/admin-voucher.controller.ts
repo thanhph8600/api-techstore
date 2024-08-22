@@ -1,11 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards, HttpException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Request,
+  UseGuards,
+  HttpException,
+} from '@nestjs/common';
 import { AdminVoucherService } from './admin-voucher.service';
 import { CreateAdminVoucherDto } from './dto/create-admin-voucher.dto';
 import { UpdateAdminVoucherDto } from './dto/update-admin-voucher.dto';
 import { AuthGuard } from 'src/middleware/auth/auth.guard';
 import { Public } from 'src/middleware/auth/public';
-import {ObjectId, Types } from 'mongoose';
-
+import { ObjectId, Types } from 'mongoose';
 
 @Controller('admin-voucher')
 export class AdminVoucherController {
@@ -13,7 +23,10 @@ export class AdminVoucherController {
 
   @UseGuards(AuthGuard)
   @Post('')
-  async create(@Body() createDto: CreateAdminVoucherDto, @Request() req): Promise<HttpException> {
+  async create(
+    @Body() createDto: CreateAdminVoucherDto,
+    @Request() req,
+  ): Promise<HttpException> {
     return this.adminVoucherService.createAdminVoucher(createDto, req.user);
   }
 
@@ -25,9 +38,12 @@ export class AdminVoucherController {
 
   @Public()
   @Get('getbycode/:code/:id_customer')
-  async findByCode(@Param('code')  code: string, @Param("id_customer") id_customer: string) {
-    const id_customerToObjectId = new Types.ObjectId(id_customer)
-    return this.adminVoucherService.findOneByCode(code, id_customerToObjectId)
+  async findByCode(
+    @Param('code') code: string,
+    @Param('id_customer') id_customer: string,
+  ) {
+    const id_customerToObjectId = new Types.ObjectId(id_customer);
+    return this.adminVoucherService.findOneByCode(code, id_customerToObjectId);
   }
 
   @Public()
@@ -37,7 +53,10 @@ export class AdminVoucherController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdminVoucherDto: UpdateAdminVoucherDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateAdminVoucherDto: UpdateAdminVoucherDto,
+  ) {
     return this.adminVoucherService.update(+id, updateAdminVoucherDto);
   }
 

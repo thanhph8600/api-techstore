@@ -7,7 +7,7 @@ import {
 import { CreateDiscountDto } from './dto/create-discount.dto';
 import { UpdateDiscountDto } from './dto/update-discount.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Discount } from './schemas/discount.schema';
 import { DiscountDetail } from './schemas/discount-detail';
 import { ShopService } from 'src/controller/seller/shop/shop.service';
@@ -89,8 +89,25 @@ export class DiscountService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} discount`;
+  async findOneByIdProductPrice(id: string) {
+    const id_productPrice = new Types.ObjectId(id);
+    try {
+      const discountDetail = await this.discountDetailModel
+        .findOne({ id_productPrice })
+        .populate({
+          path: 'id_discount',
+          select: 'time_start time_end',
+        });
+
+      if (!discountDetail) {
+        return null;
+      }
+
+      return discountDetail;
+    } catch (error) {
+      console.log('Error finding discount by product price:', error);
+      throw new InternalServerErrorException();
+    }
   }
 
   async update(

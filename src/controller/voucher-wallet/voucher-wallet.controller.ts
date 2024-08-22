@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { VoucherWalletService } from './voucher-wallet.service';
 import { CreateVoucherWalletDto } from './dto/create-voucher-wallet.dto';
 import { UpdateVoucherWalletDto } from './dto/update-voucher-wallet.dto';
@@ -11,7 +19,9 @@ export class VoucherWalletController {
   @Public()
   @Post()
   create(@Body() createVoucherWalletDto: CreateVoucherWalletDto) {
-    return this.voucherWalletService.createVoucherWallet(createVoucherWalletDto);
+    return this.voucherWalletService.createVoucherWallet(
+      createVoucherWalletDto,
+    );
   }
 
   @Public()
@@ -27,7 +37,10 @@ export class VoucherWalletController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVoucherWalletDto: UpdateVoucherWalletDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateVoucherWalletDto: UpdateVoucherWalletDto,
+  ) {
     return this.voucherWalletService.update(+id, updateVoucherWalletDto);
   }
 

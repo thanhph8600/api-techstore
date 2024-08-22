@@ -33,6 +33,12 @@ export class ShopController {
     return this.shopService.findAll();
   }
 
+  @Public()
+  @Get('store/:id')
+  findById(@Param('id') id: string) {
+    return this.shopService.findById(id);
+  }
+
   @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Request() req) {

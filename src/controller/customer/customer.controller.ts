@@ -8,11 +8,9 @@ import {
   Patch,
   Request,
   UseGuards,
-  Put,
-  UseInterceptors,
-  UploadedFiles,
-  BadRequestException,
   UploadedFile,
+  BadRequestException,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
@@ -20,11 +18,11 @@ import { Public } from 'src/middleware/auth/public';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/middleware/auth/auth.guard';
 import { UpdatePassword } from './dto/update-customer.dto';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import * as fs from 'fs';
 import { extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import * as fs from 'fs';
 
 @ApiBearerAuth()
 @ApiTags('customer')
@@ -69,8 +67,7 @@ export class CustomerController {
   // @Public()
   @Post('update-avatar')
   @UseInterceptors(
-    FileInterceptor('avatar',
-      {
+    FileInterceptor('avatar', {
       storage: diskStorage({
         destination: (req, file, cb) => {
           const uploadPath = './uploads';
@@ -91,12 +88,11 @@ export class CustomerController {
           cb(null, true);
         }
       },
-    }
-  ),
+    }),
   )
   async updateAvatar(
     @UploadedFile() file: Express.Multer.File,
-    @Request() req
+    @Request() req,
   ) {
     console.log(file);
 
@@ -105,24 +101,29 @@ export class CustomerController {
     }
 
     const avatarUrl = `/uploads/${file.filename}`;
+    console.log(avatarUrl);
 
     // Cập nhật avatarUrl vào cơ sở dữ liệu
-    const oldAvatarPath = await this.customerService.updateAvatar(req.user, file);
-    console.log("oldAvatarPath",oldAvatarPath);
-    const finalOldAvatarPath = `/DATN/api-techstore/uploads/${oldAvatarPath}`
+    const oldAvatarPath = await this.customerService.updateAvatar(
+      req.user,
+      file,
+    );
+    console.log('oldAvatarPath', oldAvatarPath);
+    const finalOldAvatarPath = `/DATN/api-techstore/uploads/${oldAvatarPath}`;
 
-    const avatarDefault = `/DATN/api-techstore/uploads/avata-default.jpg`
-    
+    const avatarDefault = `/DATN/api-techstore/uploads/avata-default.jpg`;
 
-    if (finalOldAvatarPath ) {
-      if(finalOldAvatarPath === avatarDefault) {
-        return
-      }else {
+    if (finalOldAvatarPath) {
+      if (finalOldAvatarPath === avatarDefault) {
+        return;
+      } else {
         fs.unlink(finalOldAvatarPath, (err) => {
           if (err) {
             console.error(`Error deleting old avatar: ${err}`);
           } else {
-            console.log(`Successfully deleted old avatar: ${finalOldAvatarPath}`);
+            console.log(
+              `Successfully deleted old avatar: ${finalOldAvatarPath}`,
+            );
           }
         });
       }

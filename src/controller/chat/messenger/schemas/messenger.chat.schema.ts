@@ -18,7 +18,7 @@ export class Messenger {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Product' })
   id_product: ObjectId;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Order' })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'ItemsOrder' })
   id_order: ObjectId;
 
   @Prop()
@@ -29,6 +29,9 @@ export class Messenger {
 
   @Prop()
   content: string;
+
+  @Prop()
+  isAuto: boolean;
 
   @Prop({ default: false })
   isWatched: boolean;

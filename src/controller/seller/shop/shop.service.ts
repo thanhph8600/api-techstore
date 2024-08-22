@@ -6,13 +6,16 @@ import { Shop } from './entities/shop.entity';
 import { CustomerService } from 'src/controller/customer/customer.service';
 import { payload } from 'src/controller/customer/interface/customer.interface';
 import { BanShopService } from 'src/controller/ban_shop/ban_shop.service';
+import { CustomerFollowService } from 'src/controller/customer-follow/customer-follow.service';
+import { ShopDocument } from './schemas/shop.schema';
 
 @Injectable()
 export class ShopService {
   constructor(
-    @InjectModel('Shop') private readonly shopModule: Model<Shop>,
+    @InjectModel('Shop') private readonly shopModule: Model<ShopDocument>,
     private readonly customerService: CustomerService,
-    private banShopService: BanShopService
+    private banShopService: BanShopService,
+    private readonly customerFollowService: CustomerFollowService,
   ) {}
 
   async create(payload) {
@@ -28,24 +31,31 @@ export class ShopService {
       thumbnail: payload.avata,
     };
     const shop = await this.shopModule.create(newShop);
-
     await this.banShopService.create({
       id_shop: shop.id,
-      reasonBan: "",
+      reasonBan: '',
       banStartDate: new Date(),
       banEndDate: new Date(),
-    })
+    });
 
     return shop;
   }
-
 
   async findAll() {
     return await this.shopModule.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} shop`;
+  async findById(id: string): Promise<Shop> {
+    try {
+      const shop = await this.shopModule.findById(id).populate('id_customer');
+      if (!shop) throw new Error('Shop khong ton tai!');
+      const followers = await this.customerFollowService.findByShopId(id);
+      if (followers.length > 0) shop.count_follower = followers.length;
+      shop.follows = followers.map((follow) => follow.customerId);
+      return handleThumbnail(shop);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
   findByCustomer(req) {
@@ -70,6 +80,16 @@ export class ShopService {
 
   remove(id: number) {
     return `This action removes a #${id} shop`;
+  }
+  async search(query: string) {
+    console.log(query);
+    const shop = await this.shopModule
+      .find({
+        name: { $regex: 'ao ba lo', $options: 'i' },
+      })
+      .select('name')
+      .exec();
+    return shop;
   }
 }
 export function handleThumbnail(profile) {

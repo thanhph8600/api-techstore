@@ -17,5 +17,6 @@ import { ShopModule } from 'src/controller/seller/shop/shop.module';
   ],
   controllers: [VoucherController],
   providers: [VoucherService],
+  exports: [VoucherService],
 })
 export class VoucherModule {}

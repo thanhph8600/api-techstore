@@ -51,6 +51,24 @@ export class RoomChatController {
     return this.roomChatService.findByIdShop(req.user);
   }
 
+  @Get('detailRoomChat/:id')
+  findDetailRoomChat(
+    @Param('id') id: string,
+    @Query('skip') skip: number,
+    @Query('limit') limit: number,
+    @Request() req,
+  ) {
+    return this.roomChatService.findDetailRoomChat(id, req.user, skip, limit);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('shopandcustomer')
+  findByIdShopAndCustomer(
+    @Body() payload: { id_shop: string; id_customer: string },
+  ) {
+    return this.roomChatService.findOneByIdShopAndIdCustomer(payload);
+  }
+
   @Patch(':id')
   update(
     @Param('id') id: string,
