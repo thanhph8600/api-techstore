@@ -17,6 +17,10 @@ export class WalletController {
     return this.walletService.findAll();
   }
 
+  @Post('deposit')
+  async deposit( @Body() {walletId ,amount , description , cardId} : {walletId: string ,amount: number , description: string , cardId?: string}) {
+    return this.walletService.deposit(walletId, amount , description , cardId);
+  }
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.walletService.findOne(+id);

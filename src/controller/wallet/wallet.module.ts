@@ -5,12 +5,14 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { WalletSchema } from './schemas/wallet.schema';
 import { WalletTransactionsModule } from '../wallet-transactions/wallet-transactions.module';
 import { NotificationModule } from '../notification/notification.module';
+import { CardLinkModule } from '../card-link/card-link.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Wallet', schema: WalletSchema }]),
     WalletTransactionsModule,
-    NotificationModule
+    NotificationModule,
+    CardLinkModule
   ],
   controllers: [WalletController],
   providers: [WalletService],

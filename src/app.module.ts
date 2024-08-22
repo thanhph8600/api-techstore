@@ -37,6 +37,7 @@ import { NotificationModule } from './controller/notification/notification.modul
 import { ViolateModule } from './controller/violate/violate.module';
 import { WalletModule } from './controller/wallet/wallet.module';
 import { WalletTransactionsModule } from './controller/wallet-transactions/wallet-transactions.module';
+import { CardLinkModule } from './controller/card-link/card-link.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
@@ -83,6 +84,7 @@ import { WalletTransactionsModule } from './controller/wallet-transactions/walle
     ViolateModule,
     WalletModule,
     WalletTransactionsModule,
+    CardLinkModule,
   ],
   controllers: [AppController],
   providers: [AppService],

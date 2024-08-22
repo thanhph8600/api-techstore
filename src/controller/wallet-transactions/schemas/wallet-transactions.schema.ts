@@ -17,6 +17,9 @@ export class WalletTransactions {
   @Prop({type: String , required: true})
   description: string;
 
+  @Prop({ type: Types.ObjectId, required: false , ref: 'CardLink' })
+  cardId: Types.ObjectId;
+
   @Prop({type: Date , default: Date.now()})
   created_At: Date;
 }

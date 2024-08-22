@@ -5,12 +5,14 @@ export type WalletDocument = HydratedDocument<Wallet>;
 
 @Schema()
 export class Wallet {
-    @Prop({ type: Types.ObjectId, required: true , ref: 'Customer' })
-    customerId: Types.ObjectId;
-  
+  @Prop({ type: Types.ObjectId, required: true, ref: 'Customer' })
+  customerId: Types.ObjectId;
+
   @Prop({ type: Number, default: 0 })
   balance: number;
-
+  
+  cards?: any;
+  
   @Prop({ type: Date, default: new Date() })
   created_At: Date;
 }

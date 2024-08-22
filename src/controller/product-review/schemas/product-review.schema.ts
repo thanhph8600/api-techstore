@@ -10,17 +10,20 @@ export class ProductReview {
   @Prop({ type: Types.ObjectId, required: true, ref: 'Product' })
   productId: Types.ObjectId;
 
-   @Prop({ type: Types.ObjectId, required: true, ref: 'ProductPrice' })
-   productPriceId: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, required: true, ref: 'ProductPrice' })
+  productPriceId: Types.ObjectId;
 
-   @Prop({ type: Types.ObjectId, required: true, ref: 'Customer' })
-   customerId: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, required: true, ref: 'Customer' })
+  customerId: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, required: true, ref: 'ItemsOrder' })
+  itemsOrderId: Types.ObjectId;
 
   @Prop({ required: false })
   content: string;
 
-   @Prop({ type: [String] , required: false })
-   images: [string];
+  @Prop({ type: [String], required: false })
+  images: [string];
 
   @Prop({ required: true })
   rating: number;

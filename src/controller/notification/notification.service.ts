@@ -13,7 +13,7 @@ export class NotificationService {
     private readonly websocket: WebSocketGateway
   ) { }
   async create(
-    createNotification: CreateNotificationDto , delayInSeconds: number = 5
+    createNotification: CreateNotificationDto , delayInSeconds: number = 2
   ): Promise<Notification> {
    const newNotification = await this.notificationModel.create(createNotification);
     const { customerId, title, content, type, orderItemsId } = createNotification;

@@ -37,7 +37,7 @@ export class HistorySearchService {
         });
         return historySearch;
       }
-      const historyList = HistorySearch.query.reverse();
+      const historyList = HistorySearch.query;
       return historyList.slice(0, 6);
     } catch (error) {
       console.error('Error in findOne:', error);
@@ -49,25 +49,26 @@ export class HistorySearchService {
     try {
       const customerId = new Types.ObjectId(id);
       const { value } = updateHistorySearchDto;
+  
       const historySearch = await this.historySearchModel
         .findOne({ customerId: customerId })
         .exec();
       if (historySearch) {
-        const checkQuery = historySearch.query.find(
-          (item: any) => item == value,
+        const index = historySearch.query.findIndex(
+          (item: any) => item === value,
         );
-        if (checkQuery) {
-          return;
-        } else {
-          historySearch.query.push(value);
-          return await historySearch.save();
+        if (index > -1) {
+          historySearch.query.splice(index, 1);
         }
+        historySearch.query.unshift(value);
+        return await historySearch.save();
       }
     } catch (error) {
       console.error('Error in update:', error);
       throw new InternalServerErrorException();
     }
   }
+  
 
   remove(id: number) {
     return `This action removes a #${id} historySearch`;

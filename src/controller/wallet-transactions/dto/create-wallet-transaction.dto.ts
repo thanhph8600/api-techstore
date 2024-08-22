@@ -15,6 +15,8 @@ export class CreateWalletTransactionDto {
     @IsNotEmpty()
     type: string
 
+    cardId?: string
+
     @ApiProperty()
     @IsNotEmpty()
     description: string

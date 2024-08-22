@@ -18,6 +18,11 @@ export class CreateProductReviewDto {
     @ApiProperty()
     @IsNotEmpty()
     @Type(() => String)
+    itemsOrderId: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @Type(() => String)
     customerId: string;
 
     @ApiProperty()
@@ -30,6 +35,4 @@ export class CreateProductReviewDto {
     content: string;
 
     images?: string[];
-
-    itemsOrderId?: string;
 }
