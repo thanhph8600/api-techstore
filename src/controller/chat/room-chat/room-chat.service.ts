@@ -91,7 +91,7 @@ export class RoomChatService {
       if (!listRoomChat) return [];
       return this.handleThumbnailListRoom(listRoomChat);
     } catch (error) {
-      console.log('Error get list Room chat by Id Customer \n', error);
+      console.log('Error get list Room chat findByIdCustomer \n', error);
       throw new InternalServerErrorException();
     }
   }
@@ -126,7 +126,7 @@ export class RoomChatService {
         this.handleByTimeCreateLastMess(listRoomChat),
       );
     } catch (error) {
-      console.log('Error get list Room chat by Id Customer \n', error);
+      console.log('Error get list Room chat by findByIdShop \n', error);
       throw new InternalServerErrorException();
     }
   }
@@ -147,7 +147,7 @@ export class RoomChatService {
       });
       return newRoom;
     } catch (error) {
-      console.log('Error get list Room chat by Id Customer \n', error);
+      console.log('Error updateLastMess \n', error);
       throw new InternalServerErrorException();
     }
   }
@@ -273,7 +273,7 @@ export class RoomChatService {
         .lean();
       return this.handleThumbnailRoomDetail(roomChatDetail);
     } catch (error) {
-      console.log('Error get list Room chat by Id Customer \n', error);
+      console.log('Error get list Room chat by findDetailRoomChat \n', error);
       throw new InternalServerErrorException();
     }
   }
@@ -307,7 +307,7 @@ export class RoomChatService {
         return roomChat;
       }
     } catch (error) {
-      console.log('Error get list Room chat by Id Customer \n', error);
+      console.log('Error get list findOneByIdShopAndIdCustomer \n', error);
       throw new InternalServerErrorException();
     }
   }

@@ -45,6 +45,7 @@ import { ViolateModule } from './controller/violate/violate.module';
 import { WalletModule } from './controller/wallet/wallet.module';
 import { WalletTransactionsModule } from './controller/wallet-transactions/wallet-transactions.module';
 import { BanShopModule } from './controller/ban_shop/ban_shop.module';
+import { WalletShopModule } from './controller/wallet-shop/wallet-shop.module';
 
 @Module({
   imports: [
@@ -97,6 +98,7 @@ import { BanShopModule } from './controller/ban_shop/ban_shop.module';
     VoucherWalletModule,
     ProductReviewReplyModule,
     AddressShopModule,
+    WalletShopModule,
   ],
   controllers: [AppController],
   providers: [AppService],

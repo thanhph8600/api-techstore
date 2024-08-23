@@ -11,6 +11,9 @@ import { Model, Types } from 'mongoose';
 import { ItemsOrder } from './schemas/itemsOrder.schema';
 import { payload } from '../customer/interface/customer.interface';
 import { ShopService } from '../seller/shop/shop.service';
+import { NotificationService } from '../notification/notification.service';
+import { CreateNotificationDto } from '../notification/dto/create-notification.dto';
+import { NotificationType } from '../notification/Schemas/notification.schema';
 
 @Injectable()
 export class ItemsOrderService {
@@ -18,6 +21,7 @@ export class ItemsOrderService {
     @InjectModel('ItemsOrder')
     private readonly itemsOrderModel: Model<ItemsOrder>,
     private readonly shopService: ShopService,
+    private readonly notificationService: NotificationService,
   ) {}
   async create(createItemsOrderDto: CreateItemsOrderDto) {
     try {
@@ -158,7 +162,7 @@ export class ItemsOrderService {
         .populate('voucherShopId')
         .lean()
         .exec();
-      return this.handleThumbnailOrder(item);
+      return handleThumbnailOrder(item);
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error);
@@ -176,6 +180,18 @@ export class ItemsOrderService {
           select: 'name phone avata',
         })
         .populate('shopId')
+        .populate({
+          path: 'orderId',
+          select: 'address voucher2t methodPayment total coin',
+          populate: [
+            {
+              path: 'address',
+            },
+            {
+              path: 'voucher2t',
+            },
+          ],
+        })
         .populate({
           path: 'items.productPriceId',
           select: 'id_color id_product id_size price stock',
@@ -235,13 +251,27 @@ export class ItemsOrderService {
         order.status === 'Chờ xác nhận' &&
         String(shop._id) === String(order.shopId)
       ) {
-        return this.updateOrder(order, id, status);
+        const updateOrder = await this.updateOrder(order, id, status);
+        this.nofiticationOrder(
+          String(shop.id_customer),
+          'Xác nhận đơn hàng thành công',
+          `Bạn đã xác nhận đơn hàng với mã #${String(order._id).toUpperCase()} thành công`,
+          String(order._id),
+        );
+        return updateOrder;
       } else if (
         status === 'Đang vận chuyển' &&
         order.status === 'Xác nhận' &&
         String(shop._id) === String(order.shopId)
       ) {
-        return this.updateOrder(order, id, status, 'Đã gửi hàng');
+        const updateOrder = this.updateOrder(order, id, status, 'Đã gửi hàng');
+        this.nofiticationOrder(
+          String(shop.id_customer),
+          'Gửi hàng thành công',
+          `Bạn đã giao đơn hàng với mã #${String(order._id).toUpperCase()} thành công`,
+          String(order._id),
+        );
+        return updateOrder;
       }
       return new HttpException(
         'Bạn không thể cập nhật đơn hàng!',
@@ -252,6 +282,22 @@ export class ItemsOrderService {
       console.log(error);
       throw new InternalServerErrorException(error);
     }
+  }
+
+  nofiticationOrder(
+    customerId: string,
+    title: string,
+    content: string,
+    orderItemsId: string,
+  ) {
+    const dataCreateNotification: CreateNotificationDto = {
+      customerId,
+      title,
+      content,
+      type: NotificationType.ORDER,
+      orderItemsId,
+    };
+    this.notificationService.create(dataCreateNotification, 1);
   }
 
   async updateOrder(
@@ -287,32 +333,33 @@ export class ItemsOrderService {
   handleThumbnailListOrder(listOrder) {
     if (listOrder.length > 0) {
       listOrder.map((order) => {
-        return this.handleThumbnailOrder(order);
+        return handleThumbnailOrder(order);
       });
     }
     return listOrder;
   }
-  handleThumbnailOrder(order) {
-    if (order.customerId && order.customerId.avata) {
-      const avata = order.customerId.avata;
-      if (!avata.startsWith('http://') && !avata.startsWith('https://')) {
-        order.customerId.avata = `${process.env.URL_API}uploads/${avata}`;
-      }
+}
+
+export function handleThumbnailOrder(order) {
+  if (order.customerId && order.customerId.avata) {
+    const avata = order.customerId.avata;
+    if (!avata.startsWith('http://') && !avata.startsWith('https://')) {
+      order.customerId.avata = `${process.env.URL_API}uploads/${avata}`;
     }
-    if (order.items && order.items.length > 0) {
-      order.items.map((itemPrice) => {
-        const thumbnail = itemPrice.productPriceId.id_product[0].thumbnails[0];
-        if (
-          !thumbnail.startsWith('http://') &&
-          !thumbnail.startsWith('https://')
-        ) {
-          itemPrice.productPriceId.id_product[0].thumbnails[0] = `${process.env.URL_API}uploads/${thumbnail}`;
-        }
-        return itemPrice;
-      });
-    }
-    return {
-      ...order,
-    };
   }
+  if (order.items && order.items.length > 0) {
+    order.items.map((itemPrice) => {
+      const thumbnail = itemPrice.productPriceId.id_product[0].thumbnails[0];
+      if (
+        !thumbnail.startsWith('http://') &&
+        !thumbnail.startsWith('https://')
+      ) {
+        itemPrice.productPriceId.id_product[0].thumbnails[0] = `${process.env.URL_API}uploads/${thumbnail}`;
+      }
+      return itemPrice;
+    });
+  }
+  return {
+    ...order,
+  };
 }

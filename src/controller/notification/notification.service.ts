@@ -1,12 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Notification, NotificationType } from './Schemas/notification.schema';
 import { WebSocketGateway } from 'src/web-socket/web-socket.gateway';
 import { payload } from '../customer/interface/customer.interface';
-// import { Queue } from 'bull';
+import { handleThumbnailOrder } from '../items-order/items-order.service';
 @Injectable()
 export class NotificationService {
   constructor(
@@ -82,24 +86,51 @@ export class NotificationService {
           },
         })
         .exec();
-      return notifications.reverse();
+      return this.handleThumbnailNotification(notifications.reverse());
     } catch (error) {
       console.log(error);
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} notification`;
-  }
-
   async updateNotificationReaded(id: string) {
     await this.notificationModel.updateMany({ customerId: id }, { read: true });
   }
-  update(id: number, updateNotificationDto: UpdateNotificationDto) {
-    return `This action updates a #${id} notification`;
+
+  async updateById(idNotification: string, customerId: string) {
+    try {
+      const notification =
+        await this.notificationModel.findById(idNotification);
+      if (customerId !== String(notification.customerId))
+        return new HttpException(
+          'Bạn không thể cập nhật thông báo này!',
+          HttpStatus.BAD_REQUEST,
+        );
+      await this.notificationModel.findByIdAndUpdate(idNotification, {
+        read: true,
+      });
+      return new HttpException(
+        'Bạn không thể cập nhật thông báo này!',
+        HttpStatus.NO_CONTENT,
+      );
+    } catch (error) {
+      console.log('error updateById notificationModel');
+      console.log(error);
+      throw new InternalServerErrorException(error);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} notification`;
+  handleThumbnailNotification(notifications) {
+    if (notifications.length > 0) {
+      const newNotifi = notifications.map((notification) => {
+        if (notification.orderItemsId) {
+          notification.orderItemsId = handleThumbnailOrder(
+            notification.orderItemsId,
+          );
+        }
+        return notification;
+      });
+      return newNotifi;
+    }
+    return notifications;
   }
 }
