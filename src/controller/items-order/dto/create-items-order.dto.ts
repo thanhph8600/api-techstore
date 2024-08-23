@@ -65,6 +65,16 @@ export class CreateItemsOrderDto {
   @IsNumber()
   discount: number;
 
+  @ApiProperty({ required: false })
+  @IsNotEmpty()
+  @IsNumber()
+  discount2t?: number;
+
+  @ApiProperty({ required: false })
+  @IsNotEmpty()
+  @IsNumber()
+  coinRefunt?: number;
+
   @ApiProperty({ required: true })
   @IsNotEmpty()
   @IsNumber()

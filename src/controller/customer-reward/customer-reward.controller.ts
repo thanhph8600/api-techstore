@@ -38,6 +38,11 @@ export class CustomerRewardController {
     return this.customerRewardService.update(id, updateCustomerRewardDto);
   }
 
+  @Patch('refunt/:id')
+  refunt(@Param('id') id: string, @Body() coin: number) {
+    return this.customerRewardService.addCoinRefund(id, coin);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.customerRewardService.remove(+id);

@@ -40,20 +40,26 @@ export class ItemsOrder {
     value: Date;
   }[];
 
-  @Prop({ type: Number, required: true })
+  @Prop({ type: Number })
   costShipping: number;
 
-  @Prop({ type: Number, required: true })
+  @Prop({ type: Number })
   total: number;
 
-  @Prop({ type: Number, required: true })
+  @Prop({ type: Number })
   subTotal: number;
 
-  @Prop({ type: Number, required: true })
+  @Prop({ type: Number })
   discount: number;
 
-  @Prop({ type: Number, required: true })
+  @Prop({ type: Number })
+  discount2t: number;
+
+  @Prop({ type: Number })
   coin: number;
+
+  @Prop({ type: Number, default: 0 })
+  coinRefunt: number;
 
   @Prop({
     type: Types.ObjectId,

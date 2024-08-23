@@ -9,6 +9,7 @@ import { ProductPriceService } from '../variation/product-price/product-price.se
 import { SubOrderService } from '../sub-order/sub-order.service';
 import { CartService } from '../cart/cart.service';
 import { CustomerRewardService } from '../customer-reward/customer-reward.service';
+import { WalletService } from '../wallet/wallet.service';
 
 @Injectable()
 export class OrderService {
@@ -19,6 +20,7 @@ export class OrderService {
     private readonly subOrderService: SubOrderService,
     private readonly cartService: CartService,
     private readonly customerRewardService: CustomerRewardService,
+    private readonly walletService: WalletService,
   ) {}
   async create(createOrderDto: CreateOrderDto) {
     try {
@@ -51,6 +53,13 @@ export class OrderService {
       }
       const newOrder = new this.orderModel(createOrderDto);
       await newOrder.save();
+      if (newOrder.methodPayment === 'Techtribe Pay') {
+        await this.walletService.withDraw(
+          newOrder.customerId.toString(),
+          newOrder.total,
+          `thanh toán đơn hàng`,
+        );
+      }
       await this.customerRewardService.minusCoin(
         createOrderDto.customerId,
         createOrderDto.coin,
@@ -69,6 +78,15 @@ export class OrderService {
             return acc + item.productPriceId.price * item.quantity;
           }
         }, 0);
+        if (newOrder.totalDiscount > 0) {
+          item.discount2t =
+            newOrder.totalDiscount / createOrderDto.items.length;
+        } else {
+          item.discount2t = 0;
+        }
+        if (newOrder.coinRefunt > 0) {
+          item.coinRefunt = newOrder.coinRefunt / createOrderDto.items.length;
+        }
         if (newOrder.coin > 0) {
           item.coin = newOrder.coin / createOrderDto.items.length;
           item.total = subTotalListItem - item.coin + item.costShipping;
@@ -80,7 +98,10 @@ export class OrderService {
             subTotalListItem - item.discount + item.costShipping - coin;
         } else {
           item.coin = 0;
-          item.total = subTotalListItem + item.costShipping;
+          item.total =
+            subTotalListItem +
+            item.costShipping -
+            (item.discount2t + item.discount);
         }
         await this.itemsOrderService.create({
           customerId: createOrderDto.customerId,
@@ -91,6 +112,8 @@ export class OrderService {
           total: item.total,
           subTotal: subTotalListItem,
           discount: item.discount,
+          coinRefunt: item.coinRefunt,
+          discount2t: item.discount2t,
           coin: item.coin,
           voucherShopId: item.voucherShopId?._id,
         });

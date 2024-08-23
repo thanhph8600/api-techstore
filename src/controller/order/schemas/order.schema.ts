@@ -26,7 +26,13 @@ export class Order {
   voucher2t: Types.ObjectId;
 
   @Prop({ type: Number, default: 0 })
+  totalDiscount: number;
+
+  @Prop({ type: Number, default: 0 })
   coin: number;
+
+  @Prop({ type: Number, default: 0 })
+  coinRefunt: number;
 
   @Prop({ type: Number, default: 0 })
   costShipping: number;

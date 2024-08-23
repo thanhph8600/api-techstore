@@ -23,7 +23,6 @@ import { FlashSaleModule } from './controller/marketing/flash-sale/flash-sale.mo
 import { WebSocketModule } from './web-socket/web-socket.module';
 import { RoomChatModule } from './controller/chat/room-chat/room-chat.module';
 import { MessengerModule } from './controller/chat/messenger/messenger.module';
-import { BanShopModule } from './controller/ban_shop/ban_shop.module';
 import { ItemsSubOrderModule } from './controller/items-sub-order/items-sub-order.module';
 import { ItemsOrderModule } from './controller/items-order/items-order.module';
 import { ProductReviewModule } from './controller/product-review/product-review.module';
@@ -42,6 +41,10 @@ import { SubOrderModule } from './controller/sub-order/sub-order.module';
 import { VoucherWalletModule } from './controller/voucher-wallet/voucher-wallet.module';
 import { ProductReviewReplyModule } from './controller/product-review-reply/product-review-reply.module';
 import { AddressShopModule } from './controller/address-shop/address-shop.module';
+import { ViolateModule } from './controller/violate/violate.module';
+import { WalletModule } from './controller/wallet/wallet.module';
+import { WalletTransactionsModule } from './controller/wallet-transactions/wallet-transactions.module';
+import { BanShopModule } from './controller/ban_shop/ban_shop.module';
 
 @Module({
   imports: [
@@ -85,6 +88,9 @@ import { AddressShopModule } from './controller/address-shop/address-shop.module
     CustomerRewardModule,
     HistorySearchModule,
     NotificationModule,
+    ViolateModule,
+    WalletModule,
+    WalletTransactionsModule,
     SearchQueryModule,
     SpectificationDetailModule,
     SubOrderModule,
