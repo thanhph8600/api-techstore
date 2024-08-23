@@ -11,6 +11,7 @@ import { UpdateSubOrderDto } from './dto/update-sub-order.dto';
 import { CustomerRewardService } from '../customer-reward/customer-reward.service';
 import { VoucherService } from '../marketing/voucher/voucher.service';
 import { ItemsSubOrderService } from '../items-sub-order/items-sub-order.service';
+import { AdminVoucherService } from '../admin/admin-voucher/admin-voucher.service';
 @Injectable()
 export class SubOrderService {
   constructor(
@@ -18,6 +19,7 @@ export class SubOrderService {
     private readonly customerReward: CustomerRewardService,
     private readonly voucherService: VoucherService,
     private readonly itemsSubOrderService: ItemsSubOrderService,
+    private readonly adminVoucherService: AdminVoucherService
   ) { }
   async create(createSubOrderDto: CreateSubOrderDto) {
     try {
@@ -84,10 +86,6 @@ export class SubOrderService {
       } else {
         subOrder.total = totalSubOrder;
       }
-      const coinRefunt = listProduct.reduce((acc: number, item: any) => {
-        return acc + item.coin;
-      }, 0);
-      subOrder.coinRefunt = coinRefunt;
       const discountShop = listProduct.reduce((acc: number, item: any) => {
         return acc + item.discount;
       }, 0);
@@ -127,11 +125,10 @@ export class SubOrderService {
         throw new NotFoundException(`SubOrder with ID ${id} not found`);
       }
       if (updateSubOrderDto.voucher2t) {
-        const dataVoucher = await this.voucherService.findByIdVoucher(
+        const dataVoucher = await this.adminVoucherService.findOneById(
           updateSubOrderDto.voucher2t,
         );
-
-        if (dataVoucher.type === 'price') {
+        if (dataVoucher.type === 'Hoàn tiền') {
           const discountAmount = subOrder.total * (dataVoucher.percent / 100);
           const discountToApply = discountAmount > dataVoucher.maximum_reduction
             ? dataVoucher.maximum_reduction
@@ -139,7 +136,7 @@ export class SubOrderService {
           subOrder.totalDisCount = discountToApply;
           subOrder.coinRefunt = 0;
           subOrder.total = subOrder.total - discountToApply;
-        } else if (dataVoucher.type === 'coin') {
+        } else if (dataVoucher.type === 'Hoàn xu') {
           const coinAmount = subOrder.total * (dataVoucher.percent / 100);
           const coinToApply = coinAmount > dataVoucher.maximum_reduction
             ? dataVoucher.maximum_reduction

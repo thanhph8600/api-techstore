@@ -6,6 +6,7 @@ import { SubOrder, SubOrderSchema } from './schemas/sub-order.schema';
 import { CustomerRewardModule } from '../customer-reward/customer-reward.module';
 import { VoucherModule } from '../marketing/voucher/voucher.module';
 import { ItemsSubOrderModule } from '../items-sub-order/items-sub-order.module';
+import { AdminVoucherModule } from '../admin/admin-voucher/admin-voucher.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ItemsSubOrderModule } from '../items-sub-order/items-sub-order.module';
     CustomerRewardModule,
     VoucherModule,
     ItemsSubOrderModule,
+    AdminVoucherModule
   ],
   controllers: [SubOrderController],
   providers: [SubOrderService],

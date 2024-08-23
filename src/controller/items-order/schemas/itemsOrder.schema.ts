@@ -76,7 +76,7 @@ export class ItemsOrder {
     type: String,
     required: false,
     default: null,
-    enum: ['Đã gửi hàng', 'Đã giao hàng'],
+    enum: ['Đã gửi hàng', 'Đã giao hàng', 'Giao không thành công'],
   })
   statusShipping: string;
 

@@ -93,6 +93,12 @@ export class CartSelectService {
       return CartSelect;
     }
   }
+  async slelectAllItemOfShop (id: string, updateCartSlecteDto: any): Promise<CartSelect> {
+    const customerId = new Types.ObjectId(id);
+    const { shopId } = updateCartSlecteDto;
+   const cartSlected = await this.cartSelectModal.findOne({customerId: customerId}).exec();
+   return cartSlected;
+  }
   async removeChildItem(
     id: string,
     updateCartSlecteDto: any,

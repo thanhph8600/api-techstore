@@ -22,7 +22,7 @@ export class SubOrder {
   @Prop({ type: Number, default: 0 })
   totalDiscountShop: number;
 
-  @Prop({ type: Types.ObjectId, default: null, ref: 'Voucher' })
+  @Prop({ type: Types.ObjectId, default: null, ref: 'AdminVoucher' })
   voucher2t: Types.ObjectId;
 
   @Prop({ type: Number, default: 0 })

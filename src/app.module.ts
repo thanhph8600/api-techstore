@@ -38,6 +38,8 @@ import { ViolateModule } from './controller/violate/violate.module';
 import { WalletModule } from './controller/wallet/wallet.module';
 import { WalletTransactionsModule } from './controller/wallet-transactions/wallet-transactions.module';
 import { CardLinkModule } from './controller/card-link/card-link.module';
+import { AdminVoucherModule } from './controller/admin/admin-voucher/admin-voucher.module';
+import { ReturnOrderModule } from './controller/return-order/return-order.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
@@ -85,6 +87,8 @@ import { CardLinkModule } from './controller/card-link/card-link.module';
     WalletModule,
     WalletTransactionsModule,
     CardLinkModule,
+    AdminVoucherModule,
+    ReturnOrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],

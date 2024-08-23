@@ -25,7 +25,7 @@ export class ItemsOrderService {
       await this.notificationService.create({
         customerId: createItemsOrderDto.customerId,
         title: `Đặt hàng thành công`,
-        content: `Đơn hàng với mã ${itemsOrder._id} của bạn đã được đặt thành công`,
+        content: `Đơn hàng với mã 2TEX${itemsOrder._id.toString().slice(0, 6)} của bạn đã được đặt thành công`,
         type: NotificationType.ORDER,
         orderItemsId: itemsOrder._id.toString(),
       })
@@ -38,7 +38,19 @@ export class ItemsOrderService {
 
   findAll() {
     try {
-      return this.itemsOrderModel.find();
+      return this.itemsOrderModel.find()
+      .populate({
+        path: 'orderId',
+        select: 'address voucher2t methodPayment total coin',
+        populate: [
+          {
+            path: 'address',
+          },
+          {
+            path: 'voucher2t',
+          },
+        ],
+      })
     } catch (error) {
       console.log('error itemsOrder findAll ', error);
       throw new InternalServerErrorException();
@@ -359,11 +371,42 @@ export class ItemsOrderService {
       throw new InternalServerErrorException(error);
     }
   }
-
+  async refuntOrder(id: string) {
+    try {
+      const item = await this.itemsOrderModel.findById(id);
+      if(item.statusShipping){
+        return new HttpException('error', 280);
+      }
+      item.status = 'Hoàn';
+      await item.save();  
+      const refundStockPromises = [];
+        for (const subItem of item.items) {
+          const refundPromise = this.productPriceService.refuntStock(
+            subItem.productPriceId.toString(),
+            subItem.quantity
+          );
+          refundStockPromises.push(refundPromise);
+      }
+    await Promise.all(refundStockPromises);
+      return item;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
   async updateStatusTime({ id, key, value }: any) {
     try {
       const item = await this.itemsOrderModel.findById(id);
       item.statusUpdate.push({ key: key, value: value });
+      if(key === 'Đã giao hàng'){
+        await this.notificationService.create({
+          customerId: item.customerId.toString(),
+          type: NotificationType.ORDER,
+          title: 'Giao hàng thành công',
+          content: `Shipper đã xác nhận giao đơn hàng cho bạn thành công`,
+          orderItemsId: item._id.toString(),
+        })
+      }
+     
       return await item.save();
     } catch (error) {
       throw new InternalServerErrorException(error);
