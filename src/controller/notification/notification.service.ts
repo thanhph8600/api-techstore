@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Notification, NotificationType } from './Schemas/notification.schema';
 import { WebSocketGateway } from 'src/web-socket/web-socket.gateway';
+import { payload } from '../customer/interface/customer.interface';
 // import { Queue } from 'bull';
 @Injectable()
 export class NotificationService {
@@ -43,6 +44,30 @@ export class NotificationService {
     try {
       const notifications = await this.notificationModel
         .find({ customerId: id })
+        .populate({
+          path: 'orderItemsId',
+          populate: {
+            path: 'items.productPriceId',
+            select: 'id_product',
+            populate: [
+              {
+                path: 'id_product',
+                select: 'name , thumbnails',
+              },
+            ],
+          },
+        })
+        .exec();
+      return notifications.reverse();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async findByShop(payload: payload) {
+    try {
+      const notifications = await this.notificationModel
+        .find({ customerId: payload.sub })
         .populate({
           path: 'orderItemsId',
           populate: {

@@ -6,10 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
+import { AuthGuard } from 'src/middleware/auth/auth.guard';
 
 @Controller('notification')
 export class NotificationController {
@@ -28,6 +31,12 @@ export class NotificationController {
   @Get('customer/:id')
   getNotification(@Param('id') id: string) {
     return this.notificationService.findByIdCustomer(id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('customer/:id')
+  getNotificationByShop(@Request() req) {
+    return this.notificationService.findByShop(req.user);
   }
 
   @Get(':id')
