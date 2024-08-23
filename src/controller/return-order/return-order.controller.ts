@@ -5,7 +5,7 @@ import { UpdateReturnOrderDto } from './dto/update-return-order.dto';
 
 @Controller('return-order')
 export class ReturnOrderController {
-  constructor(private readonly returnOrderService: ReturnOrderService) {}
+  constructor(private readonly returnOrderService: ReturnOrderService) { }
 
   @Post()
   create(@Body() createReturnOrderDto: CreateReturnOrderDto) {
@@ -16,7 +16,10 @@ export class ReturnOrderController {
   findAll() {
     return this.returnOrderService.findAll();
   }
-
+  @Get('items-order/:id')
+  findOneByItemsOrderId(@Param('id') id: string) {
+    return this.returnOrderService.findOneByItemsOrderId(id);
+  }
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.returnOrderService.findOne(+id);
@@ -24,7 +27,7 @@ export class ReturnOrderController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateReturnOrderDto: UpdateReturnOrderDto) {
-    return this.returnOrderService.update(+id, updateReturnOrderDto);
+    return this.returnOrderService.update(id, updateReturnOrderDto);
   }
 
   @Delete(':id')

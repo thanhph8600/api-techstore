@@ -85,6 +85,8 @@ export class CreateItemsOrderDto {
   @Type(() => String)
   voucherShopId: string;
 
+  status?: string;
+
   statusShipping?: string;
 
   statusUpdate?: { key: string; value: Date }[];

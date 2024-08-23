@@ -9,7 +9,7 @@ export class ReturnOrder {
     customerId: Types.ObjectId;
 
     @Prop({ type: Types.ObjectId, required: true, ref: 'ItemsOrder' })
-    itemOrder: Types.ObjectId;
+    itemsOrderId: Types.ObjectId;
 
     @Prop({ type: Types.ObjectId, required: true, ref: 'Shop' })
     shopId: Types.ObjectId;
@@ -27,7 +27,8 @@ export class ReturnOrder {
                 returnReason: { type: String, required: true },
                 refundAmount: { type: Number, required: true },
                 description: { type: String },
-                image: { type: [String], default: [] },
+                images: { type: [String], default: [] },
+                discount2t: { type: Number },
             },
         ],
         _id: false,
@@ -40,13 +41,16 @@ export class ReturnOrder {
         refundAmount: number;
         description?: string;
         image?: string[];
+        discount2t?: number
     }[];
     @Prop({
         type: String,
-        enum: ['Đang chờ', 'Đã xử lý', 'Từ chối', 'Hoàn tiền'],
-        default: 'Đang chờ',
+        enum: ['Đã tiếp nhận', 'Đã gửi hàng lại', 'Kiểm tra hàng hoàn', 'Hoàn tiền', 'Từ chối'],
+        default: 'Đã tiếp nhận',
     })
     status: string;
+
+    statusUpdate?: { key: string; value: Date }[];
 
     @Prop({ type: Date, default: Date.now })
     returnDate: Date;

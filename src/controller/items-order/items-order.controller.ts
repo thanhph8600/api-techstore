@@ -23,6 +23,11 @@ export class ItemsOrderController {
     return this.itemsOrderService.create(createItemsOrderDto);
   }
 
+  @Post('deliveryFailed/:id')
+  deliveryFailed(@Param('id') id: string) {
+    return this.itemsOrderService.deliveryFailed(id);
+  }
+
   @Get()
   findAll() {
     return this.itemsOrderService.findAll();

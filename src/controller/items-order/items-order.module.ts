@@ -6,6 +6,7 @@ import { ItemsOrder, ItemsOrderSchema } from './schemas/itemsOrder.schema';
 import { ShopModule } from '../seller/shop/shop.module';
 import { ProductPriceModule } from '../variation/product-price/product-price.module';
 import { NotificationModule } from '../notification/notification.module';
+import { WalletModule } from '../wallet/wallet.module';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { NotificationModule } from '../notification/notification.module';
     ]),
     ShopModule,
     ProductPriceModule,
-    NotificationModule
+    NotificationModule,
+    WalletModule
   ],
   controllers: [ItemsOrderController],
   providers: [ItemsOrderService],

@@ -22,5 +22,6 @@ import { WalletModule } from '../wallet/wallet.module';
   ],
   controllers: [OrderController],
   providers: [OrderService],
+  exports: [OrderService],
 })
 export class OrderModule {}
