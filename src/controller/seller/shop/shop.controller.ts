@@ -42,7 +42,7 @@ export class ShopController {
   @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Request() req) {
-    return this.shopService.findByCustomer(req);
+    return this.shopService.findByCustomer(req.user);
   }
 
   @UseGuards(AuthGuard)

@@ -6,11 +6,14 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { ProductReviewService } from './product-review.service';
 import { CreateProductReviewDto } from './dto/create-product-review.dto';
 import { UpdateProductReviewDto } from './dto/update-product-review.dto';
 import { Public } from 'src/middleware/auth/public';
+import { AuthGuard } from 'src/middleware/auth/auth.guard';
 
 @Controller('product-review')
 export class ProductReviewController {
@@ -34,6 +37,12 @@ export class ProductReviewController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productReviewService.findOne(+id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('shop/:id')
+  findByShop(@Request() req) {
+    return this.productReviewService.findByShop(req.user);
   }
 
   @Patch(':id')

@@ -211,6 +211,7 @@ export class ProductService {
 
   async productQuery(q: string, page?: number, limit?: number, sort?: string) {
     console.log('Received q:', q);
+    console.log(page, limit, sort);
     return ['Test Product 1', 'Test Product 2'];
   }
   async update(id: string, updateProductDto: UpdateProductDto) {

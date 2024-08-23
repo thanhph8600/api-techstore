@@ -47,7 +47,12 @@ export class ShopService {
 
   async findById(id: string): Promise<Shop> {
     try {
-      const shop = await this.shopModule.findById(id).populate('id_customer');
+      const shop = await this.shopModule
+        .findById(id)
+        .populate('id_customer')
+        .populate('addressShop')
+        .lean()
+        .exec();
       if (!shop) throw new Error('Shop khong ton tai!');
       const followers = await this.customerFollowService.findByShopId(id);
       if (followers.length > 0) shop.count_follower = followers.length;
@@ -58,8 +63,24 @@ export class ShopService {
     }
   }
 
-  findByCustomer(req) {
-    return this.create(req.user);
+  async findByCustomer(payload: payload) {
+    try {
+      const shop = await this.create(payload);
+      const profile = await this.shopModule
+        .findById(String(shop._id))
+        .populate('id_customer')
+        .populate('AddressShop')
+        .exec();
+      if (!profile) throw new Error('Shop khong ton tai!');
+      const followers = await this.customerFollowService.findByShopId(
+        String(shop._id),
+      );
+      if (followers.length > 0) profile.count_follower = followers.length;
+      profile.follows = followers.map((follow) => follow.customerId);
+      return handleThumbnail(profile);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
   async update(payload: payload, updateShopDto: UpdateShopDto) {

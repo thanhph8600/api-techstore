@@ -30,6 +30,18 @@ import { ProductReviewModule } from './controller/product-review/product-review.
 import { AutoReplyModule } from './controller/chat/auto-reply/auto-reply.module';
 import { MessageShortCutModule } from './controller/chat/message-short-cut/message-short-cut.module';
 import { OrderModule } from './controller/order/order.module';
+import { AdminVoucherModule } from './controller/admin/admin-voucher/admin-voucher.module';
+import { CartSelectModule } from './controller/cart-select/cart-select.module';
+import { CustomerFollowModule } from './controller/customer-follow/customer-follow.module';
+import { CustomerRewardModule } from './controller/customer-reward/customer-reward.module';
+import { HistorySearchModule } from './controller/history-search/history-search.module';
+import { NotificationModule } from './controller/notification/notification.module';
+import { SearchQueryModule } from './controller/search-query/search-query.module';
+import { SpectificationDetailModule } from './controller/specification/spectification-detail/spectification-detail.module';
+import { SubOrderModule } from './controller/sub-order/sub-order.module';
+import { VoucherWalletModule } from './controller/voucher-wallet/voucher-wallet.module';
+import { ProductReviewReplyModule } from './controller/product-review-reply/product-review-reply.module';
+import { AddressShopModule } from './controller/address-shop/address-shop.module';
 
 @Module({
   imports: [
@@ -67,6 +79,18 @@ import { OrderModule } from './controller/order/order.module';
     AutoReplyModule,
     MessageShortCutModule,
     BanShopModule,
+    AdminVoucherModule,
+    CartSelectModule,
+    CustomerFollowModule,
+    CustomerRewardModule,
+    HistorySearchModule,
+    NotificationModule,
+    SearchQueryModule,
+    SpectificationDetailModule,
+    SubOrderModule,
+    VoucherWalletModule,
+    ProductReviewReplyModule,
+    AddressShopModule,
   ],
   controllers: [AppController],
   providers: [AppService],
