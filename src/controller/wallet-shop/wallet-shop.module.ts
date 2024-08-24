@@ -4,8 +4,8 @@ import { WalletShopController } from './wallet-shop.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { WalletShop, WalletShopSchema } from './schemas/walletShop.schema';
 import { ShopModule } from '../seller/shop/shop.module';
-import { WalletTransactionsModule } from '../wallet-transactions/wallet-transactions.module';
 import { NotificationModule } from '../notification/notification.module';
+import { WalletShopTransactionsModule } from '../wallet-shop-transactions/wallet-shop-transactions.module';
 
 @Module({
   imports: [
@@ -13,7 +13,7 @@ import { NotificationModule } from '../notification/notification.module';
       { name: WalletShop.name, schema: WalletShopSchema },
     ]),
     ShopModule,
-    WalletTransactionsModule,
+    WalletShopTransactionsModule,
     NotificationModule,
   ],
   controllers: [WalletShopController],

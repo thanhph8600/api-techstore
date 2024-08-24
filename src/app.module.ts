@@ -46,6 +46,7 @@ import { WalletModule } from './controller/wallet/wallet.module';
 import { WalletTransactionsModule } from './controller/wallet-transactions/wallet-transactions.module';
 import { BanShopModule } from './controller/ban_shop/ban_shop.module';
 import { WalletShopModule } from './controller/wallet-shop/wallet-shop.module';
+import { WalletShopTransactionsModule } from './controller/wallet-shop-transactions/wallet-shop-transactions.module';
 
 @Module({
   imports: [
@@ -99,6 +100,7 @@ import { WalletShopModule } from './controller/wallet-shop/wallet-shop.module';
     ProductReviewReplyModule,
     AddressShopModule,
     WalletShopModule,
+    WalletShopTransactionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

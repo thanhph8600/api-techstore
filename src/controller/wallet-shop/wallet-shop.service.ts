@@ -4,10 +4,10 @@ import { WalletShop } from './schemas/walletShop.schema';
 import { Model } from 'mongoose';
 import { payload } from '../customer/interface/customer.interface';
 import { ShopService } from '../seller/shop/shop.service';
-import { WalletTransactionsService } from '../wallet-transactions/wallet-transactions.service';
 import { NotificationService } from '../notification/notification.service';
 import { fortmatNumberToVnd } from '../wallet/wallet.service';
 import { NotificationType } from '../notification/Schemas/notification.schema';
+import { WalletShopTransactionsService } from '../wallet-shop-transactions/wallet-shop-transactions.service';
 
 @Injectable()
 export class WalletShopService {
@@ -15,7 +15,7 @@ export class WalletShopService {
     @InjectModel(WalletShop.name)
     private readonly walletShopModel: Model<WalletShop>,
     private readonly shopService: ShopService,
-    private readonly walletTransactionService: WalletTransactionsService,
+    private readonly walletShopTransactionService: WalletShopTransactionsService,
     private readonly notificationService: NotificationService,
   ) {}
   async create(payload: payload) {
@@ -40,7 +40,17 @@ export class WalletShopService {
     }
   }
 
-  async depositOrder(amount: number, id_shop: string, id_order: string) {
+  async findByShop(payload: payload) {
+    const check = await this.create(payload);
+    const wallet = await this.walletShopModel
+      .findById(check._id)
+      .populate('WalletShopTransactions')
+      .lean()
+      .exec();
+    return wallet;
+  }
+
+  async handleWalletShop(amount: number, id_shop: string, id_order: string) {
     try {
       const shop = await this.shopService.findById(id_shop);
       let wallet = await this.walletShopModel.findOne({ id_shop });
@@ -58,7 +68,7 @@ export class WalletShopService {
         description: `Danh thu từ đơn hàng #${id_order.toUpperCase()}`,
       };
       const createTran =
-        await this.walletTransactionService.create(dataWalletTran);
+        await this.walletShopTransactionService.create(dataWalletTran);
       const balance = wallet.balance + amount;
       await this.update(String(wallet._id), balance);
       await this.notificationService.create({
