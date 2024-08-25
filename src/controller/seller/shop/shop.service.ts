@@ -45,6 +45,10 @@ export class ShopService {
     return await this.shopModule.find();
   }
 
+  async countShop() {
+    return await this.shopModule.estimatedDocumentCount()
+  }
+
   async findById(id: string): Promise<Shop> {
     try {
       const shop = await this.shopModule.findById(id).populate('id_customer');
@@ -90,6 +94,33 @@ export class ShopService {
       .select('name')
       .exec();
     return shop;
+  }
+
+  async updateCreatedAtById(id: string, newCreatedAt: Date): Promise<void> {
+    await this.shopModule.updateOne(
+      { _id: id },
+      { $set: { createdAt: newCreatedAt } }
+    );
+  }
+
+
+  async countShopsCreatedInMonth(year: number, month: number): Promise<number> {
+    const startOfMonth = new Date(year, month - 1, 1);
+    const endOfMonth = new Date(year, month, 1);
+
+    return this.shopModule.countDocuments({
+      createdAt: { $gte: startOfMonth, $lt: endOfMonth },
+    });
+  }
+
+  async addCreatedAtToExistingShops(): Promise<void> {
+    const currentDate = new Date();
+
+    // Cập nhật tất cả các tài liệu mà không có trường createdAt
+    await this.shopModule.updateMany(
+      { createdAt: { $exists: false } }, // Chỉ cập nhật các tài liệu không có createdAt
+      { $set: { createdAt: currentDate } } // Đặt giá trị createdAt là ngày hiện tại
+    );
   }
 }
 export function handleThumbnail(profile) {

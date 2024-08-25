@@ -24,4 +24,5 @@ export class CreateCustomerDto {
   refresh_token: string;
 
   isBan: boolean;
+
 }

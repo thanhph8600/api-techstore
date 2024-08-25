@@ -35,6 +35,9 @@ export class Product {
 
   @Prop({ default: false })
   unlisted: boolean;
+
+  @Prop({default: new Date()})
+  createdAt: Date
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

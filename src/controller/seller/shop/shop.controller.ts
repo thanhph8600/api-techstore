@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Request,
+  Query,
 } from '@nestjs/common';
 import { ShopService } from './shop.service';
 import { UpdateShopDto } from './dto/update-shop.dto';
@@ -34,6 +35,13 @@ export class ShopController {
   }
 
   @Public()
+  @Get('count-shop')
+  countShop() {
+    return this.shopService.countShop();
+  }
+
+
+  @Public()
   @Get('store/:id')
   findById(@Param('id') id: string) {
     return this.shopService.findById(id);
@@ -54,5 +62,34 @@ export class ShopController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.shopService.remove(+id);
+  }
+
+
+  // thống kê
+
+  @Public()
+  @Post('add-createdAt')
+  async addCreatedAtToExistingShops(): Promise<string> {
+    await this.shopService.addCreatedAtToExistingShops();
+    return 'Added createdAt to all existing Shops';
+  }
+
+  @Patch('update-createdAt')
+  async updateShopCreatedAt(
+    @Body('id') id: string,
+    @Body('createdAt') createdAt: string,
+  ): Promise<string> {
+    const newCreatedAt = new Date(createdAt);
+    await this.shopService.updateCreatedAtById(id, newCreatedAt);
+    return `Shop ${id} updated with new createdAt: ${newCreatedAt.toISOString()}`;
+  }
+
+  @Public()
+  @Get('count/month')
+  async countShopsInMonth(
+    @Query('year') year: number,
+    @Query('month') month: number,
+  ): Promise<number> {
+    return this.shopService.countShopsCreatedInMonth(year, month);
   }
 }

@@ -119,6 +119,10 @@ export class ProductService {
     return handleThumbnailListProduct(listProducts);
   }
 
+  async countProduct() {
+    return await this.productModel.estimatedDocumentCount()
+  }
+
   async findOne(id: ObjectId) {
     try {
       const product: any = await this.productModel
@@ -314,6 +318,34 @@ export class ProductService {
       console.log('error remove product' + error);
       throw new InternalServerErrorException();
     }
+  }
+
+  // Thống kê 
+  async addCreatedAtToExistingShops(): Promise<void> {
+    const currentDate = new Date();
+
+    // Cập nhật tất cả các tài liệu mà không có trường createdAt
+    await this.productModel.updateMany(
+      { createdAt: { $exists: false } }, // Chỉ cập nhật các tài liệu không có createdAt
+      { $set: { createdAt: currentDate } } // Đặt giá trị createdAt là ngày hiện tại
+    );
+  }
+
+  async updateCreatedAtById(id: string, newCreatedAt: Date): Promise<void> {
+    await this.productModel.updateOne(
+      { _id: id },
+      { $set: { createdAt: newCreatedAt } }
+    );
+  }
+
+
+  async countShopsCreatedInMonth(year: number, month: number): Promise<number> {
+    const startOfMonth = new Date(year, month - 1, 1);
+    const endOfMonth = new Date(year, month, 1);
+
+    return this.productModel.countDocuments({
+      createdAt: { $gte: startOfMonth, $lt: endOfMonth },
+    });
   }
 }
 export function handleThumbnailListProduct(listProduct) {

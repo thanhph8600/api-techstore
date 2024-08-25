@@ -46,9 +46,11 @@ export class SpectificationDetailService {
     return `This action returns a #${id} spectificationDetail`;
   }
 
-  update(id: number, update: UpdateSpectificationDetailDto) {
-    console.log(update);
-    return `This action updates a #${id} spectificationDetail`;
+  async update(id: string, name: string) {
+    await this.model.findByIdAndUpdate(id,{
+      name: name
+    }, { new: true }).exec();
+    return new HttpException("Cập nhật thành công", HttpStatus.OK)
   }
 
   remove(id: number) {

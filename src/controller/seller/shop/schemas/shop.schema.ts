@@ -35,6 +35,9 @@ export class Shop {
 
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Customer' }] })
   follows?: Types.ObjectId[];
+
+  @Prop({default: new Date()})
+  createdAt: Date
 }
 
 export const shopSchema = SchemaFactory.createForClass(Shop);

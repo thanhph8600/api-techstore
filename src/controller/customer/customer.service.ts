@@ -72,8 +72,13 @@ export class CustomerService {
     return newUser;
   }
 
-  findAll() {
-    return `This action returns all customer`;
+  async findAll() {
+    return await this.customerModel.find();
+  }
+  
+
+  async countUser() {
+    return await this.customerModel.estimatedDocumentCount()
   }
 
   findOne(id: number) {
@@ -168,5 +173,32 @@ export class CustomerService {
     await customer.save();
 
     return oldPathAvatar;
+  }
+
+  async addCreatedAtToExistingUsers(): Promise<void> {
+    const currentDate = new Date();
+
+    // Cập nhật tất cả các tài liệu mà không có trường createdAt
+    await this.customerModel.updateMany(
+      { createdAt: { $exists: false } }, // Chỉ cập nhật các tài liệu không có createdAt
+      { $set: { createdAt: currentDate } } // Đặt giá trị createdAt là ngày hiện tại
+    );
+  }
+
+  async updateCreatedAtById(id: string, newCreatedAt: Date): Promise<void> {
+    await this.customerModel.updateOne(
+      { _id: id },
+      { $set: { createdAt: newCreatedAt } }
+    );
+  }
+
+
+  async countUsersCreatedInMonth(year: number, month: number): Promise<number> {
+    const startOfMonth = new Date(year, month - 1, 1);
+    const endOfMonth = new Date(year, month, 1);
+
+    return this.customerModel.countDocuments({
+      createdAt: { $gte: startOfMonth, $lt: endOfMonth },
+    });
   }
 }

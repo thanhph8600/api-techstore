@@ -41,6 +41,12 @@ export class ProductController {
   }
 
   @Public()
+  @Get('count-product')
+  async countProduct() {
+    return await this.productService.countProduct();
+  }
+
+  @Public()
   @Get(':id')
   findById(@Param('id') id: ObjectId) {
     return this.productService.findOne(id);
@@ -102,4 +108,34 @@ export class ProductController {
   remove(@Param('id') id: string) {
     return this.productService.remove(id);
   }
+
+  // Thống kê
+
+  @Public()
+  @Post('add-createdAt')
+  async addCreatedAtToExistingUsers(): Promise<string> {
+    await this.productService.addCreatedAtToExistingShops();
+    return 'Added createdAt to all existing products';
+  }
+
+  @Public()
+  @Put('update-createdAt')
+  async updateUserCreatedAt(
+    @Body('id') id: string,
+    @Body('createdAt') createdAt: string,
+  ): Promise<string> {
+    const newCreatedAt = new Date(createdAt);
+    await this.productService.updateCreatedAtById(id, newCreatedAt);
+    return `User ${id} updated with new createdAt: ${newCreatedAt.toISOString()}`;
+  }
+
+  @Public()
+  @Get('count/month')
+  async countUsersInMonth(
+    @Query('year') year: number,
+    @Query('month') month: number,
+  ): Promise<number> {
+    return this.productService.countShopsCreatedInMonth(year, month);
+  }
+  
 }

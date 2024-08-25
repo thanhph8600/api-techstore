@@ -45,15 +45,14 @@ export class SpectificationDetailController {
     return await this.spectificationDetailService.findByIdSpecification(id_specification)
   }
 
-  @Patch(':id')
+  @Patch('')
   update(
-    @Param('id') id: string,
-    @Body() updateSpectificationDetailDto: UpdateSpectificationDetailDto,
+    @Body('id') id: string,
+    @Body('name') name: string,
   ) {
-    return this.spectificationDetailService.update(
-      +id,
-      updateSpectificationDetailDto,
-    );
+    console.log("name: ",name);
+    console.log("id: ",id);
+    return this.spectificationDetailService.update(id,name);
   }
 
   @Delete(':id')

@@ -32,6 +32,8 @@ import { MessageShortCutModule } from './controller/chat/message-short-cut/messa
 import { OrderModule } from './controller/order/order.module';
 import { AdminVoucherModule } from './controller/admin/admin-voucher/admin-voucher.module';
 import { VoucherWalletModule } from './controller/voucher-wallet/voucher-wallet.module';
+import { WalletAdminModule } from './controller/wallet-admin/wallet-admin.module';
+import { WalletAdminTransactionModule } from './controller/wallet-admin-transaction/wallet-admin-transaction.module';
 
 @Module({
   imports: [
@@ -70,8 +72,9 @@ import { VoucherWalletModule } from './controller/voucher-wallet/voucher-wallet.
     MessageShortCutModule,
     BanShopModule,
     AdminVoucherModule,
-    OrderModule,
-    VoucherWalletModule
+    VoucherWalletModule,
+    WalletAdminModule,
+    WalletAdminTransactionModule
   ],
   controllers: [AppController],
   providers: [AppService],

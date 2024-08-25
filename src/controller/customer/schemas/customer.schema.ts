@@ -29,6 +29,9 @@ export class Customer {
 
   @Prop({ default: false })
   isBan: boolean;
+
+  @Prop({default: new Date()})
+  createdAt: Date
 }
 
 export const CustomerSchema = SchemaFactory.createForClass(Customer);

@@ -11,6 +11,8 @@ import {
   UploadedFile,
   BadRequestException,
   UseInterceptors,
+  Put,
+  Query,
 } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
@@ -23,6 +25,8 @@ import { diskStorage } from 'multer';
 import * as fs from 'fs';
 import { extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import { payload } from './interface/customer.interface';
+import { Customer } from './schemas/customer.schema';
 
 @ApiBearerAuth()
 @ApiTags('customer')
@@ -36,10 +40,17 @@ export class CustomerController {
     return this.customerService.create(createCustomerDto);
   }
 
+  @Public()
   @Get()
-  findAll() {
+  findAll(){
     return this.customerService.findAll();
   }
+  
+  @Public()
+  @Get('count-user')
+  async countUser() {
+    return await this.customerService.countUser()
+  } 
 
   @UseGuards(AuthGuard)
   @Get('getOneUser')
@@ -133,5 +144,33 @@ export class CustomerController {
       message: 'Avata được cập nhật thành công',
       file,
     };
+  }
+
+  // Thống kê
+
+  @Public()
+  @Post('add-createdAt')
+  async addCreatedAtToExistingUsers(): Promise<string> {
+    await this.customerService.addCreatedAtToExistingUsers();
+    return 'Added createdAt to all existing users';
+  }
+
+  @Patch('update-createdAt')
+  async updateUserCreatedAt(
+    @Body('id') id: string,
+    @Body('createdAt') createdAt: string,
+  ): Promise<string> {
+    const newCreatedAt = new Date(createdAt);
+    await this.customerService.updateCreatedAtById(id, newCreatedAt);
+    return `User ${id} updated with new createdAt: ${newCreatedAt.toISOString()}`;
+  }
+
+  @Public()
+  @Get('count/month')
+  async countUsersInMonth(
+    @Query('year') year: number,
+    @Query('month') month: number,
+  ): Promise<number> {
+    return this.customerService.countUsersCreatedInMonth(year, month);
   }
 }
