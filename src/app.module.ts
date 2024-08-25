@@ -47,6 +47,7 @@ import { WalletTransactionsModule } from './controller/wallet-transactions/walle
 import { BanShopModule } from './controller/ban_shop/ban_shop.module';
 import { WalletShopModule } from './controller/wallet-shop/wallet-shop.module';
 import { WalletShopTransactionsModule } from './controller/wallet-shop-transactions/wallet-shop-transactions.module';
+import { AnalysisShopModule } from './controller/analysis-shop/analysis-shop.module';
 
 @Module({
   imports: [
@@ -101,6 +102,7 @@ import { WalletShopTransactionsModule } from './controller/wallet-shop-transacti
     AddressShopModule,
     WalletShopModule,
     WalletShopTransactionsModule,
+    AnalysisShopModule,
   ],
   controllers: [AppController],
   providers: [AppService],

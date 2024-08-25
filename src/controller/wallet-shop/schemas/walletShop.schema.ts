@@ -18,7 +18,7 @@ export class WalletShop {
 }
 export const WalletShopSchema = SchemaFactory.createForClass(WalletShop);
 
-WalletShopSchema.virtual('WalletShopTransactions', {
+WalletShopSchema.virtual('wallet_transaction', {
   ref: 'WalletShopTransactions',
   localField: '_id',
   foreignField: 'walletId',

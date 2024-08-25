@@ -46,6 +46,13 @@ shopSchema.virtual('AddressShop', {
   justOne: false,
 });
 
+shopSchema.virtual('ShopView', {
+  ref: 'ShopView',
+  localField: '_id',
+  foreignField: 'id_shop',
+  justOne: false,
+});
+
 // Thiết lập để virtual field xuất hiện khi gọi populate
 shopSchema.set('toObject', { virtuals: true });
 shopSchema.set('toJSON', { virtuals: true });

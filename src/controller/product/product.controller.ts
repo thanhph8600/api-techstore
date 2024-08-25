@@ -35,6 +35,12 @@ export class ProductController {
   }
 
   @Public()
+  @Post('view/:id')
+  createViewProduct(@Param('id') id: string) {
+    return this.productService.createViewProduct(id);
+  }
+
+  @Public()
   @Get()
   findAll() {
     return this.productService.findAll();

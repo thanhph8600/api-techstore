@@ -17,6 +17,7 @@ import { UploadService } from 'src/middleware/upload/upload.service';
 import { DiscountService } from '../marketing/discount/discount.service';
 import { ProductReviewService } from '../product-review/product-review.service';
 import { ItemsOrderService } from '../items-order/items-order.service';
+import { ProductView } from './schemas/product-view.schema';
 
 @Injectable()
 export class ProductService {
@@ -30,6 +31,8 @@ export class ProductService {
     private readonly discountService: DiscountService,
     private readonly productReviewService: ProductReviewService,
     private readonly itemsOrderService: ItemsOrderService,
+    @InjectModel(ProductView.name)
+    private readonly productviewModel: Model<ProductView>,
   ) {}
 
   async create(createProductDto: CreateProductDto, payload) {
@@ -49,6 +52,19 @@ export class ProductService {
     }
 
     return newProduct;
+  }
+
+  async createViewProduct(id_product: string) {
+    try {
+      const product = await this.productModel.findById(id_product);
+      if (product) {
+        return await this.productviewModel.create({ id_product });
+      }
+    } catch (error) {
+      console.log('error createViewProduct');
+      console.log(error);
+      return new InternalServerErrorException();
+    }
   }
 
   async createProductSpecification(
@@ -205,8 +221,23 @@ export class ProductService {
         path: 'id_categoryDetail',
         populate: { path: 'id_category' },
       })
+      .populate('product_view')
       .lean();
-    return handleThumbnailListProduct(products);
+    const handleRating = await this.handleRatingListProduct(products);
+    return this.handleRatingListProduct(handleRating);
+  }
+  async handleRatingListProduct(listProduct) {
+    const newList = [...listProduct];
+    if (listProduct.length > 0) {
+      for (let index = 0; index < newList.length; index++) {
+        const element = newList[index];
+        const rating = await this.productReviewService.getRatingByProductId(
+          String(element._id),
+        );
+        newList[index].rating = rating;
+      }
+    }
+    return newList;
   }
 
   async productQuery(q: string, page?: number, limit?: number, sort?: string) {

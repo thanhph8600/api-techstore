@@ -14,12 +14,16 @@ import { UploadModule } from 'src/middleware/upload/upload.module';
 import { DiscountModule } from '../marketing/discount/discount.module';
 import { ProductReviewModule } from '../product-review/product-review.module';
 import { ItemsOrderModule } from '../items-order/items-order.module';
+import { ProductView, ProductViewSchema } from './schemas/product-view.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]),
     MongooseModule.forFeature([
       { name: ProductSpecification.name, schema: ProductSpecificationSchema },
+    ]),
+    MongooseModule.forFeature([
+      { name: ProductView.name, schema: ProductViewSchema },
     ]),
     ShopModule,
     ProductPriceModule,

@@ -8,6 +8,7 @@ import { payload } from 'src/controller/customer/interface/customer.interface';
 import { BanShopService } from 'src/controller/ban_shop/ban_shop.service';
 import { CustomerFollowService } from 'src/controller/customer-follow/customer-follow.service';
 import { ShopDocument } from './schemas/shop.schema';
+import { ShopView } from './schemas/shop-view.schema';
 
 @Injectable()
 export class ShopService {
@@ -16,6 +17,8 @@ export class ShopService {
     private readonly customerService: CustomerService,
     private banShopService: BanShopService,
     private readonly customerFollowService: CustomerFollowService,
+    @InjectModel(ShopView.name)
+    private readonly shopViewModule: Model<ShopView>,
   ) {}
 
   async create(payload) {
@@ -41,6 +44,19 @@ export class ShopService {
     return shop;
   }
 
+  async createViewShop(id_shop: string) {
+    try {
+      const shop = await this.shopModule.findById(id_shop);
+      if (shop) {
+        return await this.shopViewModule.create({ id_shop });
+      }
+    } catch (error) {
+      console.log('error createViewProduct');
+      console.log(error);
+      return new InternalServerErrorException();
+    }
+  }
+
   async findAll() {
     return await this.shopModule.find();
   }
@@ -51,6 +67,7 @@ export class ShopService {
         .findById(id)
         .populate('id_customer')
         .populate('addressShop')
+        .populate('ShopView')
         .lean()
         .exec();
       if (!shop) throw new Error('Shop khong ton tai!');

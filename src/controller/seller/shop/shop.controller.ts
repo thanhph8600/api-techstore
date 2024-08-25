@@ -28,6 +28,12 @@ export class ShopController {
   }
 
   @Public()
+  @Post('view/:id')
+  createViewShop(@Param('id') id: string) {
+    return this.shopService.createViewShop(id);
+  }
+
+  @Public()
   @Get()
   findAll() {
     return this.shopService.findAll();

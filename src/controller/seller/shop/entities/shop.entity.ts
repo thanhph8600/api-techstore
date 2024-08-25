@@ -7,4 +7,7 @@ export class Shop {
     phone: string;
     avata: string;
   }[];
+  ShopView: {
+    created_at: string;
+  }[];
 }
