@@ -70,7 +70,7 @@ export class CreateItemsOrderDto {
   @IsNumber()
   discount2t?: number;
 
-  @ApiProperty({ required: false})
+  @ApiProperty({ required: false })
   @IsNotEmpty()
   @IsNumber()
   coinRefunt?: number;

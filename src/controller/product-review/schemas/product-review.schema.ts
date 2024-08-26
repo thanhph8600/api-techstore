@@ -33,3 +33,10 @@ export class ProductReview {
 }
 
 export const ProductReviewSchema = SchemaFactory.createForClass(ProductReview);
+
+ProductReviewSchema.virtual('ProductReviewReply', {
+  ref: 'ProductReviewReply',
+  localField: '_id',
+  foreignField: 'id_productReview',
+  justOne: false,
+});

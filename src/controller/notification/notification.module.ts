@@ -8,12 +8,12 @@ import { WebSocketModule } from 'src/web-socket/web-socket.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: 'Notification', schema: NotificationSchema }
+      { name: 'Notification', schema: NotificationSchema },
     ]),
-    WebSocketModule
+    WebSocketModule,
   ],
   controllers: [NotificationController],
   providers: [NotificationService],
-  exports: [NotificationService]
+  exports: [NotificationService],
 })
 export class NotificationModule {}

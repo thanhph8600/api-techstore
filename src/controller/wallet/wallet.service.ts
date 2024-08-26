@@ -29,7 +29,7 @@ export class WalletService {
     return `This action returns a #${id} wallet`;
   }
 
-  async findByIdCustomer (id: string) {
+  async findByIdCustomer(id: string) {
     try {
       const wallet = await this.walletModel
         .findOne({ customerId: id })
@@ -38,10 +38,10 @@ export class WalletService {
           select: 'name phone avata',
         })
         .exec();
-        if(!wallet){
-         await this.create({customerId: id})
-          return this.findByIdCustomer(id)
-        }
+      if (!wallet) {
+        await this.create({ customerId: id });
+        return this.findByIdCustomer(id);
+      }
       return wallet;
     } catch (error) {
       throw new InternalServerErrorException(error);
@@ -85,7 +85,8 @@ export class WalletService {
         throw new InternalServerErrorException(error);
       }
     }
-  async withDraw(id: string, amount: number , description: string) {
+  
+  async withDraw(id: string, amount: number, description: string) {
     try {
       const wallet = await this.walletModel.findOne({ customerId: id }).exec();
       if (!wallet) {
@@ -101,19 +102,21 @@ export class WalletService {
         walletId: wallet._id.toString(),
         amount: amount,
         type: 'withdraw',
-        description: description
+        description: description,
       });
       await this.notificationService.create({
         customerId: wallet.customerId.toString(),
         title: 'Biến động số dư',
-        content: `-${fortmatNumberToVnd(amount)} cho ` + description + ` số dư sau giao dịch: ${fortmatNumberToVnd(newAmount)}`,
+        content:
+          `-${fortmatNumberToVnd(amount)} cho ` +
+          description +
+          ` số dư sau giao dịch: ${fortmatNumberToVnd(newAmount)}`,
         type: NotificationType.WALLET,
-      })
+      });
       return { walletTransactions };
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
-    
   }
   remove(id: number) {
     return `This action removes a #${id} wallet`;

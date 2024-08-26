@@ -1,11 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { WalletTransactionsService } from './wallet-transactions.service';
 import { CreateWalletTransactionDto } from './dto/create-wallet-transaction.dto';
 import { UpdateWalletTransactionDto } from './dto/update-wallet-transaction.dto';
 
 @Controller('wallet-transactions')
 export class WalletTransactionsController {
-  constructor(private readonly walletTransactionsService: WalletTransactionsService) {}
+  constructor(
+    private readonly walletTransactionsService: WalletTransactionsService,
+  ) {}
 
   @Post()
   create(@Body() createWalletTransactionDto: CreateWalletTransactionDto) {
@@ -28,8 +38,14 @@ export class WalletTransactionsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateWalletTransactionDto: UpdateWalletTransactionDto) {
-    return this.walletTransactionsService.update(+id, updateWalletTransactionDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateWalletTransactionDto: UpdateWalletTransactionDto,
+  ) {
+    return this.walletTransactionsService.update(
+      +id,
+      updateWalletTransactionDto,
+    );
   }
 
   @Delete(':id')

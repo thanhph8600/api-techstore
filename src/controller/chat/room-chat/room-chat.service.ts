@@ -88,10 +88,10 @@ export class RoomChatService {
           },
         })
         .lean();
-        if(!listRoomChat) return [];
+      if (!listRoomChat) return [];
       return this.handleThumbnailListRoom(listRoomChat);
     } catch (error) {
-      console.log('Error get list Room chat by Id Customer \n', error);
+      console.log('Error get list Room chat findByIdCustomer \n', error);
       throw new InternalServerErrorException();
     }
   }
@@ -120,12 +120,24 @@ export class RoomChatService {
             },
           },
         })
+        .sort({ 'id_lastMess.created_at': -1 })
         .lean();
-      return this.handleThumbnailListRoom(listRoomChat);
+      return this.handleThumbnailListRoom(
+        this.handleByTimeCreateLastMess(listRoomChat),
+      );
     } catch (error) {
-      console.log('Error get list Room chat by Id Customer \n', error);
+      console.log('Error get list Room chat by findByIdShop \n', error);
       throw new InternalServerErrorException();
     }
+  }
+
+  handleByTimeCreateLastMess(listRoomChat) {
+    const sortedListRoomChat = listRoomChat.sort((a, b) => {
+      const dateA = new Date(a.id_lastMess?.created_at || 0).getTime();
+      const dateB = new Date(b.id_lastMess?.created_at || 0).getTime();
+      return dateB - dateA;
+    });
+    return sortedListRoomChat;
   }
 
   async updateLastMess(_id: string, id_lastMess: string) {
@@ -135,7 +147,7 @@ export class RoomChatService {
       });
       return newRoom;
     } catch (error) {
-      console.log('Error get list Room chat by Id Customer \n', error);
+      console.log('Error updateLastMess \n', error);
       throw new InternalServerErrorException();
     }
   }
@@ -164,21 +176,36 @@ export class RoomChatService {
           limit: limit,
           sort: { _id: -1 },
         },
-        populate: {
-          path: 'id_product',
-          select: ['_id', 'id_shop', 'name', 'thumbnails'],
-          populate: {
-            path: 'product_price',
-            select: ['stock', 'price'],
+        populate: [
+          {
+            path: 'id_product',
+            select: ['_id', 'id_shop', 'name', 'thumbnails'],
             populate: {
-              path: 'discount_detail',
-              select: ['percent', 'status'],
+              path: 'product_price',
+              select: ['stock', 'price'],
               populate: {
-                path: 'id_discount',
+                path: 'discount_detail',
+                select: ['percent', 'status'],
+                populate: {
+                  path: 'id_discount',
+                },
               },
             },
           },
-        },
+          {
+            path: 'id_order',
+            populate: {
+              path: 'items.productPriceId',
+              select: 'id_color id_product id_size price stock',
+              populate: [
+                {
+                  path: 'id_product',
+                  select: 'name , thumbnails',
+                },
+              ],
+            },
+          },
+        ],
       })
       .populate({
         path: 'id_customer',
@@ -194,8 +221,12 @@ export class RoomChatService {
     return this.handleThumbnailRoomDetail(roomChatDetail);
   }
 
-
-  async findDetailRoomChat(id: string , payload: payload, skip: number = 1, limit: number = 20) {
+  async findDetailRoomChat(
+    id: string,
+    payload: payload,
+    skip: number = 1,
+    limit: number = 20,
+  ) {
     try {
       const roomChat = await this.RoomChatModel.findById(id);
       if (
@@ -240,30 +271,43 @@ export class RoomChatService {
         })
         .populate('id_lastMess')
         .lean();
-        return this.handleThumbnailRoomDetail(roomChatDetail);
+      return this.handleThumbnailRoomDetail(roomChatDetail);
     } catch (error) {
-      console.log('Error get list Room chat by Id Customer \n', error);
+      console.log('Error get list Room chat by findDetailRoomChat \n', error);
       throw new InternalServerErrorException();
     }
   }
-  async findOneByIdShopAndIdCustomer(payload : any) {
-      const newPayload: any = {
+  async findOneByIdShopAndIdCustomer(payload: any) {
+    const newPayload: any = {
+      id_shop: payload.id_shop,
+      id_customer: payload.id_customer,
+      sub: payload.id_customer,
+    };
+    try {
+      const findRoomChat = await this.RoomChatModel.findOne({
         id_shop: payload.id_shop,
         id_customer: payload.id_customer,
-        sub: payload.id_customer
-      };
-    try {
-      const findRoomChat = await this.RoomChatModel.findOne({ id_shop: payload.id_shop, id_customer: payload.id_customer });
-        if(!findRoomChat){
-          const newRoom = await this.createRoomChat(payload);
-          const roomchat = await this.findDetailRoomChat(newRoom._id, newPayload, 1, 20)
-          return roomchat;
-        }else {
-          const roomChat = await this.findDetailRoomChat(findRoomChat._id, newPayload, 1, 20);
-          return roomChat;
-        }
+      });
+      if (!findRoomChat) {
+        const newRoom = await this.createRoomChat(payload);
+        const roomchat = await this.findDetailRoomChat(
+          newRoom._id,
+          newPayload,
+          1,
+          20,
+        );
+        return roomchat;
+      } else {
+        const roomChat = await this.findDetailRoomChat(
+          findRoomChat._id,
+          newPayload,
+          1,
+          20,
+        );
+        return roomChat;
+      }
     } catch (error) {
-      console.log('Error get list Room chat by Id Customer \n', error);
+      console.log('Error get list findOneByIdShopAndIdCustomer \n', error);
       throw new InternalServerErrorException();
     }
   }
@@ -324,6 +368,15 @@ export class RoomChatService {
             mess.id_product.thumbnails = mess.id_product.thumbnails.map(
               (thumb) => ensureUrl(thumb),
             );
+          }
+        }
+        if (mess.id_order) {
+          if (mess.id_order.items) {
+            mess.id_order.items[0].productPriceId.id_product[0].thumbnails[0] =
+              ensureUrl(
+                mess.id_order.items[0].productPriceId.id_product[0]
+                  .thumbnails[0],
+              );
           }
         }
       });

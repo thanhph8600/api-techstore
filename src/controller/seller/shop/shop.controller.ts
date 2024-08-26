@@ -28,6 +28,12 @@ export class ShopController {
   }
 
   @Public()
+  @Post('view/:id')
+  createViewShop(@Param('id') id: string) {
+    return this.shopService.createViewShop(id);
+  }
+
+  @Public()
   @Get()
   findAll() {
     return this.shopService.findAll();
@@ -42,7 +48,7 @@ export class ShopController {
   @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Request() req) {
-    return this.shopService.findByCustomer(req);
+    return this.shopService.findByCustomer(req.user);
   }
 
   @UseGuards(AuthGuard)

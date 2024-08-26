@@ -66,3 +66,10 @@ ProductSchema.virtual('product_price', {
   foreignField: 'id_product',
   justOne: false,
 });
+
+ProductSchema.virtual('product_view', {
+  ref: 'ProductView',
+  localField: '_id',
+  foreignField: 'id_product',
+  justOne: false,
+});

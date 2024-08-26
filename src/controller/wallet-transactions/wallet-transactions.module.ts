@@ -8,10 +8,10 @@ import { WalletTransactionsSchema } from './schemas/wallet-transactions.schema';
   imports: [
     MongooseModule.forFeature([
       { name: 'WalletTransactions', schema: WalletTransactionsSchema },
-    ])
+    ]),
   ],
   controllers: [WalletTransactionsController],
   providers: [WalletTransactionsService],
-  exports: [WalletTransactionsService]
+  exports: [WalletTransactionsService],
 })
 export class WalletTransactionsModule {}

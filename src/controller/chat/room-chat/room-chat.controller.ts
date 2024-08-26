@@ -1,4 +1,3 @@
-import { payload } from './../../customer/interface/customer.interface';
 import {
   Controller,
   Get,
@@ -64,7 +63,9 @@ export class RoomChatController {
 
   @UseGuards(AuthGuard)
   @Post('shopandcustomer')
-  findByIdShopAndCustomer(@Body() payload: { id_shop: string, id_customer: string } ) {
+  findByIdShopAndCustomer(
+    @Body() payload: { id_shop: string; id_customer: string },
+  ) {
     return this.roomChatService.findOneByIdShopAndIdCustomer(payload);
   }
 

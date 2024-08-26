@@ -12,4 +12,5 @@ export class CustomerFollow {
   shopId: Types.ObjectId;
 }
 
-export const CustomerFollowSchema = SchemaFactory.createForClass(CustomerFollow);
+export const CustomerFollowSchema =
+  SchemaFactory.createForClass(CustomerFollow);

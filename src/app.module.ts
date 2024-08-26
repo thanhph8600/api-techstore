@@ -16,12 +16,6 @@ import { ProductPriceModule } from './controller/variation/product-price/product
 import { UploadModule } from './middleware/upload/upload.module';
 import mongoose from 'mongoose';
 import { CartModule } from './controller/cart/cart.module';
-import { CartSelectModule } from './controller/cart-select/cart-select.module';
-import { OrderModule } from './controller/order/order.module';
-import { SubOrderModule } from './controller/sub-order/sub-order.module';
-import { SearchQueryModule } from './controller/search-query/search-query.module';
-import { HistorySearchModule } from './controller/history-search/history-search.module';
-import { CustomerRewardModule } from './controller/customer-reward/customer-reward.module';
 import { DiscountModule } from './controller/marketing/discount/discount.module';
 import { VoucherModule } from './controller/marketing/voucher/voucher.module';
 import { AddressModule } from './controller/address/address.module';
@@ -32,14 +26,30 @@ import { MessengerModule } from './controller/chat/messenger/messenger.module';
 import { ItemsSubOrderModule } from './controller/items-sub-order/items-sub-order.module';
 import { ItemsOrderModule } from './controller/items-order/items-order.module';
 import { ProductReviewModule } from './controller/product-review/product-review.module';
+import { AutoReplyModule } from './controller/chat/auto-reply/auto-reply.module';
+import { MessageShortCutModule } from './controller/chat/message-short-cut/message-short-cut.module';
+import { OrderModule } from './controller/order/order.module';
+import { AdminVoucherModule } from './controller/admin/admin-voucher/admin-voucher.module';
+import { CartSelectModule } from './controller/cart-select/cart-select.module';
 import { CustomerFollowModule } from './controller/customer-follow/customer-follow.module';
+import { CustomerRewardModule } from './controller/customer-reward/customer-reward.module';
+import { HistorySearchModule } from './controller/history-search/history-search.module';
 import { NotificationModule } from './controller/notification/notification.module';
+import { SearchQueryModule } from './controller/search-query/search-query.module';
+import { SpectificationDetailModule } from './controller/specification/spectification-detail/spectification-detail.module';
+import { SubOrderModule } from './controller/sub-order/sub-order.module';
+import { VoucherWalletModule } from './controller/voucher-wallet/voucher-wallet.module';
+import { ProductReviewReplyModule } from './controller/product-review-reply/product-review-reply.module';
+import { AddressShopModule } from './controller/address-shop/address-shop.module';
 import { ViolateModule } from './controller/violate/violate.module';
 import { WalletModule } from './controller/wallet/wallet.module';
 import { WalletTransactionsModule } from './controller/wallet-transactions/wallet-transactions.module';
 import { CardLinkModule } from './controller/card-link/card-link.module';
-import { AdminVoucherModule } from './controller/admin/admin-voucher/admin-voucher.module';
 import { ReturnOrderModule } from './controller/return-order/return-order.module';
+import { BanShopModule } from './controller/ban_shop/ban_shop.module';
+import { WalletShopModule } from './controller/wallet-shop/wallet-shop.module';
+import { WalletShopTransactionsModule } from './controller/wallet-shop-transactions/wallet-shop-transactions.module';
+import { AnalysisShopModule } from './controller/analysis-shop/analysis-shop.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
@@ -59,15 +69,6 @@ import { ReturnOrderModule } from './controller/return-order/return-order.module
     CategoryDetailModule,
     BrandModule,
     SpecificationModule,
-    ProductPriceModule,
-    UploadModule,
-    CartModule,
-    CartSelectModule,
-    OrderModule,
-    SubOrderModule,
-    SearchQueryModule,
-    HistorySearchModule,
-    CustomerRewardModule,
     CartModule,
     ProductPriceModule,
     UploadModule,
@@ -79,9 +80,17 @@ import { ReturnOrderModule } from './controller/return-order/return-order.module
     RoomChatModule,
     MessengerModule,
     ItemsSubOrderModule,
+    OrderModule,
     ItemsOrderModule,
     ProductReviewModule,
+    AutoReplyModule,
+    MessageShortCutModule,
+    BanShopModule,
+    AdminVoucherModule,
+    CartSelectModule,
     CustomerFollowModule,
+    CustomerRewardModule,
+    HistorySearchModule,
     NotificationModule,
     ViolateModule,
     WalletModule,
@@ -89,6 +98,15 @@ import { ReturnOrderModule } from './controller/return-order/return-order.module
     CardLinkModule,
     AdminVoucherModule,
     ReturnOrderModule,
+    SearchQueryModule,
+    SpectificationDetailModule,
+    SubOrderModule,
+    VoucherWalletModule,
+    ProductReviewReplyModule,
+    AddressShopModule,
+    WalletShopModule,
+    WalletShopTransactionsModule,
+    AnalysisShopModule,
   ],
   controllers: [AppController],
   providers: [AppService],

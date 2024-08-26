@@ -6,6 +6,8 @@ import { AuthGuard } from './auth.guard';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { CustomerModule } from 'src/controller/customer/customer.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { VoucherWalletSchemas } from 'src/controller/voucher-wallet/schemas/voucher-wallet.schemas';
 
 @Module({
   imports: [
@@ -16,6 +18,9 @@ import { CustomerModule } from 'src/controller/customer/customer.module';
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: process.env.JWT_TOKEN_EXPIRATION_TIME },
     }),
+    MongooseModule.forFeature([
+      { name: 'VoucherWallet', schema: VoucherWalletSchemas },
+    ]),
   ],
   controllers: [AuthController],
   providers: [

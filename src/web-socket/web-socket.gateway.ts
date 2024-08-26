@@ -33,6 +33,11 @@ export class WebSocketGateway {
     }
   }
 
+  async sendNotification(payload) {
+    this.server.emit('notification', payload);
+    return payload;
+  }
+
   @SubscribeMessage('notification')
   async notification(payload) {
     this.server.emit('notification', payload); // broadcast messages

@@ -125,12 +125,13 @@ export class ProductPriceService {
     return update;
   }
 
-  async refuntStock (id: string, quantity: number) {
+  async refuntStock(id: string, quantity: number) {
     const productPriceId = new Types.ObjectId(id);
     const item = await this.productpriceModel.findById(productPriceId);
     item.stock += quantity;
     await item.save();
   }
+
   async updateVation(updateProductPriceDto: UpdateProductPriceDto) {
     const variation = updateProductPriceDto.variation;
     const keys = Object.keys(variation);

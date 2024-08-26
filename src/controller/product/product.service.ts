@@ -17,6 +17,7 @@ import { UploadService } from 'src/middleware/upload/upload.service';
 import { DiscountService } from '../marketing/discount/discount.service';
 import { ProductReviewService } from '../product-review/product-review.service';
 import { ItemsOrderService } from '../items-order/items-order.service';
+import { ProductView } from './schemas/product-view.schema';
 
 @Injectable()
 export class ProductService {
@@ -29,7 +30,9 @@ export class ProductService {
     private readonly uploadService: UploadService,
     private readonly discountService: DiscountService,
     private readonly productReviewService: ProductReviewService,
-    private readonly itemsOrderService: ItemsOrderService
+    private readonly itemsOrderService: ItemsOrderService,
+    @InjectModel(ProductView.name)
+    private readonly productviewModel: Model<ProductView>,
   ) {}
 
   async create(createProductDto: CreateProductDto, payload) {
@@ -49,6 +52,19 @@ export class ProductService {
     }
 
     return newProduct;
+  }
+
+  async createViewProduct(id_product: string) {
+    try {
+      const product = await this.productModel.findById(id_product);
+      if (product) {
+        return await this.productviewModel.create({ id_product });
+      }
+    } catch (error) {
+      console.log('error createViewProduct');
+      console.log(error);
+      return new InternalServerErrorException();
+    }
   }
 
   async createProductSpecification(
@@ -129,7 +145,7 @@ export class ProductService {
           path: 'product_specifications',
           populate: [
             { path: 'id_specifications' },
-            { path: 'id_specifications_detail' },
+            // { path: 'id_specifications_detail' },
           ],
         })
         .populate('variation_color')
@@ -142,6 +158,7 @@ export class ProductService {
         .lean()
         .exec();
       if (!product) throw new HttpException('Không tìm thấy sản phẩm', 404);
+      const listItems = await this.itemsOrderService.findAll();
       const getRating = await this.productReviewService.getRatingByProductId(
         product?._id,
       );
@@ -203,14 +220,30 @@ export class ProductService {
         path: 'id_categoryDetail',
         populate: { path: 'id_category' },
       })
+      .populate('product_view')
       .lean();
-    return handleThumbnailListProduct(products);
+    const handleRating = await this.handleRatingListProduct(products);
+    return this.handleRatingListProduct(handleRating);
+  }
+  async handleRatingListProduct(listProduct) {
+    const newList = [...listProduct];
+    if (listProduct.length > 0) {
+      for (let index = 0; index < newList.length; index++) {
+        const element = newList[index];
+        const rating = await this.productReviewService.getRatingByProductId(
+          String(element._id),
+        );
+        newList[index].rating = rating;
+      }
+    }
+    return newList;
   }
 
   async productQuery(q: string, page?: number, limit?: number, sort?: string) {
     console.log('Received q:', q);
+    console.log(page, limit, sort);
     return ['Test Product 1', 'Test Product 2'];
-}
+  }
   async update(id: string, updateProductDto: UpdateProductDto) {
     try {
       return this.productModel.findByIdAndUpdate(id, updateProductDto);

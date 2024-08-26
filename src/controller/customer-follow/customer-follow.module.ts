@@ -11,7 +11,7 @@ import { CustomerFollowSchema } from './Schemas/customer-follow.schema';
         name: 'CustomerFollow',
         schema: CustomerFollowSchema,
       },
-    ])
+    ]),
   ],
   controllers: [CustomerFollowController],
   providers: [CustomerFollowService],

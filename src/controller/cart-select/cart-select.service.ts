@@ -33,7 +33,7 @@ export class CartSelectService {
     return cartSelecte;
   }
 
-  async updateSelect (id: string, payload: any): Promise<CartSelect> {
+  async updateSelect(id: string, payload: any): Promise<CartSelect> {
     const customerId = new Types.ObjectId(id);
     const cartSelecte = await this.cartSelectModal
       .findOne({ customerId: customerId })
@@ -41,7 +41,7 @@ export class CartSelectService {
     if (!cartSelecte) {
       throw new NotFoundError(`Cart with customerId ${id} not found`);
     }
-    cartSelecte.listProductSelect = payload.listProductSelect
+    cartSelecte.listProductSelect = payload.listProductSelect;
     return await cartSelecte.save();
   }
   async update(id: string, updateCartSlecteDto: any): Promise<CartSelect> {

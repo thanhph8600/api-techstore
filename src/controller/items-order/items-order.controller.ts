@@ -33,34 +33,19 @@ export class ItemsOrderController {
     return this.itemsOrderService.findAll();
   }
 
-  @Get(':id')
-  findById(@Param('id') id: string) {
-    return this.itemsOrderService.findById(id);
-  }
-
   @Get('query/:customerId/:query')
   findByQuery(@Param('customerId') customerId: string,@Param('query') query: string) {
     return this.itemsOrderService.findByQuery(customerId,query);
   }
 
+  @Get(':id')
+  findById(@Param('id') id: string) {
+    return this.itemsOrderService.findById(id);
+  }
+
   @Get('customer/:id')
   findByCustomerId(@Param('id') id: string) {
     return this.itemsOrderService.findByIdCustomer(id);
-  }
-
-  @Post('cancel/:id')
-  cancelOrder(@Param('id') id: string) {
-    return this.itemsOrderService.cancelOrder(id);
-  }
-
-  @Patch('updateStatusTime')
-  updateStatusTime(@Body() payload: {id: string, key: string, value: Date}) {
-    return this.itemsOrderService.updateStatusTime(payload);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateItemsOrderDto: UpdateItemsOrderDto) {
-    return this.itemsOrderService.update(id, updateItemsOrderDto);
   }
 
   @UseGuards(AuthGuard)
@@ -69,7 +54,34 @@ export class ItemsOrderController {
     return this.itemsOrderService.findByShop(req.user);
   }
 
-  
+  @Post('cancel/:id')
+  cancelOrder(@Param('id') id: string) {
+    return this.itemsOrderService.cancelOrder(id);
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateItemsOrderDto: UpdateItemsOrderDto,
+  ) {
+    return this.itemsOrderService.update(id, updateItemsOrderDto);
+  }
+
+  @Patch('updateStatusTime/123')
+  updateStatusTime(@Body() payload: {id: string, key: string, value: Date}) {
+    return this.itemsOrderService.updateStatusTime(payload);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('update-status/:id')
+  updateStatusOrder(
+    @Param('id') id: string,
+    @Request() req,
+    @Body() data: { status: string },
+  ) {
+    return this.itemsOrderService.updateStatusOrder(id, req.user, data.status);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.itemsOrderService.remove(+id);

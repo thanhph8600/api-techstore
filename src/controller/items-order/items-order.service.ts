@@ -1,4 +1,9 @@
-import { HttpException, Injectable, InternalServerErrorException, Query } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateItemsOrderDto } from './dto/create-items-order.dto';
 import { UpdateItemsOrderDto } from './dto/update-items-order.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -6,12 +11,13 @@ import { Model, Types } from 'mongoose';
 import { ItemsOrder } from './schemas/itemsOrder.schema';
 import { payload } from '../customer/interface/customer.interface';
 import { ShopService } from '../seller/shop/shop.service';
-import { ProductPriceService } from '../variation/product-price/product-price.service';
 import { NotificationService } from '../notification/notification.service';
+import { CreateNotificationDto } from '../notification/dto/create-notification.dto';
 import { NotificationType } from '../notification/Schemas/notification.schema';
 import { WalletService } from '../wallet/wallet.service';
 import { CustomerRewardService } from '../customer-reward/customer-reward.service';
 import { VoucherService } from '../marketing/voucher/voucher.service';
+import { ProductPriceService } from '../variation/product-price/product-price.service';
 
 @Injectable()
 export class ItemsOrderService {
@@ -36,7 +42,7 @@ export class ItemsOrderService {
         orderItemsId: itemsOrder._id.toString(),
       })
       const shop = await this.shopService.findById(createItemsOrderDto.shopId);
-      if(shop){
+      if (shop) {
         await this.notificationService.create({
           customerId: shop.id_customer[0]._id.toString(),
           title: `Bạn có đơn hàng mới`,
@@ -70,6 +76,7 @@ export class ItemsOrderService {
       console.log('error itemsOrder findAll ', error);
       throw new InternalServerErrorException();
     }
+    return `This action returns all itemsOrder`;
   }
   async findByIdOrder(id: string): Promise<any> {
     try {
@@ -203,7 +210,7 @@ export class ItemsOrderService {
       //   (item: any) => item.returnOrderId !== null
       // )
       // if(listItemHasReturn.length > 0){
-       
+
       // }
       return listItemQuery.reverse();
     } catch (error) {
@@ -300,6 +307,18 @@ export class ItemsOrderService {
         })
         .populate('shopId')
         .populate({
+          path: 'orderId',
+          select: 'address voucher2t methodPayment total coin',
+          populate: [
+            {
+              path: 'address',
+            },
+            {
+              path: 'voucher2t',
+            },
+          ],
+        })
+        .populate({
           path: 'items.productPriceId',
           select: 'id_color id_product id_size price stock',
           populate: [
@@ -329,25 +348,41 @@ export class ItemsOrderService {
             {
               path: 'voucher2t',
             },
-          ],  
+          ],
         })
         .populate('returnOrderId')
+        .lean()
         .exec();
-      return item;
+      return handleThumbnailOrder(item);
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException(error);
     }
   }
   async findByShop(payload: payload): Promise<any> {
     try {
       const shop = await this.shopService.create(payload);
-      const items: any = await this.itemsOrderModel
-        .find({ shopId: String(shop._id) })
+      const check = await this.itemsOrderModel
+        .find({
+          shopId: String(shop._id),
+        })
         .populate({
           path: 'customerId',
           select: 'name phone avata',
         })
         .populate('shopId')
+        .populate({
+          path: 'orderId',
+          select: 'address voucher2t methodPayment total coin',
+          populate: [
+            {
+              path: 'address',
+            },
+            {
+              path: 'voucher2t',
+            },
+          ],
+        })
         .populate({
           path: 'items.productPriceId',
           select: 'id_color id_product id_size price stock',
@@ -367,44 +402,33 @@ export class ItemsOrderService {
           ],
         })
         .populate('items.discountDetailId')
-        .populate('voucherShopId')
-        .populate({
-          path: 'orderId',
-          select: 'address voucher2t methodPayment total coin',
-          populate: [
-            {
-              path: 'address',
-            },
-            {
-              path: 'voucher2t',
-            },
-          ],
-        })
+        .lean()
         .exec();
-      return this.handleThumbnailItemOrder(items.reverse());
+      return this.handleThumbnailListOrder(check.reverse());
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException(error);
     }
   }
   findOne(id: string) {
-   try {
-    return this.itemsOrderModel.findById(new Types.ObjectId(id)).populate({
-      path: 'orderId',
-      select: 'methodPayment',
-    });
-   }
-   catch (error) {
-    throw new InternalServerErrorException(error);
-   }
+    try {
+      return this.itemsOrderModel.findById(new Types.ObjectId(id)).populate({
+        path: 'orderId',
+        select: 'methodPayment',
+      });
+    }
+    catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 
   async update(id: string, updateItemsOrderDto: UpdateItemsOrderDto) {
     if (updateItemsOrderDto.status === 'Hoàn hàng') {
       await this.updateStatusTime({ id: id, key: 'Hoàn hàng', value: new Date() });
     }
-    if(updateItemsOrderDto.status === 'Hoàn thành') {
+    if (updateItemsOrderDto.status === 'Hoàn thành') {
       const order = await this.findById(id);
-      if(order.coinRefunt > 0) {
+      if (order.coinRefunt > 0) {
         await this.customerRewardService.addCoinRefund(order.customerId._id.toString(), order.coinRefunt);
         await this.notificationService.create({
           customerId: order.customerId._id.toString(),
@@ -413,7 +437,7 @@ export class ItemsOrderService {
           content: `Đơn hàng 2TEX${order._id.toString().slice(0, 6)} đã hoàn thành và được hoàn trả ${order.coinRefunt} xu`,
           orderItemsId: order._id
         })
-      }else {
+      } else {
         await this.notificationService.create({
           customerId: order.customerId._id.toString(),
           type: NotificationType.ORDER,
@@ -422,6 +446,9 @@ export class ItemsOrderService {
           orderItemsId: order._id
         })
       }
+    }
+    if(updateItemsOrderDto.statusShipping === 'Đã giao hàng') {
+      await this.updateStatusTime({ id: id, key: 'Đã giao hàng', value: new Date() });
     }
     const update = this.itemsOrderModel.findByIdAndUpdate(id, updateItemsOrderDto);
     return update;
@@ -452,14 +479,14 @@ export class ItemsOrderService {
   async deliveryFailed(id: string) {
     try {
       const item = await this.itemsOrderModel.findById(id)
-      .populate({
-        path: 'orderId',
-        select: 'methodPayment',
-      })
+        .populate({
+          path: 'orderId',
+          select: 'methodPayment',
+        })
       item.statusShipping = 'Giao không thành công';
       if ((item.orderId as any).methodPayment === 'Techtribe Pay') {
         const wallet = await this.walletService.findByIdCustomer(item.customerId.toString());
-        await this.walletService.deposit(wallet._id, item.total , `hoàn trả từ đơn hàng 2TEX${item._id.toString().slice(0, 6)} `);
+        await this.walletService.deposit(wallet._id, item.total, `hoàn trả từ đơn hàng 2TEX${item._id.toString().slice(0, 6)} `);
       }
       await item.save();
       await this.cancelOrderByShipping(id);
@@ -469,7 +496,7 @@ export class ItemsOrderService {
       throw new InternalServerErrorException(error);
     }
   }
-  async cancelOrderByShipping (id: string) {
+  async cancelOrderByShipping(id: string) {
     try {
       const item = await this.itemsOrderModel.findById(id);
       item.status = 'Đã huỷ';
@@ -496,7 +523,7 @@ export class ItemsOrderService {
     }
   }
 
-  async refuntOrder(id: string , returnOrderId: string) {
+  async refuntOrder(id: string, returnOrderId: string) {
     try {
       const item = await this.itemsOrderModel.findById(id);
       item.status = 'Hoàn hàng';
@@ -512,7 +539,7 @@ export class ItemsOrderService {
     try {
       const item = await this.itemsOrderModel.findById(id);
       item.status = 'Hoàn thành';
-      if(item.coinRefunt > 0) {
+      if (item.coinRefunt > 0) {
         await this.customerRewardService.addCoinRefund(item.customerId.toString(), item.coinRefunt);
         await this.notificationService.create({
           customerId: item.customerId.toString(),
@@ -521,7 +548,7 @@ export class ItemsOrderService {
           content: `Đơn hàng 2TEX${item._id.toString().slice(0, 6)} đã hoàn thành và được hoàn trả ${item.coinRefunt} xu`,
           orderItemsId: item._id.toString(),
         })
-      }else{
+      } else {
         await this.notificationService.create({
           customerId: item.customerId.toString(),
           type: NotificationType.ORDER,
@@ -539,8 +566,10 @@ export class ItemsOrderService {
   }
   async updateStatusTime({ id, key, value }: any) {
     try {
+      
       const item = await this.itemsOrderModel.findById(id);
       item.statusUpdate.push({ key: key, value: value });
+      
       if (key === 'Đã giao hàng') {
         await this.notificationService.create({
           customerId: item.customerId.toString(),
@@ -550,12 +579,97 @@ export class ItemsOrderService {
           orderItemsId: item._id.toString(),
         })
       }
-
       return await item.save();
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }
+
+  async updateStatusOrder(id: string, payload: payload, status: string) {
+    try {
+      const order = await this.itemsOrderModel.findById(id);
+      const shop = await this.shopService.create(payload);
+      if (
+        status === 'Xác nhận' &&
+        order.status === 'Chờ xác nhận' &&
+        String(shop._id) === String(order.shopId)
+      ) {
+        const updateOrder = await this.updateOrder(order, id, status);
+        this.nofiticationOrder(
+          String(shop.id_customer),
+          'Xác nhận đơn hàng thành công',
+          `Bạn đã xác nhận đơn hàng với mã #${String(order._id).toUpperCase()} thành công`,
+          String(order._id),
+        );
+        return updateOrder;
+      } else if (
+        status === 'Đang vận chuyển' &&
+        order.status === 'Xác nhận' &&
+        String(shop._id) === String(order.shopId)
+      ) {
+        const updateOrder = this.updateOrder(order, id, status, 'Đã gửi hàng');
+        this.nofiticationOrder(
+          String(shop.id_customer),
+          'Gửi hàng thành công',
+          `Bạn đã giao đơn hàng với mã #${String(order._id).toUpperCase()} thành công`,
+          String(order._id),
+        );
+        return updateOrder;
+      }
+      return new HttpException(
+        'Bạn không thể cập nhật đơn hàng!',
+        HttpStatus.CONFLICT,
+      );
+    } catch (error) {
+      console.log('error update status order');
+      console.log(error);
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  nofiticationOrder(
+    customerId: string,
+    title: string,
+    content: string,
+    orderItemsId: string,
+  ) {
+    const dataCreateNotification: CreateNotificationDto = {
+      customerId,
+      title,
+      content,
+      type: NotificationType.ORDER,
+      orderItemsId,
+    };
+    this.notificationService.create(dataCreateNotification, 1);
+  }
+
+  async updateOrder(
+    order,
+    id: string,
+    status: string,
+    statusShipping?: string,
+  ) {
+    try {
+      const dataUpdateTime = {
+        id: id,
+        key: statusShipping || status,
+        value: new Date(),
+      };
+      order.statusUpdate.push(dataUpdateTime);
+      if (statusShipping) order.statusShipping = statusShipping;
+      order.status = status;
+      await this.itemsOrderModel.findByIdAndUpdate(id, order);
+      return new HttpException(
+        'Cập nhật tình trạng đơn hàng thành công!',
+        HttpStatus.CREATED,
+      );
+    } catch (error) {
+      console.log('error update status order');
+      console.log(error);
+      throw new InternalServerErrorException(error);
+    }
+  }
+
   remove(id: number) {
     return `This action removes a #${id} itemsOrder`;
   }
@@ -567,33 +681,36 @@ export class ItemsOrderService {
       throw new InternalServerErrorException(error);
     }
   }
-  handleThumbnailItemOrder(listOrder) {
+  handleThumbnailListOrder(listOrder) {
     if (listOrder.length > 0) {
       listOrder.map((order) => {
-        if (order.customerId && order.customerId.avata) {
-          const avata = order.customerId.avata;
-          if (!avata.startsWith('http://') && !avata.startsWith('https://')) {
-            order.customerId.avata = `${process.env.URL_API}uploads/${avata}`;
-          }
-        }
-        if (order.items && order.items.length > 0) {
-          order.items.map((itemPrice) => {
-            const thumbnail =
-              itemPrice.productPriceId.id_product[0].thumbnails[0];
-            if (
-              !thumbnail.startsWith('http://') &&
-              !thumbnail.startsWith('https://')
-            ) {
-              itemPrice.productPriceId.id_product[0].thumbnails[0] = `${process.env.URL_API}uploads/${thumbnail}`;
-            }
-            return itemPrice;
-          });
-        }
-        return {
-          ...order,
-        };
+        return handleThumbnailOrder(order);
       });
     }
     return listOrder;
   }
+}
+
+export function handleThumbnailOrder(order) {
+  if (order.customerId && order.customerId.avata) {
+    const avata = order.customerId.avata;
+    if (!avata.startsWith('http://') && !avata.startsWith('https://')) {
+      order.customerId.avata = `${process.env.URL_API}uploads/${avata}`;
+    }
+  }
+  if (order.items && order.items.length > 0) {
+    order.items.map((itemPrice) => {
+      const thumbnail = itemPrice.productPriceId.id_product[0].thumbnails[0];
+      if (
+        !thumbnail.startsWith('http://') &&
+        !thumbnail.startsWith('https://')
+      ) {
+        itemPrice.productPriceId.id_product[0].thumbnails[0] = `${process.env.URL_API}uploads/${thumbnail}`;
+      }
+      return itemPrice;
+    });
+  }
+  return {
+    ...order,
+  };
 }

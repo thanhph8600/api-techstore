@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as MongooseSchema, Types } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 export type NotificationDocument = HydratedDocument<Notification>;
 
@@ -25,7 +25,13 @@ export class Notification {
   @Prop({ type: String, enum: NotificationType, required: true })
   type: NotificationType;
 
-  @Prop({ type: Types.ObjectId, ref: 'ItemsOrder', required: function() { return this.type === NotificationType.ORDER; } })
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'ItemsOrder',
+    required: function () {
+      return this.type === NotificationType.ORDER;
+    },
+  })
   orderItemsId?: Types.ObjectId;
 
   @Prop({ default: false })

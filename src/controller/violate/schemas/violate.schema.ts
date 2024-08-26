@@ -7,7 +7,7 @@ export type ViolateFollowDocument = HydratedDocument<ViolateFollow>;
 export class ViolateFollow {
   @Prop({ type: Types.ObjectId, required: true })
   customerId?: Types.ObjectId;
-  
+
   @Prop({ type: Types.ObjectId, required: true })
   shopId?: Types.ObjectId;
 

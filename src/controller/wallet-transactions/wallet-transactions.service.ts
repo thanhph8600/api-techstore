@@ -8,14 +8,17 @@ import { WalletTransactions } from './schemas/wallet-transactions.schema';
 @Injectable()
 export class WalletTransactionsService {
   constructor(
-    @InjectModel('WalletTransactions') private walletTransactionModel: Model<WalletTransactions>,
+    @InjectModel('WalletTransactions')
+    private walletTransactionModel: Model<WalletTransactions>,
   ) {}
   create(createWalletTransactionDto: CreateWalletTransactionDto) {
     return this.walletTransactionModel.create(createWalletTransactionDto);
   }
 
   async fintByIdWallet(id: string) {
-    const transactions = await this.walletTransactionModel.find({ walletId: id }).exec();
+    const transactions = await this.walletTransactionModel
+      .find({ walletId: id })
+      .exec();
     return transactions.reverse();
   }
   findAll() {

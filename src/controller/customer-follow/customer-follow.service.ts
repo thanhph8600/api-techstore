@@ -8,7 +8,8 @@ import { CustomerFollow } from './Schemas/customer-follow.schema';
 @Injectable()
 export class CustomerFollowService {
   constructor(
-    @InjectModel('CustomerFollow') private readonly customerFollowModel: Model<CustomerFollow>,
+    @InjectModel('CustomerFollow')
+    private readonly customerFollowModel: Model<CustomerFollow>,
   ) {}
   create(createCustomerFollowDto: CreateCustomerFollowDto) {
     return this.customerFollowModel.create(createCustomerFollowDto);
@@ -22,12 +23,12 @@ export class CustomerFollowService {
     const checkIfFollow = await this.customerFollowModel.findOne({
       customerId,
       shopId: id,
-    })
-    if(checkIfFollow) return await this.remove(checkIfFollow._id.toString());
-    
-    return await this.create({customerId, shopId: id});
+    });
+    if (checkIfFollow) return await this.remove(checkIfFollow._id.toString());
+
+    return await this.create({ customerId, shopId: id });
   }
-  
+
   async findByShopId(id: string) {
     return await this.customerFollowModel.find({ shopId: id });
   }

@@ -83,13 +83,25 @@ export class AddressController {
     };
   }
 
+  // @Public()
+  // @Delete(':addressId')
+  // async delete(
+  //   @Param('addressId') addressId: string,
+  //   @Body() updateAddressDto: UpdateAddressDto,
+  // ) {
+  //   console.log(updateAddressDto);
+  //   const updatedAddress = await this.addressService.delete(addressId);
+  //   if (!updatedAddress) {
+  //     throw new NotFoundException(`Address with ID ${addressId} not found`);
+  //   }
+  //   return {
+  //     message: 'Address updated successfully',
+  //     address: updatedAddress,
+  //   };
+  // }
   @Public()
   @Delete(':addressId')
-  async delete(
-    @Param('addressId') addressId: string,
-    @Body() updateAddressDto: UpdateAddressDto,
-  ) {
-    console.log(updateAddressDto);
+  async delete(@Param('addressId') addressId: string) {
     const updatedAddress = await this.addressService.delete(addressId);
     if (!updatedAddress) {
       throw new NotFoundException(`Address with ID ${addressId} not found`);

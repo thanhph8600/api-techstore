@@ -1,7 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
+import { AuthGuard } from 'src/middleware/auth/auth.guard';
 
 @Controller('notification')
 export class NotificationController {
@@ -22,23 +31,26 @@ export class NotificationController {
     return this.notificationService.findByIdCustomer(id);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.notificationService.findOne(+id);
+  @UseGuards(AuthGuard)
+  @Get('shop/:id')
+  getNotificationByShop(@Request() req) {
+    return this.notificationService.findByShop(req.user);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateNotificationDto: UpdateNotificationDto) {
-    return this.notificationService.update(+id, updateNotificationDto);
+  @UseGuards(AuthGuard)
+  @Patch('shop/read')
+  updateReadShop(@Request() req) {
+    return this.notificationService.updateNotificationReaded(req.user.sub);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('shop/read/:id')
+  updateReadbyId(@Request() req, @Param('id') id: string) {
+    return this.notificationService.updateById(id, req.user.sub);
   }
 
   @Patch('read/:id')
   read(@Param('id') id: string) {
     return this.notificationService.updateNotificationReaded(id);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.notificationService.remove(+id);
   }
 }

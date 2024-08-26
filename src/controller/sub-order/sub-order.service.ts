@@ -25,9 +25,9 @@ export class SubOrderService {
     try {
       const checkSubOrderIsExist = await this.subOrderModel.findOne({
         customerId: createSubOrderDto.customerId,
-      })
-      if(checkSubOrderIsExist) {
-        await this.remove(checkSubOrderIsExist._id)
+      });
+      if (checkSubOrderIsExist) {
+        await this.remove(checkSubOrderIsExist._id);
       }
       const newSubOrder = new this.subOrderModel(createSubOrderDto);
       const saveItems = createSubOrderDto.items.map(async (item) => {
@@ -125,22 +125,24 @@ export class SubOrderService {
         throw new NotFoundException(`SubOrder with ID ${id} not found`);
       }
       if (updateSubOrderDto.voucher2t) {
-        const dataVoucher = await this.adminVoucherService.findOneById(
+        const dataVoucher: any = await this.adminVoucherService.findOneById(
           updateSubOrderDto.voucher2t,
         );
         if (dataVoucher.type === 'Hoàn tiền') {
           const discountAmount = subOrder.total * (dataVoucher.percent / 100);
-          const discountToApply = discountAmount > dataVoucher.maximum_reduction
-            ? dataVoucher.maximum_reduction
-            : discountAmount;
+          const discountToApply =
+            discountAmount > dataVoucher.maximum_reduction
+              ? dataVoucher.maximum_reduction
+              : discountAmount;
           subOrder.totalDisCount = discountToApply;
           subOrder.coinRefunt = 0;
           subOrder.total = subOrder.total - discountToApply;
         } else if (dataVoucher.type === 'Hoàn xu') {
           const coinAmount = subOrder.total * (dataVoucher.percent / 100);
-          const coinToApply = coinAmount > dataVoucher.maximum_reduction
-            ? dataVoucher.maximum_reduction
-            : coinAmount;
+          const coinToApply =
+            coinAmount > dataVoucher.maximum_reduction
+              ? dataVoucher.maximum_reduction
+              : coinAmount;
           subOrder.coinRefunt = coinToApply;
           subOrder.totalDisCount = 0;
         }
