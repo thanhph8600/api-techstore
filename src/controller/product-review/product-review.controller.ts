@@ -36,6 +36,12 @@ export class ProductReviewController {
     return this.productReviewService.findOne(+id);
   }
 
+  @Public()
+  @Get('rating/shop/:id')
+  getRatingByShop(@Param('id') id: string) {
+    return this.productReviewService.getRateingByIdShop(id);
+  }
+
   @Patch(':id')
   update(
     @Param('id') id: string,

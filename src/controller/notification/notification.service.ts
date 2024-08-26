@@ -47,6 +47,10 @@ export class NotificationService {
               {
                 path: 'id_product',
                 select: 'name , thumbnails',
+              },
+              {
+                path: 'id_color',
+                select: 'value thumbnail',
               }
             ]
           },

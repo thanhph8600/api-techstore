@@ -116,7 +116,8 @@ export class ProductService {
         }
       }),
     );
-    return handleThumbnailListProduct(listProducts);
+    const list = getRandomProducts(listProducts, listProducts.length);
+    return handleThumbnailListProduct(list);
   }
 
   async findOne(id: ObjectId) {
@@ -412,3 +413,15 @@ export const checkDiscount = (startTime: string, endTime: string) => {
   const end = new Date(endTime);
   return now >= start && now <= end;
 };
+export function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+  }
+  return array;
+}
+
+export function getRandomProducts(products, numProducts) {
+  const shuffledProducts = shuffleArray(products);
+  return shuffledProducts.slice(0, numProducts);
+}

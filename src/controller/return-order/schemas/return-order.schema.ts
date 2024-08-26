@@ -50,7 +50,8 @@ export class ReturnOrder {
     })
     status: string;
 
-    statusUpdate?: { key: string; value: Date }[];
+    @Prop({ default: [] })
+    statusUpdate: { key: string; value: Date }[];
 
     @Prop({ type: Date, default: Date.now })
     returnDate: Date;

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument, Types, ObjectId } from 'mongoose';
 
 export type ItemsOrderDocument = HydratedDocument<ItemsOrder>;
 
@@ -60,10 +60,7 @@ export class ItemsOrder {
 
   @Prop({ type: Number, default: 0 })
   coinRefunt: number;
-
   
-
-
   @Prop({
     type: Types.ObjectId,
     required: false,
@@ -101,6 +98,9 @@ export class ItemsOrder {
 
   @Prop({ type: Date, required: false, default: null })
   DeliveryTime: Date;
+
+  @Prop({ type: Types.ObjectId, required: false, ref: 'ReturnOrder' })
+  returnOrderId?: Types.ObjectId;
 
   @Prop({ type: Date, default: Date.now })
   created: Date;

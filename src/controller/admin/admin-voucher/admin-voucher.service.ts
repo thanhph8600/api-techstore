@@ -73,8 +73,8 @@ export class AdminVoucherService {
     }
   }
 
-  update(id: number, updateAdminVoucherDto: UpdateAdminVoucherDto) {
-    return `This action updates a #${id} adminVoucher`;
+  update(id: string, updateAdminVoucherDto: UpdateAdminVoucherDto) {
+    return this.adminVoucherModal.updateOne({_id: id}, updateAdminVoucherDto)
   }
 
   async remove(id: string) {

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ItemsOrderService } from './items-order.service';
 import { ItemsOrderController } from './items-order.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -7,7 +7,8 @@ import { ShopModule } from '../seller/shop/shop.module';
 import { ProductPriceModule } from '../variation/product-price/product-price.module';
 import { NotificationModule } from '../notification/notification.module';
 import { WalletModule } from '../wallet/wallet.module';
-
+import { CustomerRewardModule } from '../customer-reward/customer-reward.module';
+import { VoucherModule } from '../marketing/voucher/voucher.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -16,10 +17,12 @@ import { WalletModule } from '../wallet/wallet.module';
     ShopModule,
     ProductPriceModule,
     NotificationModule,
-    WalletModule
+    WalletModule,
+    CustomerRewardModule,
+    VoucherModule,
   ],
   controllers: [ItemsOrderController],
   providers: [ItemsOrderService],
   exports: [ItemsOrderService],
 })
-export class ItemsOrderModule {}
+export class ItemsOrderModule { }

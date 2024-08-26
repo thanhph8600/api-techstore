@@ -60,10 +60,36 @@ export class ProductReviewService {
     })
     return productReviews;
   }
+  async getRateingByIdShop(id: string) {
+    try {
+      const listReview = await this.productReviewModel
+      .find()
+      .populate({
+        path: 'productId',
+      })
+      .populate({
+        path: 'customerId',
+        select: 'name phone avata',
+      })
+      .lean()
+      .exec();
+      const listReviewsByShop = listReview?.filter((item: any) => item.productId.id_shop[0].toString() === id.toString());
+      const rating = listReviewsByShop.reduce((a, b) => a + b.rating, 0) / listReviewsByShop.length || 0;
+      const data = {
+        rating: rating.toFixed(1),
+        listReview: listReviewsByShop
+      }
+      return data;
+    }
+    catch (error) {
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    
+  }
   findOne(id: number) {
     return `This action returns a #${id} productReview`;
   }
-
+  
   update(id: number, updateProductReviewDto: UpdateProductReviewDto) {
     console.log(updateProductReviewDto);
     return `This action updates a #${id} productReview`;

@@ -63,7 +63,7 @@ export class ItemsSubOrderService {
           populate: [
             {
               path: 'id_color',
-              select: 'value',
+              select: 'value thumbnail',
             },
             {
               path: 'id_product',

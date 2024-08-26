@@ -9,6 +9,8 @@ import { SubOrderModule } from '../sub-order/sub-order.module';
 import { CartModule } from '../cart/cart.module';
 import { CustomerRewardModule } from '../customer-reward/customer-reward.module';
 import { WalletModule } from '../wallet/wallet.module';
+import { AdminVoucherModule } from '../admin/admin-voucher/admin-voucher.module';
+import { VoucherModule } from '../marketing/voucher/voucher.module';
 
 @Module({
   imports: [
@@ -18,7 +20,9 @@ import { WalletModule } from '../wallet/wallet.module';
     SubOrderModule,
     CartModule,
     CustomerRewardModule,
-    WalletModule
+    WalletModule,
+    AdminVoucherModule,
+    VoucherModule,
   ],
   controllers: [OrderController],
   providers: [OrderService],

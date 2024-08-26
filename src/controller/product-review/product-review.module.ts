@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ProductReview, ProductReviewSchema } from './schemas/product-review.schema';
 import { ItemsOrderModule } from '../items-order/items-order.module';
 import { CustomerRewardModule } from '../customer-reward/customer-reward.module';
+import { ShopModule } from '../seller/shop/shop.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { CustomerRewardModule } from '../customer-reward/customer-reward.module'
       },
     ]),
     ItemsOrderModule,
-    CustomerRewardModule
+    CustomerRewardModule,
+    ShopModule,
   ],
   controllers: [ProductReviewController],
   providers: [ProductReviewService],

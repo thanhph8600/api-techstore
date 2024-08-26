@@ -71,6 +71,7 @@ export class CustomerRewardService {
       const customerReward = await this.customerRewardModel.findOneAndUpdate(
         { customerId: id },
         { $inc: { coin: +coin } },
+        { new: true }
       );
       return customerReward;
     } catch (error) {

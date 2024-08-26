@@ -57,6 +57,7 @@ export class CartService {
             },
             {
               path: 'id_color',
+              select: 'value thumbnail',
             },
             {
               path: 'id_size',

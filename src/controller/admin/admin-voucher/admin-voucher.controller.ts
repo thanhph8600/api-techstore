@@ -38,7 +38,7 @@ export class AdminVoucherController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAdminVoucherDto: UpdateAdminVoucherDto) {
-    return this.adminVoucherService.update(+id, updateAdminVoucherDto);
+    return this.adminVoucherService.update(id, updateAdminVoucherDto);
   }
 
   @Public()

@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ReturnOrderSchema } from './schemas/return-order.schema';
 import { ItemsOrderModule } from '../items-order/items-order.module';
 import { NotificationModule } from '../notification/notification.module';
+import { WalletModule } from '../wallet/wallet.module';
 
 @Module({
   imports: [
@@ -16,8 +17,10 @@ import { NotificationModule } from '../notification/notification.module';
     ]),
     ItemsOrderModule,
     NotificationModule,
+    WalletModule,
   ],
   controllers: [ReturnOrderController],
   providers: [ReturnOrderService],
+  exports: [ReturnOrderService],
 })
 export class ReturnOrderModule {}

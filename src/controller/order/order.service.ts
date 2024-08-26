@@ -10,6 +10,7 @@ import { SubOrderService } from '../sub-order/sub-order.service';
 import { CartService } from '../cart/cart.service';
 import { CustomerRewardService } from '../customer-reward/customer-reward.service';
 import { WalletService } from '../wallet/wallet.service';
+import { AdminVoucherService } from '../admin/admin-voucher/admin-voucher.service';
 
 @Injectable()
 export class OrderService {
@@ -20,7 +21,8 @@ export class OrderService {
     private readonly subOrderService: SubOrderService,
     private readonly cartService: CartService,
     private readonly customerRewardService: CustomerRewardService,
-    private readonly walletService: WalletService
+    private readonly walletService: WalletService,
+    private readonly adminVoucherService: AdminVoucherService
   ) {}
   async create(createOrderDto: CreateOrderDto) {
     try {
@@ -35,6 +37,15 @@ export class OrderService {
       );
       const checkStockResults = await Promise.all(checkStockPromises.flat());
       const allInStock = checkStockResults.every((result) => result);
+      if(createOrderDto.voucher2t){
+        const checkUsage = await this.adminVoucherService.findOneById(createOrderDto.voucher2t);
+        if(checkUsage.maximum_total_usage < 1){
+          return {
+            status: 290,
+            message: 'Voucher đã hết lượt sử dụng'
+          }
+        }
+      }
       if (!allInStock) {
         this.subOrderService.remove(createOrderDto.subOrderId);
         return {
@@ -50,6 +61,16 @@ export class OrderService {
           ),
         );
         await Promise.all(updateStockPromises.flat());
+      }
+      if(createOrderDto.voucher2t){
+        const checkUsage = await this.adminVoucherService.findOneById(createOrderDto.voucher2t);
+        if(checkUsage.maximum_total_usage < 1){
+          return {
+            status: 290,
+            message: 'Voucher đã hết lượt sử dụng'
+          }
+        }
+      await this.adminVoucherService.update(createOrderDto.voucher2t, { maximum_total_usage:  checkUsage.maximum_total_usage - 1 })
       }
       const newOrder = new this.orderModel(createOrderDto);
       await newOrder.save();
