@@ -102,13 +102,11 @@ export class ShopService {
 
   async update(payload: payload, updateShopDto: UpdateShopDto) {
     try {
-      console.log(updateShopDto);
       const shop = await this.create(payload);
       const newUpdate = await this.shopModule.findByIdAndUpdate(
         shop._id,
         updateShopDto,
       );
-      console.log(newUpdate);
       return newUpdate;
     } catch (error) {
       console.log('error update shop' + error);
